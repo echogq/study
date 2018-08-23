@@ -225,7 +225,7 @@ public class HttpRequestor {
 		Date d = new Date();
 		String s = null;
 		/** 输出格式: 2014-5-05 00:00:00 大写H为24小时制 */
-		DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ==>");
+		DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS ==>");
 		s = sdf.format(d);
 		System.out.println(s + "ThreadID=" + Thread.currentThread().getId() + " " + outStr);
 	}

@@ -60,10 +60,11 @@ public static Map<String, Integer> mTimeMap = new HashMap<String, Integer>();
 					bIsStream = true;
 				}
 				if (line.contains("Connection: Close")) {
-					HttpRequestor.timeLog("=======================Close=======================");;
+					HttpRequestor.timeLog("=====================Connection: Close=========================");;
 				}
 				HttpRequestor.timeLog(line);
 				if (line.contains("Location: ")) {
+					HttpRequestor.timeLog("=========================" + line);;
 					break;
 				}
 				if(sHeader.isEmpty() && !line.contains("HTTP"))
@@ -73,7 +74,8 @@ public static Map<String, Integer> mTimeMap = new HashMap<String, Integer>();
 				}
 				sHeader += line + "\r\n";
 				if (line.length() == 0) {
-					break;
+					HttpRequestor.timeLog("=======================line.length() == 0=======================");;
+					//break;
 				}
 			}
 		}
@@ -285,8 +287,8 @@ public static Map<String, Integer> mTimeMap = new HashMap<String, Integer>();
 		
 		if((mSocket == null) || (mSocket.isConnected() == false))
 		{
-			HttpRequestor.timeLog("新建连接： " + host + ":" + port);
 			mSocket = new Socket(host, port);
+			HttpRequestor.timeLog("新建连接： 本地端口=" + mSocket.getLocalPort() + " 服务器=" + host + ":" + port);
 	        
 	        out = new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream()));
 	        in = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
