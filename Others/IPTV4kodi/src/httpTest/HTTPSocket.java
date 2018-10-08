@@ -10,23 +10,23 @@ import java.util.Map;
 
 public class HTTPSocket
 {
-private static final int BLOCKSIZE = 10240;
-//private static OutputStream mLocalOS = null;
-private static Socket mSocket;
-private static BufferedWriter out;
-private static BufferedReader in;
-private static String sHeader = "";
-private static String sHeaderBuf = "";
-private static List<String> listFileStr = new LinkedList<String>();
-private static List<String> listHtmlStr = new LinkedList<String>();
-private static Thread bufThread = null;
-private static boolean bStopThread = false;
-private static int doneSize = 0;
-private static byte[] bufBytes = null;
-private static int iPort = 0;
-private static String sHost = "";
-private static int iPackages = 0;
-public static Map<String, Integer> mTimeMap = new HashMap<String, Integer>();
+	private static final int BLOCKSIZE = 10240;
+	//private static OutputStream mLocalOS = null;
+	private static Socket mSocket;
+	private static BufferedWriter out;
+	private static BufferedReader in;
+	private static String sHeader = "";
+	private static String sHeaderBuf = "";
+	private static List<String> listFileStr = new LinkedList<String>();
+	private static List<String> listHtmlStr = new LinkedList<String>();
+	private static Thread bufThread = null;
+	private static boolean bStopThread = false;
+	private static int doneSize = 0;
+	private static byte[] bufBytes = null;
+	private static int iPort = 0;
+	private static String sHost = "";
+	private static int iPackages = 0;
+	public static Map<String, Integer> mTimeMap = new HashMap<String, Integer>();
 
 //    public static void main(String[ ] args) throws UnknownHostException, IOException
 //    {
@@ -35,7 +35,7 @@ public static Map<String, Integer> mTimeMap = new HashMap<String, Integer>();
 //        newHttpRequest(host, port, "/PLTV/88888888/224/3221225684/index.m3u8");
 //    }
 
-	public static void newHttpRequest(String host, int port, String webPath, boolean bDownToBuf, OutputStream mLocalOS)
+	public static void newHttpRequest(String host, int port, String webPath, boolean bDownToBuf, OutputStream leftOS)
 			throws UnknownHostException, IOException, MalformedURLException {
 		if(sHost.length() == 0)
 		{
@@ -45,8 +45,10 @@ public static Map<String, Integer> mTimeMap = new HashMap<String, Integer>();
 		String line = "";
 		int iDataLen = 0;
 		boolean bIsStream = false;
+		
+		
 		if(/*(!bDownToBuf) && */(sHeaderBuf.length() == 0) || !webPath.contains(".ts"))
-		{
+		{//不是ts文件
 			connectAndRequest(sHost, iPort, webPath);
 
 			// 读取响应 头部
@@ -79,7 +81,7 @@ public static Map<String, Integer> mTimeMap = new HashMap<String, Integer>();
 				}
 			}
 		}
-		else
+		else//是ts文件
 		{
 			sHeader = sHeaderBuf; 
 			bIsStream = true;
@@ -89,13 +91,13 @@ public static Map<String, Integer> mTimeMap = new HashMap<String, Integer>();
 		if (line.length() > 0) {
 			destroyIPTVConnection();
 			HttpRequestor.timeLog(line.substring(10));
-			jump302(line, mLocalOS);
+			jump302(line, leftOS);
 		} else {
 			if(bDownToBuf){
 				sHeaderBuf = sHeader; //buffering
 			}
-			else if(mLocalOS != null)
-				mLocalOS.write(sHeader.getBytes());
+			else if(leftOS != null)
+				leftOS.write(sHeader.getBytes());
 			
 			sHeader = "";
 
@@ -149,8 +151,8 @@ public static Map<String, Integer> mTimeMap = new HashMap<String, Integer>();
 					}
 				}
 				listHtmlStr.clear();*/
-				if(mLocalOS != null)
-					mLocalOS.write(sBody.getBytes());
+				if(leftOS != null)
+					leftOS.write(sBody.getBytes());
 
 			} else {//二进制流数据
 				byte[] cbuf = new byte[BLOCKSIZE];
@@ -165,8 +167,8 @@ public static Map<String, Integer> mTimeMap = new HashMap<String, Integer>();
 				
 				if(doneSize > 0)
 				{
-					if(mLocalOS != null)
-						mLocalOS.write(bufBytes, 0, doneSize);
+					if(leftOS != null)
+						leftOS.write(bufBytes, 0, doneSize);
 					iDataLen -= doneSize;
 					doneSize = 0;
 				}
@@ -223,11 +225,11 @@ public static Map<String, Integer> mTimeMap = new HashMap<String, Integer>();
 					}
 					else {
 						len = mSocket.getInputStream().read(cbuf, 0, Math.min(count, BLOCKSIZE));
-						if(mLocalOS != null)
+						if(leftOS != null)
 							//HttpRequestor.timeLog("================================ write()" + len);
-							mLocalOS.write(cbuf, 0, len);
+							leftOS.write(cbuf, 0, len);
 							//HttpRequestor.timeLog("*************** flush(" +iTT);
-							mLocalOS.flush();
+							leftOS.flush();
 							//HttpRequestor.timeLog("*************** flush)" +iTT);
 					}
 					
@@ -327,7 +329,7 @@ public static Map<String, Integer> mTimeMap = new HashMap<String, Integer>();
 		newHttpRequest(localURL.getHost(), localURL.getPort(), localURL.getFile(), false, localOS);
 	}
 
-	public static void newUrl(String sIPTV_URL, OutputStream localOS) {
+	public static void rightGetUrl(String sIPTV_URL, OutputStream leftOS) {
 		HttpRequestor.timeLog(sIPTV_URL + " newUrl***************** \r\n");
 //		mLocalOS = localOS;
 		try {
@@ -341,7 +343,7 @@ public static Map<String, Integer> mTimeMap = new HashMap<String, Integer>();
 					{
 						HttpRequestor.timeLog(sIPTV_URL + " 出错了********** \r\n");
 					}
-					newHttpRequest(localURL.getHost(), localURL.getPort(), localURL.getFile(), false, localOS);
+					newHttpRequest(localURL.getHost(), localURL.getPort(), localURL.getFile(), false, leftOS);
 					return;
 				}
 				// 终止buf线程
@@ -357,7 +359,7 @@ public static Map<String, Integer> mTimeMap = new HashMap<String, Integer>();
 
 				bStopThread = false;
 				// 读取buf写入+下载
-				newHttpRequest(localURL.getHost(), localURL.getPort(), localURL.getFile(), false, localOS);
+				newHttpRequest(localURL.getHost(), localURL.getPort(), localURL.getFile(), false, leftOS);
 				// 清理线程历史数据
 				resetBufData();
 				bufThread = null;

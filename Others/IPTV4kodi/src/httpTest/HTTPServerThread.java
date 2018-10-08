@@ -42,7 +42,7 @@ public class HTTPServerThread extends Thread  {
                 	   public void run(){
                 	     System.out.println("Runnable running");
 			                try {
-								afterConnect(svrSocket);
+								afterLeftConnect(svrSocket);
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -81,7 +81,7 @@ public class HTTPServerThread extends Thread  {
         }
     }
 
-	public static void afterConnect(Socket svrSocket) throws IOException {
+	public static void afterLeftConnect(Socket svrSocket) throws IOException {
 		System.out.println("\r\n");
 		System.out.println("\r\n一个客户端连上了！：：：：：：：：：");
 
@@ -123,13 +123,13 @@ public class HTTPServerThread extends Thread  {
 
 		    //Socket mSocket = new Socket("127.0.0.1", 7788); 
 		    //InputStream piIns = svrSocket.getInputStream();
-		    OutputStream localOS = svrSocket.getOutputStream();
+		    OutputStream leftOS = svrSocket.getOutputStream();
 //		    InputStream localIs = svrSocket.getInputStream();
 		    
 		    try {
 		    	if(!((sLastURL.contains(".ts") && sIPTV_URL.contains(".ts"))))
 		    	{
-			    	HTTPSocket.newUrl(sIPTV_URL, localOS);
+			    	HTTPSocket.rightGetUrl(sIPTV_URL, leftOS);
 			    	sLastURL = sIPTV_URL;
 			    	if(!sIPTV_URL.contains(".ts"))
 			    	{
@@ -139,9 +139,9 @@ public class HTTPServerThread extends Thread  {
 		    	else
 		    	{
 		    		System.out.println("【访问m3u8先】：" + sLastm3u8URL);
-		    		HTTPSocket.newUrl(sLastm3u8URL, null);
+		    		HTTPSocket.rightGetUrl(sLastm3u8URL, null);
 		    		System.out.println("【访问ts】：" + sIPTV_URL);
-		    		HTTPSocket.newUrl(sIPTV_URL, localOS);
+		    		HTTPSocket.rightGetUrl(sIPTV_URL, leftOS);
 			    	sLastURL = sIPTV_URL;
 			    	
 //		    		HTTPSocket.mTimeMap.remove(sIPTV_URL.split("/")[sIPTV_URL.split("/").length-1]);
