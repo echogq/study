@@ -128,7 +128,12 @@ TDXDLL2(6,ROUND(DIF0*100),ROUND(DIF*100),ROUND(DIF3*100) + DIF13/100);
 此卖:=IF(卖点,收盘比,0);
 
 差价:=IF(卖点,此卖 - 前买,0);
-{画差价竖线}
+{画差价竖线};
+
+盈次:SUM(卖点 AND 差价>0, 0),NODRAW;
+亏次:SUM(卖点 AND 差价<=0, 0),NODRAW;
+胜率:盈次/(盈次+亏次) * 100,NODRAW;
+
 STICKLINE(卖点 AND 差价>0,此卖,前买,10,-1),COLORRED;
 STICKLINE(卖点 AND 差价<=0,此卖,前买,10,-1),COLORGREEN;
 
