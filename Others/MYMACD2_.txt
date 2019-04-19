@@ -147,6 +147,14 @@ STICKLINE(卖点 AND 差价<=0,此卖,前买,10,-1),COLORGREEN;
 
 IF(BARSLAST(卖点)>BARSLAST(买点) OR 卖点,收盘比,DRAWNULL),COLOR004080,LINETHICK2;
 
+后期:=20;
+QL:IF(BARSLAST(买点) ==后期, LLV(收盘比,后期),0);
+W:IF(BARSLAST(买点) ==后期, (REF(收盘比,后期)),0);
+Z:IF(BARSLAST(买点) ==后期, (LLV(收盘比,后期)-(REF(收盘比,后期)))<0,0);
+日内波:SUM(IF(BARSLAST(买点) ==后期, HHV(收盘比,后期)+LLV(收盘比,后期)-(2*REF(收盘比,后期)),0),0);
+
+买后下:SUM(IF(BARSLAST(买点) ==后期, (LLV(收盘比,后期)-(REF(收盘比,后期)))<0,0),0);
+
 {总计:SUM(差价,0),DOTLINE,COLOR006000,LINETHICK9;
 复利:MULAR(C/REF(C,1)*0.9995,0)};
 
