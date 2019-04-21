@@ -81,19 +81,23 @@ TDXDLL2(6,ROUND(DIF0*100),ROUND(DIF*100),ROUND(DIF3*100) + DIF13/100);
 {加仓阶段:=DEA>DEA3};
 
 加仓阶段:=DEA>=-2;
-
+{
+全买点:=CROSS(DIF0, LINE0/10)  ;
+全卖点:=CROSS(LINE0/10, DIF0) ;
+条件:=(LINE0/10>DIF0) ;
+};
 {
 全买点:=CROSS(MAOBV,MAOBV2) ;
 全卖点:=CROSS(MAOBV2,MAOBV) ;
 条件:=(MAOBV2>MAOBV) ;
-}
-
+};
 全买点:=CROSS(DIF,DEA) ;
 全卖点:=CROSS(DEA,DIF) ;
 条件:=(DEA>DIF);
 
+
 {全买点:CROSS(DIF0,DEA) ;
-全卖点:CROSS(DEA,DIF0) ;}
+全卖点:CROSS(DEA,DIF0) };
 
 前买非当日:=REF(DATE,BARSLAST(全买点)+1)<DATE;
 
