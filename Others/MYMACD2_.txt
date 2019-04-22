@@ -56,7 +56,7 @@ EXITLONG:= CROSS(DEA0, DIF0) AND (DIF0+0<DEA OR DEA<2) ,NODRAW;
 {收盘:=(((C )/REF(C,1) -1) *100) -0.0005;
 收盘比:SUM(收盘,0),COLORAAAAAA};
 
-收盘:(C/REF(C,1)) -1;
+收盘:(C-REF(C,1))/REF(C,BARSLAST(C));
 收盘比:SUM(收盘*100,0),COLORAAAAAA;
 
 {DRAWICON(ENTERLONG,收盘比,1);
@@ -140,12 +140,12 @@ SSS:=12;
 
 买后下:SUM(IF(BARSLAST(买点) ==后期, (LLV(收盘比,后期)-(REF(收盘比,后期)))<0,0),0),NODRAW;
 盈次+亏次,NODRAW;
-
-{总计:SUM(差价,0),DOTLINE,COLOR006000,LINETHICK9;
-复利:MULAR(C/REF(C,1)*0.9995,0)};
-
-复利:IF(差价=0, 1, (差价-0.0005) /100 + 1);
+{
+复利:IF(差价=0, 1, (差价-0.05) /100 + 1);
 总计:MULAR(复利,0)*100-100,DOTLINE,COLOR006000,LINETHICK9;
+}
+复利:IF(差价=0, 0, (差价-0.05));
+总计:SUM(复利,0),DOTLINE,COLOR006000,LINETHICK9;
 
 MA(总计, 200);
 
