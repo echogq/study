@@ -4,3 +4,6 @@
 
 OBV 50
 
+TDX txt to lc5，追加
+TDX 怎么显示无小数点的整数
+
