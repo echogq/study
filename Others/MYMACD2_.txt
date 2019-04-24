@@ -84,9 +84,8 @@ TDXDLL2(6,ROUND(DIF0*100),ROUND(DIF*100),ROUND(DIF3*100) + DIF13/100);
 };
 
 {以下为CODING代码};
-{加仓阶段:=DEA>DEA3};
-
-加仓阶段:=DEA>=-2;
+{加仓阶段:=DEA>DEA3;
+加仓阶段:=DEA>=-2};
 {
 全买点:=CROSS(DIF0, LINE0/10)  ;
 全卖点:=CROSS(LINE0/10, DIF0) ;
@@ -97,10 +96,11 @@ TDXDLL2(6,ROUND(DIF0*100),ROUND(DIF*100),ROUND(DIF3*100) + DIF13/100);
 全卖点:=CROSS(MAOBV2,MAOBV) ;
 条件:=(MAOBV2>MAOBV) ;
 };
-全买点:=CROSS(DIF,DEA) ;
+{全买点:=CROSS(DIF,DEA) };
+全买点:=CROSS(DIF,DEA)  AND NOT(DEA<DIF3 AND DIF3<-2);
 全卖点:=CROSS(DEA,DIF) ;
-条件:=(DEA>DIF);
-
+{条件:=(DEA>DIF)};
+条件:=BARSLAST(全买点)>BARSLAST(全卖点);
 
 {全买点:CROSS(DIF0,DEA) ;
 全卖点:CROSS(DEA,DIF0) };
@@ -113,8 +113,8 @@ TDXDLL2(6,ROUND(DIF0*100),ROUND(DIF*100),ROUND(DIF3*100) + DIF13/100);
 有金可买:=IF( DEA>DIF AND REF(DATE,BARSLAST(CROSS(0.5, 有金可买0)))<DATE,1,0),COLOR80FFFF,LINETHICK3};
 {有金可买-5.5};
 
-不同:=NOT(有金可买 = 有金可买0)-8;
-卖点0:=全卖点 AND NOT(VALUEWHEN(REF(全买点,1), DATE) = DATE);
+{不同:=NOT(有金可买 = 有金可买0)-8;
+卖点0:=全卖点 AND NOT(VALUEWHEN(REF(全买点,1), DATE) = DATE)};
 
 当日第一根:= NOT(REF(DATE,1) = DATE);
 
@@ -157,7 +157,7 @@ SSS:=12;
 总计:SUM(复利,0),DOTLINE,COLOR006000,LINETHICK9;
 }
 
-MA(总计, 200);
+{MA(总计, 200)};
 
 前高:HHV(总计,0);
 回:总计-前高,NODRAW;
