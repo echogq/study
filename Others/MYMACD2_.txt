@@ -175,7 +175,7 @@ SSS:=12;
 {MA(总计, 200)};
 
 前高:HHV(总计,0);
-回:总计-前高,NODRAW;
+回:((总计+100)/(前高+100)-1)*100,NODRAW;
 最回:LLV(回,0),NODRAW,COLOR008000;
 
 
@@ -193,8 +193,8 @@ DRAWICON(全买点,-5.2,38);
 
 
 {以下为用DLL计算的结果}
-动作:= IFF(全买点, 1, IFF(全卖点, 2, 0)) ;
-总资产:TDXDLL2(1,C,动作,IFF(0,MINUTE,DATE{DAY+(MONTH*100)})),COLORWHITE,NODRAW;
+{动作:= IFF(全买点, 1, IFF(全卖点, 2, 0)) ;
+总资产:TDXDLL2(1,C,动作,IFF(0,MINUTE,DATE)),COLORWHITE,NODRAW;
 最大回撤:TDXDLL2(2,0,0,0),NODRAW;
 收益率:TDXDLL2(3,C,C,C),NODRAW,COLORFFFF80;
-
+};
