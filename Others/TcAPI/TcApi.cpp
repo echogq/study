@@ -575,21 +575,26 @@ void CallTcAPI()
 					0597916B  |.  FF52 64       call dword ptr ds:[edx+0x64]             ;  TC...->Send Call。。。Tc.05092C40(42c40/41c40)
 					0597916E  |.  85F6          test esi,esi                             ;  TC...->Send Call。。。End
 */
-/*
+
 				MODULEINFO moduleinfo = {0};
-				GetModuleInformation(GetCurrentProcess(), GetModuleHandle("Tc.dll"), &moduleinfo, sizeof(moduleinfo));
+				GetModuleInformation(GetCurrentProcess(), GetModuleHandle("invest.dll"), &moduleinfo, sizeof(moduleinfo));
 				//_tprintf(TEXT("with GetModuleInformation = 0x%x\r\n"), (DWORD)moduleinfo.EntryPoint+0x42c40);
-				px25E = (void*)((DWORD)moduleinfo.lpBaseOfDll+0x41c40);
+				px25E = (void*)((DWORD)moduleinfo.lpBaseOfDll+ 0x40744);
+
+				GetModuleInformation(GetCurrentProcess(), GetModuleHandle("tc.dll"), &moduleinfo, sizeof(moduleinfo));
+				void *px25E22 = (void*)((DWORD)moduleinfo.lpBaseOfDll+ 0x42c40);
+
 				__asm mov eax,px25E;
 
 				__asm  push 0x0;
 				__asm  push 0x324;
 				__asm  push 0x1788;
-				__asm  push eax;
+				__asm  push eax;//invest.dll+0x40744
+				__asm  mov eax, px25E22;
 				__asm  mov ecx,esi;
-				__asm  call eax;
+				__asm  call eax; //call tc.0x42c40
 
-*/
+
 //__asm mov eax,addr;
 //__asm  push eax;
 //__asm  push 0x01;
@@ -740,8 +745,8 @@ BOOL CALLBACK DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		case IDOK:  
 			{  
 // 				MessageBox(hDlg,"哇哈哈...我写出来了","提示",MB_ICONINFORMATION);  
-			//CallTcAPI();
-			CallAddInStock();
+			CallTcAPI();
+			//CallAddInStock();
 
 		}
 			return (TRUE);  
