@@ -576,24 +576,52 @@ void CallTcAPI()
 					0597916E  |.  85F6          test esi,esi                             ;  TC...->Send Call。。。End
 */
 
-				MODULEINFO moduleinfo = {0};
-				GetModuleInformation(GetCurrentProcess(), GetModuleHandle("invest.dll"), &moduleinfo, sizeof(moduleinfo));
-				//_tprintf(TEXT("with GetModuleInformation = 0x%x\r\n"), (DWORD)moduleinfo.EntryPoint+0x42c40);
-				px25E = (void*)((DWORD)moduleinfo.lpBaseOfDll+ 0x40744);
+				//MODULEINFO moduleinfo = {0};
+				//GetModuleInformation(GetCurrentProcess(), GetModuleHandle("invest.dll"), &moduleinfo, sizeof(moduleinfo));
+				////_tprintf(TEXT("with GetModuleInformation = 0x%x\r\n"), (DWORD)moduleinfo.EntryPoint+0x42c40);
+				//px25E = (void*)((DWORD)moduleinfo.lpBaseOfDll+ 0x40744);
 
-				GetModuleInformation(GetCurrentProcess(), GetModuleHandle("tc.dll"), &moduleinfo, sizeof(moduleinfo));
-				void *px25E22 = (void*)((DWORD)moduleinfo.lpBaseOfDll+ 0x42c40);
+				//GetModuleInformation(GetCurrentProcess(), GetModuleHandle("tc.dll"), &moduleinfo, sizeof(moduleinfo));
+				//void *px25E22 = (void*)((DWORD)moduleinfo.lpBaseOfDll+ 0x42c40);
 
-				__asm mov eax,px25E;
+				//__asm mov eax,px25E;
 
-				__asm  push 0x0;
-				__asm  push 0x324;
-				__asm  push 0x1788;
-				__asm  push eax;//invest.dll+0x40744
-				__asm  mov eax, px25E22;
-				__asm  mov ecx,esi;
-				__asm  call eax; //call tc.0x42c40
+				//__asm  push 0x0;
+				//__asm  push 0x324;
+				//__asm  push 0x1788;
+				//__asm  push eax;//invest.dll+0x40744
+				//__asm  mov eax, px25E22;
+				//__asm  mov ecx,esi;
+				//__asm  call eax; //call tc.0x42c40
 
+/*
+04877C2A    FF75 1C         push dword ptr ss:[ebp+0x1C]	1
+04877C2D    FF75 18         push dword ptr ss:[ebp+0x18]	0
+04877C30    FF75 14         push dword ptr ss:[ebp+0x14]	0
+04877C33    6A 02           push 0x2
+04877C35    FF75 10         push dword ptr ss:[ebp+0x10]             ; Tc.047900CA
+04877C38    FF75 0C         push dword ptr ss:[ebp+0xC]  Tc.dll+0x70000            ; Tc.??_C@_0BB@DBEFDDME@chinese?9hongkong?$AA@@estructor?8?$AA@@D@2@@std@@8r@D@2@@std@@8:allocator<std::basic_string<char,std::char_traits<char>,std::allocator<char> > > >::_Iterator<1>::_Iterator<1>>std::char_traits<char>,std::allocator<char> > > ><char...
+04877C3B    E8 16E8FEFF     call TcApi.04866456                      ; //Real send...
+04877C40    5D              pop ebp                                  ; Tc.??_C@_0BB@DBEFDDME@chinese?9hongkong?$AA@@estructor?8?$AA@@D@2@@std@@8r@D@2@@std@@8:allocator<std::basic_string<char,std::char_traits<char>,std::allocator<char> > > >::_Iterator<1>::_Iterator<1>>std::char_traits<char>,std::allocator<char> > > ><char...
+04877C41    C3              retn
+*/
+MODULEINFO moduleinfo = {0};
+GetModuleInformation(GetCurrentProcess(), GetModuleHandle("TC.dll"), &moduleinfo, sizeof(moduleinfo));
+px25E = (void*)((DWORD)moduleinfo.lpBaseOfDll+ 0x70000);
+void *px25ECA = (void*)((DWORD)moduleinfo.lpBaseOfDll + 0x700CA);
+
+GetModuleInformation(GetCurrentProcess(), GetModuleHandle("TcApiOrg.dll"), &moduleinfo, sizeof(moduleinfo));
+void *px25E22 = (void*)((DWORD)moduleinfo.lpBaseOfDll+ 0x6456);
+
+__asm  push 0x1;
+__asm  push 0x0;
+__asm  push 0x0;
+__asm  push 0x2;
+__asm  push px25ECA;
+__asm  push px25E;
+__asm  mov eax, px25E22;
+__asm  mov ecx,esi;
+__asm  call eax; //call tc.0x42c40
 
 //__asm mov eax,addr;
 //__asm  push eax;
@@ -696,6 +724,33 @@ void CallAddInStock()
 		//__asm  call eax;
 	}
 }
+void CallAddInStock2()
+{
+	//卖出按钮入口 Base+0x349690;
+	MODULEINFO moduleinfo = { 0 };
+	GetModuleInformation(GetCurrentProcess(), GetModuleHandleA(".\\TCPlugins\\AddinStock.dll"), &moduleinfo, sizeof(moduleinfo));
+	void *px25E22 = (void*)((DWORD)moduleinfo.lpBaseOfDll + 0x349690);
+	std::cout << "！！！！！！！！！！！！！！！！！！！::px25E22=" << px25E22 << std::endl;
+
+	//std::string tmp = "外部线程调用";
+	//const char* p = tmp.c_str();
+
+	//std::string tmp2 = "注入dll跳转onbtn内部地址执行的";
+	//const char* p2 = tmp2.c_str();
+
+	__asm  mov eax, px25E22;
+	__asm  mov ecx, esi;
+	__asm  push lable;
+	//__asm  push 0x0;
+	//__asm  push p;
+	//__asm  push p2;
+	//__asm  push 0x0;
+	__asm  jmp eax; //call 
+	__asm  lable:
+	//__asm  add esp, 0x10;
+	return;
+
+}
 
 BOOL CALLBACK DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {  
@@ -747,6 +802,7 @@ BOOL CALLBACK DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 // 				MessageBox(hDlg,"哇哈哈...我写出来了","提示",MB_ICONINFORMATION);  
 			CallTcAPI();
 			//CallAddInStock();
+			//CallAddInStock2();
 
 		}
 			return (TRUE);  
