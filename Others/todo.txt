@@ -53,3 +53,8 @@ TDX 怎么显示无小数点的整数
 涨停价普卖5331跌停价普卖5332
 
 闪电融资买入5191闪电融券卖出5202
+
+hosts
+151.101.1.194 github.global.ssl.fastly.net 
+185.199.110.153 assets-cdn.github.com
+192.30.253.113 github.com
