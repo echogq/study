@@ -40,8 +40,53 @@ TDX 怎么显示无小数点的整数
 	公式模块化 = 专家公式（发出信号） + 附图引用它进行计算、画线
 	
 
-弹出闪电窗：
-	::SendMessage((HWND)0x1A1E2C, WM_COMMAND, MAKEWPARAM(5092, 0), NULL);
+void OnBuy()
+{
+	HWND hTDX_MainWnd = ::FindWindowA("TdxW_MainFrame_Class", NULL);
+	if (hTDX_MainWnd)
+	{
+	//弹出闪电窗：
+		::SendMessage((HWND)hTDX_MainWnd, WM_COMMAND, MAKEWPARAM(5092, 0), NULL);
+
+		hTDX_MainWnd = NULL;
+		while (!hTDX_MainWnd)
+		{
+			Sleep(100);
+			hTDX_MainWnd = ::FindWindowA("#32770", "闪电买入");
+		}
+		
+		CWnd *pWnd = CWnd::FromHandle(hTDX_MainWnd)->GetWindow(GW_CHILD);
+		TCHAR szBuf[256];
+
+		int idxEdit = 0;
+		while (pWnd != NULL)
+		{
+			GetClassName(pWnd->m_hWnd, szBuf, 256);
+			if (_tcsicmp(szBuf, _T("Edit")) == 0)
+			{
+				idxEdit++;
+				if (idxEdit == 3) // 1 买入价格， 3 买入数量
+				{
+					char* buf = "12000"; 
+					::SendMessage(pWnd->m_hWnd, WM_SETTEXT, 0, (long)buf);
+				}
+			}
+
+			pWnd = pWnd->GetNextWindow();
+		}
+		
+		//hTDX_MainWnd = NULL;
+		//while (!hTDX_MainWnd)
+		{
+			HWND hWnd0 = ::FindWindowExA(hTDX_MainWnd, NULL, "Button", "买 入");
+			Sleep(100);
+			SendMessage(hWnd0, BM_CLICK, 0, 0L);
+
+			//当日委托：
+			//::SendMessage((HWND)hTDX_MainWnd, WM_COMMAND, MAKEWPARAM(5333, 0), NULL);
+		}
+	}
+}
 	
 附部分：通达信交易ID调用详单
 交易委托33029闪电手5334
