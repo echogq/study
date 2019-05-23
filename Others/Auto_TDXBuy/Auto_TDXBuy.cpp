@@ -54,12 +54,18 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 			hTDX_QuickTradeWnd = ::FindWindowA("#32770", sDlgCaption);
 		}
 
-		/*
+		/*iActionID=
 		买一价闪买5081买二价闪买5082买三价闪买5083买四价闪买5084买五价闪买5085
 		买六价闪买5086买七价闪买5087买八价闪买5088买九价闪买5089买十价闪买5090
 		卖一价闪买5091卖二价闪买5092卖三价闪买5093卖四价闪买5094卖五价闪买5095
 		卖六价闪买5096卖七价闪买5097卖八价闪买5098卖九价闪买5099卖十价闪买5100
 		涨停价闪买5101跌停价闪买5102
+
+		买一价闪卖5111买二价闪卖5112买三价闪卖5113买四价闪卖5114买五价闪卖5115
+		买六价闪卖5116买七价闪卖5117买八价闪卖5118买九价闪卖5119买十价闪卖5120
+		卖一价闪卖5121卖二价闪卖5122卖三价闪卖5123卖四价闪卖5124卖五价闪卖5125
+		卖六价闪卖5126卖七价闪卖5127卖八价闪卖5128卖九价闪卖5129卖十价闪卖5130
+		涨停价闪卖5131跌停价闪卖5132
 		*/
 		//弹出闪电窗：
 		//::SendMessage((HWND)hTDX_MainWnd, WM_COMMAND, MAKEWPARAM(5085, 0), NULL);
@@ -109,9 +115,8 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 			if (_tcsicmp(szBuf, _T("Edit")) == 0)
 			{
 				idxEdit++;
-				if (idxEdit == 1) // 1 买入价格
+				if (idxEdit == 1) // 1 价格
 				{
-					// 买入价格 + 0.001
 					char temp2[256] = { 0 };
 					char tempNew[256] = { 0 };
 					while (strlen(temp2) == 0)
@@ -120,6 +125,7 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 						::SendMessageA(pWnd->m_hWnd, WM_GETTEXT, 256, (LPARAM)temp2);//EDIT的句柄，消息，接收缓冲区大小，接收缓冲区指针
 					}
 					char str[255] = { 0 };
+					// 价格 + - 0.001
 					sprintf(str, "%.3f", atof(temp2) + fPriceOffset);
 					::SendMessageA(pWnd->m_hWnd, WM_SETTEXT, 0, (LPARAM)str);
 
@@ -135,7 +141,7 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 					//CWnd::FromHandle(hTDX_QuickTradeWnd)->UpdateWindow();
 					Sleep(200);//问题：【+ 0.001】，不知道何时新的最大可买计算结束（值也可能不变）
 				}
-				if (idxEdit == 3) //  3 买入数量
+				if (idxEdit == 3) //  3 数量
 				{
 					if (NULL == pCurRateBtnWnd)
 					{
@@ -217,7 +223,6 @@ void OnBuy(char* sCode, char* sRate, float fTotalRate)
 	float fPriceOffset = 0.001;
 
 	DoTrade(sRate, sDlgCaption, iActionID, fPriceOffset, buyCount_Default, sBuyBtnTxt);
-
 }
 
 //无法更换股票，只能交易当前主图显示行情的票
@@ -232,7 +237,6 @@ void OnSell(char* sCode, char* sRate, float fTotalRate)
 	DoTrade(sRate, sDlgCaption, iActionID, fPriceOffset, buyCount_Default, sBuyBtnTxt);
 }
 
-
 // 唯一的一个 CAuto_TDXBuyApp 对象
 
 CAuto_TDXBuyApp theApp;
@@ -242,6 +246,27 @@ CAuto_TDXBuyApp theApp;
 
 BOOL CAuto_TDXBuyApp::InitInstance()
 {
+	if (3 < __argc)
+	{
+		if (strstr(__argv[0], "Auto_TDXBuy"))
+		{
+			OnBuy(__argv[1], __argv[2], atof(__argv[3]));
+		}
+		else if (strstr(__argv[0], "Auto_TDXSell"))
+		{
+			OnSell(__argv[1], __argv[2], atof(__argv[3]));
+		}
+	}
+	//if ((m_lpCmdLine[0] == _T('/0')) || (lstrcmp(m_lpCmdLine, _T("b1")) != 0))
+	//{
+	//	m_bCmdRet = TRUE;
+	//}
+	//else
+	//	m_bCmdRet = FALSE;
+	//OnSell();
+	return FALSE;
+	//============================================
+
 	// 如果一个运行在 Windows XP 上的应用程序清单指定要
 	// 使用 ComCtl32.dll 版本 6 或更高版本来启用可视化方式，
 	//则需要 InitCommonControlsEx()。  否则，将无法创建窗口。
@@ -270,21 +295,6 @@ BOOL CAuto_TDXBuyApp::InitInstance()
 	// TODO: 应适当修改该字符串，
 	// 例如修改为公司或组织名
 	SetRegistryKey(_T("应用程序向导生成的本地应用程序"));
-
-	if (3 < __argc)
-	{
-		//OnBuy(__argv[1], __argv[2], atof(__argv[3]));
-		OnSell(__argv[1], __argv[2], atof(__argv[3]));
-	}
-	//if ((m_lpCmdLine[0] == _T('/0')) || (lstrcmp(m_lpCmdLine, _T("b1")) != 0))
-	//{
-	//	m_bCmdRet = TRUE;
-	//}
-	//else
-	//	m_bCmdRet = FALSE;
-	//OnSell();
-	return FALSE;
-//============================================
 
 	CAuto_TDXBuyDlg dlg;
 	m_pMainWnd = &dlg;
