@@ -1027,16 +1027,17 @@ PluginTCalcFuncInfo g_CalcFuncSets[] =
 	{3,(pPluginFUNC)&returnWinRate},
 	{4,(pPluginFUNC)&SmoothBSCalc},
 	//{5,(pPluginFUNC)&dataExport1Minute},
-	{5,(pPluginFUNC)&getReal_BS},
+	{5,(pPluginFUNC)&getReal_BS},//根据 全卖点/全买点，算出T+1下实际的有效买卖点，返回给TDX公式
 	{6,(pPluginFUNC)&QueryDB},
 
-	{8,(pPluginFUNC)&PostMsgOf_BS},
-	{9,(pPluginFUNC)&BuyOne},
+	{8,(pPluginFUNC)&PostMsgOf_BS},//向控制台发出买卖指令
 
-	{ 10,(pPluginFUNC)&Test99 },
-	{ 11,(pPluginFUNC)&Test99 },
-	{ 12,(pPluginFUNC)&Test99 },
-	{ 13,(pPluginFUNC)&Test99 },
+	//{9,(pPluginFUNC)&BuyOne},
+	//{ 10,(pPluginFUNC)&Test99 },
+	//{ 11,(pPluginFUNC)&Test99 },
+	//{ 12,(pPluginFUNC)&Test99 },
+	//{ 13,(pPluginFUNC)&Test99 },
+
 	{ 88,(pPluginFUNC)&OutputN }, //Log输出卖出亏损的3个数值 or 3个0.0f
 	{ 89,(pPluginFUNC)&OutputP }, //Log输出卖出盈利的3个数值 or 3个0.0f
 	{0,NULL}
