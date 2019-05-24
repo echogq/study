@@ -938,7 +938,7 @@ fAction=0 表示无信号
 	}
 }
 
-void PostMsgOf_BS(int DataLen,float* pfOUT,float* pfINa,float* pfINb,float* pfINc)
+void PostMsgOf_BS(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc) //买入，卖出，周期
 {
 /*	for(int i=0;i<DataLen;i++)
 	{
@@ -975,9 +975,9 @@ void PostMsgOf_BS(int DataLen,float* pfOUT,float* pfINa,float* pfINb,float* pfIN
 			sprintf(aaa, "\r\n[TDX]指令,(%.0f_%.0f_周期：%.0f), %s,", pfINa[DataLen-1], pfINb[DataLen-1], pfINc[DataLen-1], bbb);
 			OutputDebugString(aaa);
 		}
-
 	}
 }
+
 void BuyOne(int DataLen,float* pfOUT,float* pfINa,float* pfINb,float* pfINc)
 {
 	OutputDebugString("BuyOne");
@@ -1030,7 +1030,7 @@ PluginTCalcFuncInfo g_CalcFuncSets[] =
 	{5,(pPluginFUNC)&getReal_BS},//根据 全卖点/全买点，算出T+1下实际的有效买卖点，返回给TDX公式
 	{6,(pPluginFUNC)&QueryDB},
 
-	{8,(pPluginFUNC)&PostMsgOf_BS},//向控制台发出买卖指令
+	{8,(pPluginFUNC)&PostMsgOf_BS},//向控制台发出买卖指令//(买入，卖出，周期)
 
 	//{9,(pPluginFUNC)&BuyOne},
 	//{ 10,(pPluginFUNC)&Test99 },
@@ -1040,6 +1040,7 @@ PluginTCalcFuncInfo g_CalcFuncSets[] =
 
 	{ 88,(pPluginFUNC)&OutputN }, //Log输出卖出亏损的3个数值 or 3个0.0f
 	{ 89,(pPluginFUNC)&OutputP }, //Log输出卖出盈利的3个数值 or 3个0.0f
+
 	{0,NULL}
 };
 
