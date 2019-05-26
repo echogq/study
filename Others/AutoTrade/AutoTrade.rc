@@ -1,0 +1,251 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 中文(简体，中国) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 4, 2\r\n"
+    "#pragma code_page(936)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\AutoTrade.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""l.chs\\afxres.rc""          // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MF2                 ICON                    "res\\DTZK.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_AUTOTRADE_DIALOG DIALOGEX 0, 0, 470, 338
+STYLE DS_SETFONT | DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "自动化交易控制中心"
+FONT 9, "宋体", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "确定",IDOK,413,7,50,14
+    PUSHBUTTON      "取消",IDCANCEL,413,23,50,14
+    LTEXT           "目前仓位:",IDC_STATIC,75,64,39,8
+    LTEXT           "%",IDC_STATIC,141,64,8,8
+    CONTROL         "自动买入:",IDC_CB_AUTOBUY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,186,34,46,11
+    CONTROL         "自动卖出:",IDC_CB_AUTOSELL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,186,47,51,11
+    LTEXT           "盈利: +",IDC_STATIC,279,49,30,8
+    EDITTEXT        IDC_EDIT4,310,47,19,12,ES_AUTOHSCROLL
+    LTEXT           "%",IDC_STATIC,334,49,12,8
+    LTEXT           "亏损: -",IDC_STATIC,279,63,31,8
+    EDITTEXT        IDC_EDIT5,310,61,19,12,ES_AUTOHSCROLL
+    LTEXT           "%",IDC_STATIC,334,63,12,8
+    LTEXT           "买入:",IDC_STATIC,190,99,22,8
+    LISTBOX         IDC_LIST1,177,111,42,207,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    CTEXT           "信号",IDC_STATICCMD,276,97,74,13
+    LISTBOX         IDC_LIST2,223,111,49,207,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Static",IDC_STATIC,175,7,165,68
+    CONTROL         "限制仓位",IDC_CB_PERCENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,186,18,51,11
+    EDITTEXT        IDC_EDIT_PERCENT,239,17,19,12,ES_AUTOHSCROLL
+    LTEXT           "%",IDC_STATIC,261,19,12,8
+    EDITTEXT        IDC_CUR_PERCENT,115,62,24,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    EDITTEXT        IDC_RCVBUYCODE,392,109,66,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    EDITTEXT        IDC_RCVSALECODE,350,27,48,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    LTEXT           "持仓",IDC_STATIC,17,100,18,8
+    LISTBOX         IDC_LISTINHAND,17,129,48,188,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_INFO,16,78,441,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    EDITTEXT        IDC_GETONESTOCK,350,11,48,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    PUSHBUTTON      "全部卖出",IDSALEALL,56,96,64,14
+    PUSHBUTTON      "随机买入",IDBUYRANDOM,231,96,41,14
+    CONTROL         "自动更新",IDC_AUTOUPDATE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,63,48,10
+    EDITTEXT        IDC_STOCKCOUNT,34,98,20,12,ES_AUTOHSCROLL | ES_READONLY | WS_DISABLED | NOT WS_TABSTOP
+    EDITTEXT        IDC_BUYPOOLCOUNT,210,97,20,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    LTEXT           "%",IDC_STATIC,168,99,8,8
+    EDITTEXT        IDC_WIN_PERCENT,130,97,36,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    LISTBOX         IDC_LISTRATE,128,111,47,207,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "一半",IDSALEALL2,100,112,20,14
+    PUSHBUTTON      "1/4",IDSALEALL3,56,112,20,14
+    LISTBOX         IDC_LISTNOTSALE,72,146,48,172,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "清除",IDNOTSALELST,96,131,24,14
+    LTEXT           "例外:",IDC_STATIC,73,135,21,8
+    EDITTEXT        IDC_RCVBUYCODE2,392,123,66,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    GROUPBOX        "买入池",IDC_STATIC,352,97,110,58
+    CONTROL         "1~6%：",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,356,110,32,10
+    CONTROL         "超跌：",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,356,124,32,10
+    CONTROL         "-8% ：",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,356,138,32,10
+    EDITTEXT        IDC_RCVZTCODE,392,159,68,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    LTEXT           "涨停:",IDC_STATIC,366,161,20,8
+    LTEXT           "可卖",IDC_STATIC,17,115,19,8
+    EDITTEXT        IDC_SALEABLECOUNT,34,113,20,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    PUSHBUTTON      "1/3",IDSALEALL5,78,112,20,14
+    EDITTEXT        IDC_RCVBUYCODE3,392,137,66,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    LTEXT           "买入：【MYKR】在分水岭以下，红黄为主。",IDC_STATICBUY,12,19,161,15
+    LTEXT           "卖出：【MACD】连续多次背离；\r\n         【MYKR】绿柱消失。",IDC_STATICSALE,12,30,151,21
+    GROUPBOX        "必须15分钟以上级别操作",IDC_STATICSB,7,7,164,51
+    COMBOBOX        IDC_COMBO1,375,193,55,75,CBS_SIMPLE | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "买入全部",IDC_BUTTON1,356,274,44,14
+    PUSHBUTTON      "买入1/2",IDC_BUTTON2,356,288,44,14
+    PUSHBUTTON      "买入1/3",IDC_BUTTON3,356,302,44,14
+    PUSHBUTTON      "买入1/4",IDC_BUTTON4,356,316,44,14
+    PUSHBUTTON      "卖出全部",IDC_BUTTON5,411,274,44,14
+    PUSHBUTTON      "卖出1/2",IDC_BUTTON6,411,288,44,14
+    PUSHBUTTON      "卖出1/3",IDC_BUTTON7,411,302,44,14
+    PUSHBUTTON      "卖出1/4",IDC_BUTTON8,411,316,44,14
+    LISTBOX         IDC_LIST3,274,111,78,208,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "运行通达信",ID_RUNTDX,350,59,50,14
+    DEFPUSHBUTTON   "关闭通达信",ID_KILLTDX,413,59,50,14
+    GROUPBOX        "",IDC_STATIC,344,39,63,36
+    PUSHBUTTON      "H",IDC_BUTTONRUNHUAAN,385,47,16,11
+    PUSHBUTTON      "T1",IDC_BUTTONRUNTDX1,367,47,17,11
+    PUSHBUTTON      "T",IDC_BUTTONRUNTDX,349,47,17,11
+    LTEXT           "1/",IDC_STATIC,238,35,9,8
+    EDITTEXT        IDC_RATEB,247,33,15,12,ES_AUTOHSCROLL
+    LTEXT           "1/",IDC_STATIC,237,49,9,8
+    EDITTEXT        IDC_RATES,247,47,15,12,ES_AUTOHSCROLL
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,2
+ PRODUCTVERSION 1,0,0,2
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080404b0"
+        BEGIN
+            VALUE "FileDescription", "AutoTrade Microsoft 基础类应用程序"
+            VALUE "FileVersion", "1, 0, 0, 2"
+            VALUE "InternalName", "AutoTrade"
+            VALUE "LegalCopyright", "版权所有 (C) 2015"
+            VALUE "OriginalFilename", "AutoTrade.EXE"
+            VALUE "ProductName", "AutoTrade 应用程序"
+            VALUE "ProductVersion", "1, 0, 0, 2"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_AUTOTRADE_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 463
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 331
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_AUTOTRADE_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+#endif    // 中文(简体，中国) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE 4, 2
+#pragma code_page(936)
+#endif //_WIN32
+#include "res\AutoTrade.rc2"  // non-Microsoft Visual C++ edited resources
+#include "l.chs\afxres.rc"          // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

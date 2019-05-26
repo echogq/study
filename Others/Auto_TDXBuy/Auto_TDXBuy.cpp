@@ -36,7 +36,8 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 	char sRefreshBtnTxt[256] = "Ë¢";
 	char sRateBtnTxt[256] = { 0 };
 
-	if (_tcsicmp(sRate, _T("1")) == 0)
+	if ((_tcsicmp(sRate, _T("1")) == 0) ||
+		(_tcsicmp(sRate, _T("1/1")) == 0))
 	{
 		strcpy(sRateBtnTxt, "È«²¿");
 	}
