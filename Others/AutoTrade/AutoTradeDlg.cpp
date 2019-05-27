@@ -795,6 +795,7 @@ void WriteDailyLog(CString sLog)
 
 BOOL CAutoTradeDlg::OnInitDialog()
 {
+	::OutputDebugString(" CAutoTradeDlg::OnInitDialog() ");
 	CDialog::OnInitDialog();
 /*	//    LoadLibrary(_T("Kernel32.dll"));
 	typedef BOOL(WINAPI *BeepEx)(DWORD dwFreq, DWORD dwDuration);
@@ -888,6 +889,7 @@ BOOL CAutoTradeDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 	fontTitle.CreatePointFont(90,"微软雅黑");
+	::OutputDebugString(" CAutoTradeDlg::OnInitDialog() ");
 
 // 	((CButton*)GetDlgItem(IDC_CHECKRUNTDX))->SetCheck(1);
 // 	((CButton*)GetDlgItem(IDC_CHECKRUNTDX1))->SetCheck(1);
@@ -895,6 +897,7 @@ BOOL CAutoTradeDlg::OnInitDialog()
 
 
 	KillProcess("Auto_monitorTDXpool.exe"); 
+	::OutputDebugString(" CAutoTradeDlg::OnInitDialog() ");
 
 	//SYSTEM("CMD /C TSKILL /f /im Auto_monitorTDXpool.exe");
 //OnChangeInfo();
@@ -905,8 +908,10 @@ BOOL CAutoTradeDlg::OnInitDialog()
 
 	//RunApp2End("Auto_InitTDXjy.exe"); //顺序点击，买入 卖出 资金股份 以初始化资源Instance
 	ReadNotSaleListFromFile();
+	::OutputDebugString(" CAutoTradeDlg::OnInitDialog() 1");
 	ReadStkETFFromFile();
 
+	::OutputDebugString(" CAutoTradeDlg::OnInitDialog() 2");
 	this->SetTimer(1,5000,NULL);
 	
 	//创建BuyThread:
@@ -915,7 +920,8 @@ BOOL CAutoTradeDlg::OnInitDialog()
 		return FALSE;
 	// 优先级为普通
 	SetThreadPriority(hReceiveThread,THREAD_PRIORITY_NORMAL);
-	
+	::OutputDebugString(" CAutoTradeDlg::OnInitDialog() 999");
+
 	//hProcmonitorTDXpool = (HANDLE)RunApp2End("Auto_monitorTDXpool.exe", "", FALSE); 
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -1387,9 +1393,7 @@ void CAutoTradeDlg::ReadNotSaleListFromFile() {
 
 	m_path = _T("./notSale.txt");
 
-	sfile.Open(m_path,CFile::modeRead);
-
-	if (!sfile)
+	if (!sfile.Open(m_path, CFile::modeRead))
 	{
 		return;
 	}
@@ -1833,12 +1837,12 @@ void CAutoTradeDlg::OnBnSell1_4()
 
 LRESULT CAutoTradeDlg::OnTradeMsg( WPARAM wParam, LPARAM lParam )
 {
+	CString sAct = ""; 
 	if (m_iLastAction != lParam)
 	{
 		m_iLastAction = lParam;
 
 		UpdateData(TRUE);
-		CString sAct = ""; 
 		switch(lParam)
 		{
 		case 0:
@@ -1875,12 +1879,17 @@ LRESULT CAutoTradeDlg::OnTradeMsg( WPARAM wParam, LPARAM lParam )
 		}
 
 		m_lstTradeMSG.InsertString(0, PrefixTimeStr(sAct.GetBuffer()));
-		::OutputDebugString("OnTradeMsg " + sAct);
+	::OutputDebugString("OnTradeMsg " + sAct);
 		m_lstTradeMSG.SetCaretIndex(0, 1);
 
-		GetDlgItem(IDC_STATICCMD)->SetWindowText(PrefixTimeStr(sAct.GetBuffer()));
+		//GetDlgItem(IDC_STATICCMD)->SetWindowText(PrefixTimeStr(sAct.GetBuffer()));
 		OnScreenfont(PrefixTimeStr(sAct.GetBuffer()));
 	}
+
+	GetDlgItem(IDC_STATICCMD)->SetWindowText(PrefixTimeStr(sAct.GetBuffer()));
+
+	sAct.Format("OnTradeMsg lParam=%d", lParam);
+	::OutputDebugString(sAct);
 
 	return 0;
 }
