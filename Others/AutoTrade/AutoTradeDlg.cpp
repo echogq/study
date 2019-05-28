@@ -924,6 +924,18 @@ BOOL CAutoTradeDlg::OnInitDialog()
 
 	//hProcmonitorTDXpool = (HANDLE)RunApp2End("Auto_monitorTDXpool.exe", "", FALSE); 
 
+	char buf[MAX_PATH] = { 0 };
+	GetPrivateProfileStringA("LastTradeMsg", "Msg", "", buf, sizeof(buf), ".\\LastTradeMsg.ini");
+	if (strlen(buf))
+	{
+		if (IDYES != popTimedMessageBox("发现上次遗留的信号，需要先从ini中清除吗？", 5))
+		{
+			m_iLastAction = atoi(buf);
+		}
+		else
+			WritePrivateProfileStringA("LastTradeMsg", "Msg", "", ".\\LastTradeMsg.ini");
+	}
+
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -1835,6 +1847,23 @@ void CAutoTradeDlg::OnBnSell1_4()
 	NewSellRate(4);
 }
 
+//int readLastTradeMsgFormIni()
+//{
+//
+//	string lpPath = ".\\LastTradeMsg.ini";
+//	if (sClientPathFile.length() == 0)
+//	{
+//		char buf[MAX_PATH] = { 0 };
+//		GetPrivateProfileStringA("LastTradeMsg", "Msg", "", buf, sizeof(buf), ".\\LastTradeMsg.ini");
+//		sClientPathFile = buf;
+//	}
+//	else
+//	{
+//		WritePrivateProfileStringA("LastTradeMsg", "Msg", sClientPathFile.c_str(), ".\\LastTradeMsg.ini");
+//	}
+//	return;
+//}
+
 LRESULT CAutoTradeDlg::OnTradeMsg( WPARAM wParam, LPARAM lParam )
 {
 	CString sAct = ""; 
@@ -1860,6 +1889,7 @@ LRESULT CAutoTradeDlg::OnTradeMsg( WPARAM wParam, LPARAM lParam )
 				NewBuyRate(m_iRateB);
 			}
 			
+			WritePrivateProfileStringA("LastTradeMsg", "Msg", "1", ".\\LastTradeMsg.ini");
 			break;
 		case 2:
 			sAct = "卖出";
@@ -1873,6 +1903,7 @@ LRESULT CAutoTradeDlg::OnTradeMsg( WPARAM wParam, LPARAM lParam )
 				NewSellRate(m_iRateS);
 			}
 
+			WritePrivateProfileStringA("LastTradeMsg", "Msg", "2", ".\\LastTradeMsg.ini");
 			break;
 		default:
 			break;
