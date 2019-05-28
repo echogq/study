@@ -548,7 +548,7 @@ BOOL BuyIt(CString stkCode)
 }
 BOOL SellIt(CString stkCode)
 {
-	return RunApp2End("Auto_TDXLevinSale.exe", stkCode); //直接返回1、0，表示买入成功、失败
+	return RunApp2End("Auto_TDXSell.exe", stkCode); //直接返回1、0，表示买入成功、失败
 }
 
 void SaleStk(CAutoTradeDlg * p)
@@ -1797,7 +1797,14 @@ void CAutoTradeDlg::NewSellRate( int iRate )
 
 	if (text.GetLength() > 5)
 	{
-		text.Format("%s 1/%d", text, iRate); 
+		if (m_bLimitPercent)
+		{
+			text.Format("%s 1/%d %d", text, iRate, m_iLimitPercent);
+		}
+		else
+		{
+			text.Format("%s 1/%d %d", text, iRate, 100);
+		}
 		::OutputDebugString(text);
 
 		SellIt(text);
