@@ -5,6 +5,8 @@
 #include "stdafx.h"
 #include "Auto_TDXAssets.h"
 #include "Auto_TDXAssetsDlg.h"
+#include <vector>
+#include <afxcview.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -55,10 +57,10 @@ void Func()
 {
 	::OutputDebugStringA("\r\n================================\r\n");
 	//获取树控件的内容
-	HWND hParent = (HWND)0x512394; //SysTreeView32父窗口句柄
+	HWND hParent = (HWND)0xA0D24; //SysTreeView32父窗口句柄
 	HWND hTree = FindWindowEx(hParent, NULL, _T("SysTreeView32"), _T(""));
 
-	HWND hWnd = (HWND)0x512394; //主程序句柄
+	HWND hWnd = (HWND)0xA0D24; //主程序句柄
 	DWORD PID;
 	GetWindowThreadProcessId(hWnd, &PID);
 	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, PID);
@@ -98,6 +100,30 @@ void Func()
 			if (sTreeItemText == "资金股份")
 			{
 				TreeView_SelectItem(hTree, hTreeItem);
+
+				HWND hTestWnd = (HWND)0x00120A66;
+				////WM_PARENTNOTIFY fwEvent : WM_LBUTTONDOWN xPos : 59 yPos : 57[wParam:00000201 lParam : 0039003B]
+				//::SendMessage((HWND)hTestWnd, WM_PARENTNOTIFY, 0x00000201, 0x04560048);
+
+				////WM_MOUSEACTIVATE hwndTopLevel:00120A66 nHittest:HTCLIENT uMsg:WM_LBUTTONDOWN [wParam:00120A66 lParam:02010001]
+				//::SendMessage((HWND)hTestWnd, WM_MOUSEACTIVATE, 0x00120A66, 0x02010001);
+				//::SendMessage((HWND)hTestWnd, WM_WINDOWPOSCHANGING, 0, 0x0018FA40);
+				//::SendMessage((HWND)hTestWnd, WM_WINDOWPOSCHANGED, 0, 0x0018FA34);
+				//::SendMessage((HWND)hTestWnd, WM_ACTIVATEAPP, 1, 0);
+				//::SendMessage((HWND)hTestWnd, WM_NCACTIVATE, 1, 0);
+				//::SendMessage((HWND)hTestWnd, WM_IME_NOTIFY, 2, 0);
+				//::SendMessage((HWND)hTestWnd, WM_IME_SETCONTEXT, 1, 0xC000000F);
+
+				////WM_SETCURSOR hwnd:00110B0A nHittest:HTCLIENT wMouseMsg:WM_LBUTTONDOWN [wParam:00110B0A lParam:02010001]
+				//::SendMessage((HWND)hTestWnd, WM_SETCURSOR, 0x00110B0A, 0x02010001);
+
+				////message:0x17EF [User-defined:WM_USER+5103] wParam:00000000 lParam:00000000
+				//::SendMessage((HWND)hTestWnd, WM_USER + 5103, 0, 0);
+				////message : 0x17ED[User - defined:WM_USER + 5101] wParam : 00000000 lParam : 00000000
+				//::SendMessage((HWND)hTestWnd, WM_USER + 5101, 0, 0);
+				////message : 0x17F0[User - defined:WM_USER + 5104] wParam : 00000000 lParam : 000000
+				//::SendMessage((HWND)hTestWnd, WM_USER + 5104, 0, 0);
+
 				{
 					//开工
 					//HTREEITEM hItem = TreeView_GetRoot(hTree);
@@ -144,8 +170,12 @@ void Func()
 						GetCursorPos(&pt2);
 					}
 
-					mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-					mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+// 					mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+// 					mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+
+// 					::SendMessage(hTestWnd, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(72, 1110));
+// 					::SendMessage(hTestWnd, WM_LBUTTONUP, MK_LBUTTON, MAKELPARAM(72, 1110));
+					Sleep(10);
 				}
 			}
 		}
@@ -174,6 +204,8 @@ BOOL CAuto_TDXAssetsApp::InitInstance()
 
 
 	Func();
+	//::SendMessage((HWND)0x120a66, WM_COMMAND, MAKEWPARAM(5338, 0), NULL);
+
 	return FALSE;
 
 
