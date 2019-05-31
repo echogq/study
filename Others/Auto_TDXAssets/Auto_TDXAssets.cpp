@@ -320,8 +320,10 @@ void LoopReadList2(HWND hwnd)
 	return;
 }
 
+int iTmp = 0;
 BOOL CALLBACK EnumChildProc(_In_ HWND   hwnd, _In_ LPARAM lParam)
 {
+	iTmp++;
 	char szTitle[MAX_PATH] = { 0 };
 	char szClass[MAX_PATH] = { 0 };
 	int nMaxCount = MAX_PATH;
@@ -337,6 +339,12 @@ BOOL CALLBACK EnumChildProc(_In_ HWND   hwnd, _In_ LPARAM lParam)
 	if (bNextOK)
 	{
 		bNextOK = FALSE;
+
+		while (strlen(lpWindowTxt) ==0)
+		{
+			Sleep(10);
+			GetWindowTextA(hwnd, lpWindowTxt, nMaxCount);
+		}
 		dbAvailableFunds = atof(lpWindowTxt);
 		::OutputDebugStringA("\r\n");
 		::OutputDebugStringA(lpWindowTxt);
@@ -352,6 +360,7 @@ BOOL CALLBACK EnumChildProc(_In_ HWND   hwnd, _In_ LPARAM lParam)
 	{
 		int iItem = ListView_GetItemCount(hwnd);
 		LoopReadList(hwnd);
+		iTmp++;
 
 		return FALSE; //子窗口找好了就终止EnumChildWindows
 	}
@@ -454,11 +463,15 @@ BOOL CAuto_TDXAssetsApp::InitInstance()
 	//ShowWindow(tdxWnd, SW_SHOWNORMAL);
 	::SendMessage((HWND)tdxWnd, WM_COMMAND, MAKEWPARAM(5302, 0), NULL);
 	Sleep(2000);
+	DWORD start_time = GetTickCount();
 	EnumChildWindows(tdxWnd, EnumChildProc, 0);
+	TRACE("耗时A：%.3f秒", GetTickCount()/1000.0 - start_time / 1000.0);
 
 	::SendMessage((HWND)tdxWnd, WM_COMMAND, MAKEWPARAM(5333, 0), NULL);
 	Sleep(1000);
+	start_time = GetTickCount();
 	EnumChildWindows(tdxWnd, EnumChildProc2, 0);
+	TRACE("耗时B：%.3f秒", GetTickCount() / 1000.0 - start_time / 1000.0);
 
 	//HWND subWnd = ::FindWindowA("Static", "可用资金:");
 
