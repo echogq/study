@@ -190,6 +190,241 @@ void Func()
 	}
 }
 
+using namespace std;
+BOOL bNextOK = FALSE;
+BOOL bDlgOK = FALSE;
+double dbAvailableFunds = 0.0;
+double dbStockValue = 0.0;
+double dbOrderValue = 0.0;
+
+void LoopReadList(HWND hwnd)
+{
+	if (!hwnd)
+		return;
+
+	int count, i;
+	char item[512] = { 0 }, subitem[512] = { 0 };
+
+	LVITEMA lvi, *_lvi;
+	char *_item, *_subitem;
+	DWORD pid;
+	HANDLE process;
+
+	count = (int)SendMessage(hwnd, LVM_GETITEMCOUNT, 0, 0);
+
+	GetWindowThreadProcessId(hwnd, &pid);
+	process = OpenProcess(PROCESS_VM_OPERATION | PROCESS_VM_READ |
+		PROCESS_VM_WRITE | PROCESS_QUERY_INFORMATION, FALSE, pid);
+
+	_lvi = (LVITEMA*)VirtualAllocEx(process, NULL, sizeof(LVITEMA),
+		MEM_COMMIT, PAGE_READWRITE);
+	_item = (char*)VirtualAllocEx(process, NULL, 512, MEM_COMMIT,
+		PAGE_READWRITE);
+	_subitem = (char*)VirtualAllocEx(process, NULL, 512, MEM_COMMIT,
+		PAGE_READWRITE);
+
+	lvi.cchTextMax = 512;
+
+	::OutputDebugStringA("\r\n==========================\r\n");
+	dbStockValue = 0.0;
+	for (i = 0; i < count; i++) {
+		lvi.iSubItem = 6;
+		lvi.pszText = _item;
+		WriteProcessMemory(process, _lvi, &lvi, sizeof(LVITEMA), NULL);
+		SendMessage(hwnd, LVM_GETITEMTEXT, (WPARAM)i, (LPARAM)_lvi);
+
+		lvi.iSubItem = 7;
+		lvi.pszText = _subitem;
+		WriteProcessMemory(process, _lvi, &lvi, sizeof(LVITEMA), NULL);
+		SendMessage(hwnd, LVM_GETITEMTEXT, (WPARAM)i, (LPARAM)_lvi);
+
+		ReadProcessMemory(process, _item, item, 512, NULL);
+		ReadProcessMemory(process, _subitem, subitem, 512, NULL);
+
+		dbStockValue += atof(item);
+		TRACE("%s - %s\n", item, subitem);
+	}
+
+	VirtualFreeEx(process, _lvi, 0, MEM_RELEASE);
+	VirtualFreeEx(process, _item, 0, MEM_RELEASE);
+	VirtualFreeEx(process, _subitem, 0, MEM_RELEASE);
+
+
+	return;
+}
+
+void LoopReadList2(HWND hwnd)
+{
+	if (!hwnd)
+		return;
+
+	int count, i;
+	char item[512] = { 0 }, subitem[512] = { 0 }, subitem2[512] = { 0 };
+
+	LVITEMA lvi, *_lvi;
+	char *_item, *_subitem, *_subitem2;
+	DWORD pid;
+	HANDLE process;
+
+	count = (int)SendMessage(hwnd, LVM_GETITEMCOUNT, 0, 0);
+
+	GetWindowThreadProcessId(hwnd, &pid);
+	process = OpenProcess(PROCESS_VM_OPERATION | PROCESS_VM_READ |
+		PROCESS_VM_WRITE | PROCESS_QUERY_INFORMATION, FALSE, pid);
+
+	_lvi = (LVITEMA*)VirtualAllocEx(process, NULL, sizeof(LVITEMA),
+		MEM_COMMIT, PAGE_READWRITE);
+	_item = (char*)VirtualAllocEx(process, NULL, 512, MEM_COMMIT,
+		PAGE_READWRITE);
+	_subitem = (char*)VirtualAllocEx(process, NULL, 512, MEM_COMMIT,
+		PAGE_READWRITE);
+	_subitem2 = (char*)VirtualAllocEx(process, NULL, 512, MEM_COMMIT,
+		PAGE_READWRITE);
+
+	lvi.cchTextMax = 512;
+
+	::OutputDebugStringA("\r\n==========================\r\n");
+	dbOrderValue = 0.0;
+	for (i = 0; i < count; i++) {
+		lvi.iSubItem = 3;
+		lvi.pszText = _item;
+		WriteProcessMemory(process, _lvi, &lvi, sizeof(LVITEMA), NULL);
+		SendMessage(hwnd, LVM_GETITEMTEXT, (WPARAM)i, (LPARAM)_lvi);
+
+		lvi.iSubItem = 5;
+		lvi.pszText = _subitem;
+		WriteProcessMemory(process, _lvi, &lvi, sizeof(LVITEMA), NULL);
+		SendMessage(hwnd, LVM_GETITEMTEXT, (WPARAM)i, (LPARAM)_lvi);
+
+		lvi.iSubItem = 6;
+		lvi.pszText = _subitem2;
+		WriteProcessMemory(process, _lvi, &lvi, sizeof(LVITEMA), NULL);
+		SendMessage(hwnd, LVM_GETITEMTEXT, (WPARAM)i, (LPARAM)_lvi);
+
+		ReadProcessMemory(process, _item, item, 512, NULL);
+		ReadProcessMemory(process, _subitem, subitem, 512, NULL);
+		ReadProcessMemory(process, _subitem2, subitem2, 512, NULL);
+
+		if (strcmp(item, "买入") == 0)
+		{
+			dbOrderValue += atof(subitem) * atof(subitem2)*1.00025;
+			TRACE("%s - %s - %s %.2f\n", item, subitem, subitem2, dbOrderValue + dbAvailableFunds + dbStockValue);
+		}
+	}
+
+	VirtualFreeEx(process, _lvi, 0, MEM_RELEASE);
+	VirtualFreeEx(process, _item, 0, MEM_RELEASE);
+	VirtualFreeEx(process, _subitem, 0, MEM_RELEASE);
+
+
+	return;
+}
+
+BOOL CALLBACK EnumChildProc(_In_ HWND   hwnd, _In_ LPARAM lParam)
+{
+	char szTitle[MAX_PATH] = { 0 };
+	char szClass[MAX_PATH] = { 0 };
+	int nMaxCount = MAX_PATH;
+
+	LPSTR lpClassName = szClass;
+	LPSTR lpWindowTxt = szTitle;
+
+	GetWindowTextA(hwnd, lpWindowTxt, nMaxCount);
+	GetClassNameA(hwnd, lpClassName, nMaxCount);
+	//cout << "[Child window] window handle: " << hwnd << " window name: "
+	//	<< lpWindowName << " class name " << lpClassName << endl;
+
+	if (bNextOK)
+	{
+		bNextOK = FALSE;
+		dbAvailableFunds = atof(lpWindowTxt);
+		::OutputDebugStringA("\r\n");
+		::OutputDebugStringA(lpWindowTxt);
+		::OutputDebugStringA("->");
+		::OutputDebugStringA(lpClassName);
+		::OutputDebugStringA("  ");
+	}
+	if (strstr(lpWindowTxt, "可用"))
+	{
+		bNextOK = TRUE;
+	}
+	else if ((strcmp(lpWindowTxt, "List1")==0) && (strcmp(lpClassName, "SysListView32") == 0))
+	{
+		int iItem = ListView_GetItemCount(hwnd);
+		LoopReadList(hwnd);
+
+		return FALSE; //子窗口找好了就终止EnumChildWindows
+	}
+	return TRUE;
+}
+
+BOOL CALLBACK EnumChildProc2(_In_ HWND   hwnd, _In_ LPARAM lParam)
+{
+	char szTitle[MAX_PATH] = { 0 };
+	char szClass[MAX_PATH] = { 0 };
+	int nMaxCount = MAX_PATH;
+
+	LPSTR lpClassName = szClass;
+	LPSTR lpWindowTxt = szTitle;
+
+	GetWindowTextA(hwnd, lpWindowTxt, nMaxCount);
+	GetClassNameA(hwnd, lpClassName, nMaxCount);
+	//cout << "[Child window] window handle: " << hwnd << " window name: "
+	//	<< lpWindowName << " class name " << lpClassName << endl;
+
+	//if (bDlgOK)
+	//{
+	//	dbAvailableFunds = atof(lpWindowTxt);
+	//	::OutputDebugStringA("\r\n");
+	//	::OutputDebugStringA(lpWindowTxt);
+	//	::OutputDebugStringA("->");
+	//	::OutputDebugStringA(lpClassName);
+	//	::OutputDebugStringA("  ");
+	//}
+	if ((strcmp(lpWindowTxt, "撤 单") == 0) && ::IsWindowVisible(::GetParent(hwnd)))
+	{
+		bDlgOK = TRUE;
+	}
+	else if (bDlgOK && (strcmp(lpWindowTxt, "List1")==0) && (strcmp(lpClassName, "SysListView32") == 0))
+	{
+		bDlgOK = FALSE;
+		int iItem = ListView_GetItemCount(hwnd);
+		if (iItem > 0)
+		{
+			LoopReadList2(hwnd);
+		}
+
+		return FALSE; //子窗口找好了就终止EnumChildWindows
+	}
+	return TRUE;
+}
+
+
+BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
+{
+
+	/*
+	* Remarks
+	The EnumWindows function does not enumerate child windows,
+	with the exception of a few top-level windows owned by the
+	system that have the WS_CHILD style.
+	*/
+	char szTitle[MAX_PATH] = { 0 };
+	char szClass[MAX_PATH] = { 0 };
+	int nMaxCount = MAX_PATH;
+
+	LPSTR lpClassName = szClass;
+	LPSTR lpWindowName = szTitle;
+
+	GetWindowTextA(hwnd, lpWindowName, nMaxCount);
+	GetClassNameA(hwnd, lpClassName, nMaxCount);
+	//cout << "[Parent window] window handle: " << hwnd << " window name: "
+	//	<< lpWindowName << " class name " << lpClassName << endl;
+
+	EnumChildWindows(hwnd, EnumChildProc, lParam);
+
+	return TRUE;
+}
 
 // 唯一的一个 CAuto_TDXAssetsApp 对象
 
@@ -197,15 +432,52 @@ CAuto_TDXAssetsApp theApp;
 
 
 // CAuto_TDXAssetsApp 初始化
-
+#define MAIN_WND_TITLE "华安证券V6.36 - [组合图-创业板]"
 BOOL CAuto_TDXAssetsApp::InitInstance()
 {
 	CWinApp::InitInstance();
 
 
-	Func();
-	//::SendMessage((HWND)0x120a66, WM_COMMAND, MAKEWPARAM(5338, 0), NULL);
+	//Func();
 
+	HWND tdxWnd = ::FindWindowA("TdxW_MainFrame_Class", MAIN_WND_TITLE);
+	//先必须确保主图是股票的窗口
+	while (NULL == tdxWnd)
+	{
+		::MessageBoxA(NULL, "找不到标题为：'"
+			MAIN_WND_TITLE
+			"' 的窗口！", "友好提示", MB_ICONEXCLAMATION);
+		tdxWnd = ::FindWindowA("TdxW_MainFrame_Class", MAIN_WND_TITLE);
+	}
+
+	//ShowWindow(tdxWnd, SW_HIDE);
+	//ShowWindow(tdxWnd, SW_SHOWNORMAL);
+	::SendMessage((HWND)tdxWnd, WM_COMMAND, MAKEWPARAM(5302, 0), NULL);
+	Sleep(2000);
+	EnumChildWindows(tdxWnd, EnumChildProc, 0);
+
+	::SendMessage((HWND)tdxWnd, WM_COMMAND, MAKEWPARAM(5333, 0), NULL);
+	Sleep(1000);
+	EnumChildWindows(tdxWnd, EnumChildProc2, 0);
+
+	//HWND subWnd = ::FindWindowA("Static", "可用资金:");
+
+	//HWND hd = GetDesktopWindow();        //得到桌面窗口
+	//hd = GetWindow(hd, GW_CHILD);        //得到屏幕上第一个子窗口
+	//char s[200] = { 0 };
+	//int num = 1;
+	//while (hd != NULL)                    //循环得到所有的子窗口
+	//{
+	//	memset(s, 0, 200);
+	//	GetWindowTextA(hd, s, 200);
+	//	if (strcmp(s, "可用资金:") == 0)
+	//	{
+	//		subWnd = hd;
+	//		break;
+	//	}
+	//	hd = GetNextWindow(hd, GW_HWNDNEXT);
+	//}
+	//::SendMessage((HWND)subWnd, WM_COMMAND, MAKEWPARAM(5302, 0), NULL);
 	return FALSE;
 
 
