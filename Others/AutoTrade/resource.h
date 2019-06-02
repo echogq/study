@@ -69,6 +69,8 @@
 #define IDC_RCVBUYCODE2                 1062
 #define IDC_RCVBUYCODE3                 1063
 #define IDC_INFO                        1072
+#define IDC_INFO2                       1073
+#define IDC_COPYDATA                    1073
 
 // Next default values for new objects
 // 

@@ -138,6 +138,8 @@ public:
 	afx_msg void OnBnClickedButtonruntdx();
 	int m_iRateS;
 	int m_iRateB;
+	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
+	CString m_strCopyData;
 };
 
 //{{AFX_INSERT_LOCATION}}

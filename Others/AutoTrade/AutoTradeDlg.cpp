@@ -633,6 +633,7 @@ CAutoTradeDlg::CAutoTradeDlg(CWnd* pParent /*=NULL*/)
 , m_bAutoBuy(FALSE)
 , m_iRateS(2)
 , m_iRateB(2)
+, m_strCopyData(_T(""))
 {
 	//{{AFX_DATA_INIT(CAutoTradeDlg)
 	m_buyCode = _T("");
@@ -693,6 +694,7 @@ void CAutoTradeDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LIST3, m_lstTradeMSG);
 	DDX_Text(pDX, IDC_RATES, m_iRateS);
 	DDX_Text(pDX, IDC_RATEB, m_iRateB);
+	DDX_Text(pDX, IDC_COPYDATA, m_strCopyData);
 }
 
 BEGIN_MESSAGE_MAP(CAutoTradeDlg, CDialog)
@@ -742,6 +744,7 @@ ON_BN_CLICKED(IDC_BUTTONRUNTDX1, &CAutoTradeDlg::OnBnClickedButtonruntdx1)
 ON_BN_CLICKED(IDC_BUTTONRUNTDX, &CAutoTradeDlg::OnBnClickedButtonruntdx)
 ON_BN_CLICKED(ID_KILLTDX, &CAutoTradeDlg::OnBnClickedKilltdx)
 ON_BN_CLICKED(ID_RUNTDX, &CAutoTradeDlg::OnBnClickedRuntdx)
+ON_WM_COPYDATA()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1021,6 +1024,32 @@ void CAutoTradeDlg::OnReadLV()
 {
 
 }
+BOOL IsExistProcess(const char*  szProcessName)
+{
+	PROCESSENTRY32 processEntry32;
+	HANDLE toolHelp32Snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (((int)toolHelp32Snapshot) != -1)
+	{
+		processEntry32.dwSize = sizeof(processEntry32);
+		if (Process32First(toolHelp32Snapshot, &processEntry32))
+		{
+			do
+			{
+				int iLen = 2 * strlen(processEntry32.szExeFile);
+				char* chRtn = new char[iLen + 1];
+				//转换成功返回为非负值
+				//wcstombs(chRtn, processEntry32.szExeFile, iLen + 1);
+				if (strcmp(szProcessName, processEntry32.szExeFile) == 0)
+				{
+					return TRUE;
+				}
+			} while (Process32Next(toolHelp32Snapshot, &processEntry32));
+		}
+		CloseHandle(toolHelp32Snapshot);
+	}
+	//
+	return FALSE;
+}
 
 void CAutoTradeDlg::OnTimer(UINT nIDEvent) 
 {
@@ -1037,6 +1066,19 @@ void CAutoTradeDlg::OnTimer(UINT nIDEvent)
 	CTime tm=CTime::GetCurrentTime();
 	//
 	//TRACE(str);
+	if (!IsExistProcess("TdxW.exe"))
+	{
+		if ((tm.GetHour() >= 9) && (tm.GetHour() < 15))
+		{
+			char buf[MAX_PATH] = { 0 };
+			GetPrivateProfileStringA("LastTradeMsg", "TDXPath", "", buf, sizeof(buf), ".\\LastTradeMsg.ini");
+			if (strlen(buf) > 0)
+			{
+				//WinExec(buf, SW_NORMAL);
+				RunApp2End("Auto_OpenHuaAn.exe", buf);
+			}
+		}
+	}
 
 	if ((tm.GetHour() == 23) && ((tm.GetMinute() == 58) || (tm.GetMinute() == 59) ))
 	{
@@ -1969,3 +2011,23 @@ void CAutoTradeDlg::OnBnClickedButtonruntdx()
 	RunApp2End(AUTO_OPEN_ALL, sPara);
 }
 
+
+
+BOOL CAutoTradeDlg::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+
+	//m_strCopyData = (LPSTR)pCopyDataStruct->lpData;
+
+	// 获得实际长度的字符串
+
+	m_strCopyData = "\r\n" + m_strCopyData;
+	//m_strCopyData = "\r\n" + CString(PrefixTimeStr(" ")) + m_strCopyData;
+	m_strCopyData = CString(PrefixTimeStr(" ")) + ((CString)(LPSTR)(pCopyDataStruct->lpData)).Left(pCopyDataStruct->cbData) + m_strCopyData;
+
+	// 更新数据
+
+	UpdateData(FALSE);
+
+	return CDialog::OnCopyData(pWnd, pCopyDataStruct);
+}

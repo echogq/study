@@ -144,7 +144,7 @@
       <OutputFile>.\Release/AutoTrade.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>echo copy /y $(TargetPath) ..\..\mytool\AutoTrade.exe</Command>
+      <Command>copy /y $(TargetPath) ..\..\mytool\AutoTrade.exe</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
