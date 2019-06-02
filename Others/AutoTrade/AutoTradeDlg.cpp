@@ -928,7 +928,7 @@ BOOL CAutoTradeDlg::OnInitDialog()
 	//hProcmonitorTDXpool = (HANDLE)RunApp2End("Auto_monitorTDXpool.exe", "", FALSE); 
 
 	char buf[MAX_PATH] = { 0 };
-	GetPrivateProfileStringA("LastTradeMsg", "Msg", "", buf, sizeof(buf), ".\\LastTradeMsg.ini");
+	GetPrivateProfileStringA("LastTradeMsg", "Msg", "", buf, sizeof(buf), ".\\AutoTrade.ini");
 	if (strlen(buf))
 	{
 		if (IDYES != popTimedMessageBox("发现上次遗留的信号，需要先从ini中清除吗？", 5))
@@ -936,7 +936,7 @@ BOOL CAutoTradeDlg::OnInitDialog()
 			m_iLastAction = atoi(buf);
 		}
 		else
-			WritePrivateProfileStringA("LastTradeMsg", "Msg", "", ".\\LastTradeMsg.ini");
+			WritePrivateProfileStringA("LastTradeMsg", "Msg", "", ".\\AutoTrade.ini");
 	}
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -1071,7 +1071,7 @@ void CAutoTradeDlg::OnTimer(UINT nIDEvent)
 		if ((tm.GetHour() >= 9) && (tm.GetHour() < 15))
 		{
 			char buf[MAX_PATH] = { 0 };
-			GetPrivateProfileStringA("LastTradeMsg", "TDXPath", "", buf, sizeof(buf), ".\\LastTradeMsg.ini");
+			GetPrivateProfileStringA("LastTradeMsg", "TDXPath", "", buf, sizeof(buf), ".\\AutoTrade.ini");
 			if (strlen(buf) > 0)
 			{
 				//WinExec(buf, SW_NORMAL);
@@ -1899,16 +1899,16 @@ void CAutoTradeDlg::OnBnSell1_4()
 //int readLastTradeMsgFormIni()
 //{
 //
-//	string lpPath = ".\\LastTradeMsg.ini";
+//	string lpPath = ".\\AutoTrade.ini";
 //	if (sClientPathFile.length() == 0)
 //	{
 //		char buf[MAX_PATH] = { 0 };
-//		GetPrivateProfileStringA("LastTradeMsg", "Msg", "", buf, sizeof(buf), ".\\LastTradeMsg.ini");
+//		GetPrivateProfileStringA("LastTradeMsg", "Msg", "", buf, sizeof(buf), ".\\AutoTrade.ini");
 //		sClientPathFile = buf;
 //	}
 //	else
 //	{
-//		WritePrivateProfileStringA("LastTradeMsg", "Msg", sClientPathFile.c_str(), ".\\LastTradeMsg.ini");
+//		WritePrivateProfileStringA("LastTradeMsg", "Msg", sClientPathFile.c_str(), ".\\AutoTrade.ini");
 //	}
 //	return;
 //}
@@ -1938,7 +1938,7 @@ LRESULT CAutoTradeDlg::OnTradeMsg( WPARAM wParam, LPARAM lParam )
 				NewBuyRate(m_iRateB);
 			}
 			
-			WritePrivateProfileStringA("LastTradeMsg", "Msg", "1", ".\\LastTradeMsg.ini");
+			WritePrivateProfileStringA("LastTradeMsg", "Msg", "1", ".\\AutoTrade.ini");
 			break;
 		case 2:
 			sAct = "卖出";
@@ -1952,7 +1952,7 @@ LRESULT CAutoTradeDlg::OnTradeMsg( WPARAM wParam, LPARAM lParam )
 				NewSellRate(m_iRateS);
 			}
 
-			WritePrivateProfileStringA("LastTradeMsg", "Msg", "2", ".\\LastTradeMsg.ini");
+			WritePrivateProfileStringA("LastTradeMsg", "Msg", "2", ".\\AutoTrade.ini");
 			break;
 		default:
 			break;
