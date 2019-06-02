@@ -316,6 +316,7 @@ void LoopReadList2(HWND hwnd)
 	VirtualFreeEx(process, _item, 0, MEM_RELEASE);
 	VirtualFreeEx(process, _subitem, 0, MEM_RELEASE);
 
+	TRACE("%s - %.2f\n", "资产：", dbOrderValue + dbAvailableFunds + dbStockValue);
 
 	return;
 }
@@ -352,11 +353,15 @@ BOOL CALLBACK EnumChildProc(_In_ HWND   hwnd, _In_ LPARAM lParam)
 		::OutputDebugStringA(lpClassName);
 		::OutputDebugStringA("  ");
 	}
-	if (strstr(lpWindowTxt, "可用"))
+
+	//::OutputDebugStringA("\r\n");
+	//::OutputDebugStringA(lpWindowTxt);
+
+	if (strstr(lpWindowTxt, "可用资金:"))
 	{
 		bNextOK = TRUE;
 	}
-	else if ((strcmp(lpWindowTxt, "List1")==0) && (strcmp(lpClassName, "SysListView32") == 0))
+	else if ((dbAvailableFunds >0.0)&&(strcmp(lpWindowTxt, "List1")==0) && (strcmp(lpClassName, "SysListView32") == 0))
 	{
 		int iItem = ListView_GetItemCount(hwnd);
 		LoopReadList(hwnd);
@@ -439,39 +444,77 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 
 CAuto_TDXAssetsApp theApp;
 
-
-// CAuto_TDXAssetsApp 初始化
 #define MAIN_WND_TITLE "华安证券V6.36 - [组合图-创业板]"
-BOOL CAuto_TDXAssetsApp::InitInstance()
+void CopyDataToTradeWnd(char* msg)
 {
-	CWinApp::InitInstance();
+	HWND hTradeWnd = ::FindWindow(NULL, "自动化交易控制中心");
+	if (hTradeWnd != NULL)
+	{
+		COPYDATASTRUCT cds;
+		cds.dwData = 0;
+		cds.lpData = msg;
+		cds.cbData = strlen(msg) + 1; //字符串请记得把'\0'加上, 不然就错了, 这里是ANSI字符串
 
+		::SendMessage(hTradeWnd, WM_COPYDATA, 0, (LPARAM)&cds);
+	}
+}
 
-	//Func();
-
+void GetMyAssets()
+{
 	HWND tdxWnd = ::FindWindowA("TdxW_MainFrame_Class", MAIN_WND_TITLE);
-	//先必须确保主图是股票的窗口
+	//先必须确保主图是股票的窗口, 否则普通买入无效
 	while (NULL == tdxWnd)
 	{
-		::MessageBoxA(NULL, "找不到标题为：'"
+		char msg[] = "[Assets] 找不到标题为：'"
 			MAIN_WND_TITLE
-			"' 的窗口！", "友好提示", MB_ICONEXCLAMATION);
+			"' 的窗口！";
+		CopyDataToTradeWnd(msg);
+
+		//::MessageBoxA(NULL, msg, "友好提示", MB_ICONEXCLAMATION);
+		Sleep(3000);
 		tdxWnd = ::FindWindowA("TdxW_MainFrame_Class", MAIN_WND_TITLE);
 	}
 
+	CopyDataToTradeWnd("[Assets] 找到主窗口了。");
 	//ShowWindow(tdxWnd, SW_HIDE);
 	//ShowWindow(tdxWnd, SW_SHOWNORMAL);
 	::SendMessage((HWND)tdxWnd, WM_COMMAND, MAKEWPARAM(5302, 0), NULL);
 	Sleep(2000);
 	DWORD start_time = GetTickCount();
 	EnumChildWindows(tdxWnd, EnumChildProc, 0);
-	TRACE("耗时A：%.3f秒", GetTickCount()/1000.0 - start_time / 1000.0);
+	TRACE("耗时A：%.3f秒", GetTickCount() / 1000.0 - start_time / 1000.0);
 
 	::SendMessage((HWND)tdxWnd, WM_COMMAND, MAKEWPARAM(5333, 0), NULL);
 	Sleep(1000);
 	start_time = GetTickCount();
 	EnumChildWindows(tdxWnd, EnumChildProc2, 0);
 	TRACE("耗时B：%.3f秒", GetTickCount() / 1000.0 - start_time / 1000.0);
+	if (dbAvailableFunds == 0.0)
+	{
+		CopyDataToTradeWnd("[Assets] 似乎没有找到正确的可用资金窗口！");
+	}
+	else
+	{
+		CString xxx = "";
+		xxx.Format("[Assets] 可用资金:%.2f, 总资产:%.2f", dbAvailableFunds, dbOrderValue + dbAvailableFunds + dbStockValue);
+		CopyDataToTradeWnd(xxx.GetBuffer());
+		xxx.ReleaseBuffer();
+	}
+}
+
+
+// CAuto_TDXAssetsApp 初始化
+BOOL CAuto_TDXAssetsApp::InitInstance()
+{
+	CWinApp::InitInstance();
+
+
+	//Func();
+	while (TRUE)
+	{
+		GetMyAssets();
+		Sleep(3000);
+	}
 
 	//HWND subWnd = ::FindWindowA("Static", "可用资金:");
 
