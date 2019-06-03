@@ -1053,6 +1053,7 @@ BOOL IsExistProcess(const char*  szProcessName)
 
 void CAutoTradeDlg::OnTimer(UINT nIDEvent) 
 {
+	TRACE("Tid=0x%X OnTimer ", ::GetCurrentThreadId());
 	// TODO: Add your message handler code here and/or call default
 	UpdateData(TRUE);
 	if(m_bAutoUpdate && !bSaling)
@@ -1915,6 +1916,7 @@ void CAutoTradeDlg::OnBnSell1_4()
 
 LRESULT CAutoTradeDlg::OnTradeMsg( WPARAM wParam, LPARAM lParam )
 {
+	TRACE("Tid=0x%X OnTradeMsg ",::GetCurrentThreadId());
 	CString sAct = ""; 
 	if (m_iLastAction != lParam)
 	{
