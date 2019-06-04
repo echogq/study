@@ -934,6 +934,8 @@ BOOL CAutoTradeDlg::OnInitDialog()
 		if (IDYES != popTimedMessageBox("发现上次遗留的信号，需要先从ini中清除吗？", 5))
 		{
 			m_iLastAction = atoi(buf);
+			GetDlgItem(IDC_STATICCMD)->SetWindowText(PrefixTimeStr(buf));
+
 		}
 		else
 			WritePrivateProfileStringA("LastTradeMsg", "Msg", "", ".\\AutoTrade.ini");
