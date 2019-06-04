@@ -1081,11 +1081,11 @@ void CAutoTradeDlg::OnTimer(UINT nIDEvent)
 		}
 	}
 
-	if ((tm.GetHour() == 23) && ((tm.GetMinute() == 58) || (tm.GetMinute() == 59) ))
+	if ((tm.GetHour() == 23 || tm.GetHour() == 8) && ((tm.GetMinute() == 58) || (tm.GetMinute() == 59) ))
 	{
 		if (::FindWindow("TdxW_MainFrame_Class", NULL))
 		{
-			if ((IDNO != popTimedMessageBox("0点将至，通达信需要重启！需要立即kill吗？？？", 4)))
+			if ((IDNO != popTimedMessageBox("0/9点将至，通达信需要重启！需要立即kill吗？？？", 4)))
 			{
 				TRACE("\r\nRunApp2End ...");
 				RunApp2End("tskill", "/A *tdx*", FALSE);
