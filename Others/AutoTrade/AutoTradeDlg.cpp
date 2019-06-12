@@ -1053,7 +1053,30 @@ BOOL IsExistProcess(const char*  szProcessName)
 	return FALSE;
 }
 
-void CAutoTradeDlg::OnTimer(UINT nIDEvent) 
+
+void Run_HuaAnTDX()
+{
+	char buf[MAX_PATH] = { 0 };
+	GetPrivateProfileStringA("LastTradeMsg", "HA_TDXPath", "", buf, sizeof(buf), ".\\AutoTrade.ini");
+	if (strlen(buf) > 0)
+	{
+		//WinExec(buf, SW_NORMAL);
+		RunApp2End("Auto_OpenHuaAn.exe", buf);
+	}
+}
+
+void Run_TDX()
+{
+	char buf[MAX_PATH] = { 0 };
+	GetPrivateProfileStringA("LastTradeMsg", "TDXPath", "", buf, sizeof(buf), ".\\AutoTrade.ini");
+	if (strlen(buf) > 0)
+	{
+		//WinExec(buf, SW_NORMAL);
+		RunApp2End("Auto_OpenTDX.exe", buf);
+	}
+}
+
+void CAutoTradeDlg::OnTimer(UINT nIDEvent)
 {
 	TRACE("Tid=0x%X OnTimer ", ::GetCurrentThreadId());
 	// TODO: Add your message handler code here and/or call default
@@ -1073,13 +1096,8 @@ void CAutoTradeDlg::OnTimer(UINT nIDEvent)
 	{
 		if ((tm.GetHour() >= 9) && (tm.GetHour() < 15))
 		{
-			char buf[MAX_PATH] = { 0 };
-			GetPrivateProfileStringA("LastTradeMsg", "TDXPath", "", buf, sizeof(buf), ".\\AutoTrade.ini");
-			if (strlen(buf) > 0)
-			{
-				//WinExec(buf, SW_NORMAL);
-				RunApp2End("Auto_OpenHuaAn.exe", buf);
-			}
+			Run_HuaAnTDX();
+			Run_TDX();
 		}
 	}
 
@@ -1999,8 +2017,9 @@ void CAutoTradeDlg::OnBnClickedKilltdx()
 
 void CAutoTradeDlg::OnBnClickedButtonrunhuaan()
 {
-	CString sPara = " 2 "; 
-	RunApp2End(AUTO_OPEN_ALL, sPara);
+	//CString sPara = " 2 "; 
+	//RunApp2End(AUTO_OPEN_ALL, sPara);
+	Run_HuaAnTDX();
 }
 
 void CAutoTradeDlg::OnBnClickedButtonruntdx1()
@@ -2011,8 +2030,9 @@ void CAutoTradeDlg::OnBnClickedButtonruntdx1()
 
 void CAutoTradeDlg::OnBnClickedButtonruntdx()
 {
-	CString sPara = " 0 "; 
-	RunApp2End(AUTO_OPEN_ALL, sPara);
+	//CString sPara = " 0 "; 
+	//RunApp2End(AUTO_OPEN_ALL, sPara);
+	Run_TDX();
 }
 
 
