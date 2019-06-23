@@ -8,7 +8,7 @@ OBV 50
 2. 探索最佳专家系统
 3. 计算周期5复制，本地全部数据
 4. 打开debugview
-5. 交易公式：
+5. 交易公式：【MY_CCI_JY】
 	ENTERLONG: "MYCCI.ENTERLONG"(QQ,AA,BB);
 	EXITLONG: "MYCCI.EXITLONG"(QQ,AA,BB);
 
@@ -22,7 +22,7 @@ OBV 50
 	总资产:=TDXDLL2(1,O,动作,IFF(0,MINUTE,DATE));{因为是信号上一个K线所以用当前开盘价买入}
 	最大回撤:=TDXDLL2(2,QQ,AA,BB);
 
-6. 指标公式MYCCI(QQ,AA,BB)，输出ENTERLONG， EXITLONG
+6. 指标公式【MYCCI】(QQ,AA,BB)，输出ENTERLONG， EXITLONG
 /////////////////////////////////////////////////
 
 TDX txt to lc5，追加
