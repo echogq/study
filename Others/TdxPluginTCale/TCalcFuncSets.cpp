@@ -417,7 +417,7 @@ void CalcWin(int DataLen,float* pfOUT,float* currPrice,float* fAction,float* cur
 					fStockCounts = fTotalAsset / currPrice[i];
 //#ifdef _DEBUG
 					TCHAR bbb[256] = { 0 };
-					sprintf(bbb, ">>买入day,%.0f,价格,%.3f,总资产,%.3f,", fBuyDay, currPrice[i], fTotalAsset);
+					sprintf(bbb, ">>买入day,%.0f,价格,%.3f,总资产,%.3f,", fBuyDay-1000000, currPrice[i], fTotalAsset);
 					OutputDebugString(bbb);
 //#endif
 				}
@@ -442,7 +442,7 @@ void CalcWin(int DataLen,float* pfOUT,float* currPrice,float* fAction,float* cur
 
 	//#ifdef _DEBUG
 						TCHAR bbb[256] = { 0 };
-						sprintf(bbb, "====卖出day,%.0f,价格,%.3f,总资产,%.3f,[%d]次", currDay[i], currPrice[i], fTotalAsset, iSaleCount);
+						sprintf(bbb, "====卖出day,%.0f,价格,%.3f,总资产,%.3f,[%d]次", currDay[i]-1000000, currPrice[i], fTotalAsset, iSaleCount);
 						OutputDebugString(bbb);
 	//#endif
 					}
@@ -586,7 +586,7 @@ void returnMaxLost(int DataLen,float* pfOUT,float* pfINa,float* pfINb,float* pfI
 	{
 		//Log 最大回撤 fMaxLost
 		TCHAR bbb[256] = {0};
-		TraceEx("\r\n[TDX]总(%.0f_%.0f_%.0f),%2.2f～%2.2f, 价(%.3f--%.3f), 期末资产:%.3f, 盈|撤|比％,%.2f,-%.2f,%.2f, 卖|盈|比％,%d|%d|%.2f", pfINa[0], pfINb[0], pfINc[0], 190000.0+(fFirstDay/100), 190000.0+(fLastDay/100), fStartPrice, fEndPrice, fTotalAsset, fWinRate,fMaxLost, 100*fWinRate/fMaxLost, iSaleCount,iWinCount,(100.0*iWinCount/iSaleCount));
+		TraceEx("\r\n[TDX]总(%.0f_%.0f_%.0f),%2.2f～%2.2f, 价(%.3f～%.3f), 资:%.3f, 盈\t%.3f\t％|撤-%.2f％|比%.2f％, %d卖|%d盈|比%.2f％", pfINa[0], pfINb[0], pfINc[0], 190000.0+(fFirstDay/100), 190000.0+(fLastDay/100), fStartPrice, fEndPrice, fTotalAsset, fWinRate,fMaxLost, 100*fWinRate/fMaxLost, iSaleCount,iWinCount,(100.0*iWinCount/iSaleCount));
 		//OutputDebugString(bbb);
 	}
 
@@ -975,9 +975,9 @@ void PostMsgOf_BS(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* 
 			sprintf(aaa, "\r\n[TDX]指令,(%.0f_%.0f_周期：%.0f), %s,", pfINa[DataLen-1], pfINb[DataLen-1], pfINc[DataLen-1], bbb);
 			OutputDebugString(aaa);
 		}
+
 	}
 }
-
 void BuyOne(int DataLen,float* pfOUT,float* pfINa,float* pfINb,float* pfINc)
 {
 	OutputDebugString("BuyOne");
@@ -1031,16 +1031,14 @@ PluginTCalcFuncInfo g_CalcFuncSets[] =
 	{6,(pPluginFUNC)&QueryDB},
 
 	{8,(pPluginFUNC)&PostMsgOf_BS},//向控制台发出买卖指令//(买入，卖出，周期)
+	{9,(pPluginFUNC)&BuyOne},
 
-	//{9,(pPluginFUNC)&BuyOne},
-	//{ 10,(pPluginFUNC)&Test99 },
-	//{ 11,(pPluginFUNC)&Test99 },
-	//{ 12,(pPluginFUNC)&Test99 },
-	//{ 13,(pPluginFUNC)&Test99 },
-
+	{ 10,(pPluginFUNC)&Test99 },
+	{ 11,(pPluginFUNC)&Test99 },
+	{ 12,(pPluginFUNC)&Test99 },
+	{ 13,(pPluginFUNC)&Test99 },
 	{ 88,(pPluginFUNC)&OutputN }, //Log输出卖出亏损的3个数值 or 3个0.0f
 	{ 89,(pPluginFUNC)&OutputP }, //Log输出卖出盈利的3个数值 or 3个0.0f
-
 	{0,NULL}
 };
 
