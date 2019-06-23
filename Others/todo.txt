@@ -3,6 +3,27 @@
 低仓介入？ 
 
 OBV 50
+//////////////////变化参数计算输出结果//////////////////////////
+1. 创业板指K线
+2. 探索最佳专家系统
+3. 计算周期5复制，本地全部数据
+4. 打开debugview
+5. 交易公式：
+	ENTERLONG: "MYCCI.ENTERLONG"(QQ,AA,BB);
+	EXITLONG: "MYCCI.EXITLONG"(QQ,AA,BB);
+
+	{只发出5分钟周期的买卖信号：PERIOD=1 }
+	周期:= 1;
+	买信号:= (PERIOD=周期) AND (REF(ENTERLONG,1) AND NOT(EXITLONG));
+	卖信号:= (PERIOD=周期) AND (REF(EXITLONG,1) AND NOT(ENTERLONG));
+	发买卖信号:=TDXDLL2(8,买信号,卖信号,PERIOD);
+
+	动作:= IFF(买信号, 1, IFF(卖信号, 2, 0)) ;
+	总资产:=TDXDLL2(1,O,动作,IFF(0,MINUTE,DATE));{因为是信号上一个K线所以用当前开盘价买入}
+	最大回撤:=TDXDLL2(2,QQ,AA,BB);
+
+6. 指标公式MYCCI(QQ,AA,BB)，输出ENTERLONG， EXITLONG
+/////////////////////////////////////////////////
 
 TDX txt to lc5，追加
 TDX 怎么显示无小数点的整数
