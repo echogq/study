@@ -1096,8 +1096,14 @@ void CAutoTradeDlg::OnTimer(UINT nIDEvent)
 	{
 		if ((tm.GetHour() >= 9) && (tm.GetHour() < 15))
 		{
-			Run_HuaAnTDX();
-			Run_TDX();
+			if (tm.GetDayOfWeek() > 1)
+			{
+				if (tm.GetDayOfWeek() <= 6)
+				{
+					Run_HuaAnTDX();
+					Run_TDX();
+				}
+			}
 		}
 	}
 
