@@ -29,6 +29,32 @@ CAuto_TDXBuyApp::CAuto_TDXBuyApp()
 	// 将所有重要的初始化放置在 InitInstance 中
 }
 
+HWND hMainWnd = NULL;
+/// 回調函数:査找AP主窗口句柄
+BOOL CALLBACK EnumWindowsPrc(HWND hwnd, LPARAM lParam)
+{
+	char szCaption[512];
+	char *szTemp;
+
+	memset(szCaption, '\0', 512);
+	szTemp = (char *)lParam;
+	::GetWindowTextA(hwnd, szCaption, sizeof(szCaption));
+
+
+	if (strstr(szCaption, szTemp))
+	{
+		::GetClassName(hwnd, szCaption, sizeof(szCaption));
+		if (strstr(szCaption, "TdxW_MainFrame_Class"))
+		{
+			hMainWnd = hwnd;
+			return FALSE;
+		}
+	}
+
+	return TRUE;
+}
+
+
 static char sMainClass[256] = "TdxW_MainFrame_Class";
 
 void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset, char * buyCount_Default, char * sBuyBtnTxt)
@@ -44,9 +70,18 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 	else
 		strcpy(sRateBtnTxt, sRate);
 
-	HWND hTDX_MainWnd = ::FindWindowA(sMainClass, NULL);
+	//华安证券V6.36 - [组合图-创业板]
+	//通达信金融终端V7.46 - [分析图表-创业板指]
+	hMainWnd = NULL;
+	::EnumWindows(EnumWindowsPrc, (LPARAM)"华安证券");
+
+	HWND hTDX_MainWnd = hMainWnd/*::FindWindowA(sMainClass, NULL)*/;
 	if (hTDX_MainWnd)
 	{
+		::SetWindowPos(hTDX_MainWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+		::SetWindowPos(hTDX_MainWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+		::SetForegroundWindow(hTDX_MainWnd);
+
 		HWND hTDX_QuickTradeWnd = ::FindWindowA("#32770", sDlgCaption);
 		while (NULL != hTDX_QuickTradeWnd)
 		{
