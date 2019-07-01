@@ -10,7 +10,41 @@
 #define new DEBUG_NEW
 #endif
 
+void LogTrace16380(LPCTSTR pszFormat, ...)
+{
+	va_list pArgs;
 
+	char szMessageBuffer[16380] = { 0 };
+	va_start(pArgs, pszFormat);
+	_vsntprintf(szMessageBuffer, 16380, pszFormat, pArgs);
+	va_end(pArgs);
+
+	//获取应用程序目录
+	char szapipath[16380];//（D:\Documents\Downloads\TEST.exe）
+	memset(szapipath, 0, 16380);
+	::GetModuleFileNameA(NULL, szapipath, 16380);
+
+	//获取应用程序名称
+	char szExe[16380] = "";//（TEST.exe）
+	char *pbuf = NULL;
+	char* szLine = strtok_s(szapipath, "\\", &pbuf);
+	while (NULL != szLine)
+	{
+		strcpy_s(szExe, szLine);
+		szLine = strtok_s(NULL, "\\", &pbuf);
+	}
+
+	memset(szapipath, 0, 16380);
+	strcpy(szapipath, "[");
+	char* ppp = szapipath + 1;
+	//删除.exe
+	strncpy(ppp, szExe, strlen(szExe) - 4);
+	strcat(szapipath, "] ");
+	//cout << szapipath << endl;//(TEST)
+	strcat(szapipath, szMessageBuffer);
+
+	OutputDebugString(szapipath);
+}
 // CAuto_TDXBuyApp
 
 BEGIN_MESSAGE_MAP(CAuto_TDXBuyApp, CWinApp)
@@ -59,6 +93,7 @@ static char sMainClass[256] = "TdxW_MainFrame_Class";
 
 void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset, char * buyCount_Default, char * sBuyBtnTxt)
 {
+	LogTrace16380("DoTrade\n");
 	char sRefreshBtnTxt[256] = "刷";
 	char sRateBtnTxt[256] = { 0 };
 
@@ -106,13 +141,16 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 		//弹出闪电窗：
 		//::SendMessage((HWND)hTDX_MainWnd, WM_COMMAND, MAKEWPARAM(5085, 0), NULL);
 		::SendMessage((HWND)hTDX_MainWnd, WM_COMMAND, MAKEWPARAM(iActionID, 0), NULL);
+		LogTrace16380("弹出闪电窗\n");
 
+		//获取闪电窗：
 		hTDX_QuickTradeWnd = NULL;
 		while (!hTDX_QuickTradeWnd)
 		{
 			Sleep(100);
 			hTDX_QuickTradeWnd = ::FindWindowA("#32770", sDlgCaption);
 		}
+		LogTrace16380("获取闪电窗=0x%x\n", hTDX_QuickTradeWnd);
 
 		CWnd *pWnd = CWnd::FromHandle(hTDX_QuickTradeWnd)->GetWindow(GW_CHILD);
 
@@ -131,11 +169,13 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 				{
 					pCurRateBtnWnd = pWnd;
 					//SendMessage(pCurRateWnd->m_hWnd, BM_CLICK, 0, 0L);
+					LogTrace16380("获取比例窗=0x%x\n", pCurRateBtnWnd);
 				}
 				else if (_tcsicmp(temp1, sRefreshBtnTxt) == 0)
 				{
 					pRefreshBtnWnd = pWnd;
 					//SendMessage(pCurRateWnd->m_hWnd, BM_CLICK, 0, 0L);
+					LogTrace16380("获取刷新窗=0x%x\n", pRefreshBtnWnd);
 				}
 			}
 
@@ -179,6 +219,8 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 				}
 				if (idxEdit == 3) //  3 数量
 				{
+					LogTrace16380("比例窗=0x%x\n", pCurRateBtnWnd);
+
 					if (NULL == pCurRateBtnWnd)
 					{
 						::SendMessageA(pWnd->m_hWnd, WM_SETTEXT, 0, (LPARAM)buyCount_Default);
@@ -225,6 +267,7 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 		}
 
 		{
+			LogTrace16380("点击买卖按钮\n");
 			HWND hWnd0 = NULL;
 			while (NULL == hWnd0)
 			{
@@ -239,7 +282,8 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 				hWnd0 = ::FindWindowExA(hTDX_QuickTradeWnd, NULL, "Button", sBuyBtnTxt);
 			}
 
-			//委托撤单：
+			LogTrace16380("交易完成，打开委托撤单窗口看结果\n");
+			//交易完成，打开委托撤单窗口看结果：
 			//hTDX_MainWnd = ::FindWindowA(sMainClass, NULL);
 			if (hTDX_MainWnd)
 			{
