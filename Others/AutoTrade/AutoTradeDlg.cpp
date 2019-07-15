@@ -36,7 +36,7 @@ char* PrefixTimeStr( char* p )
 	newtime=localtime(&lt1);
 
 	//strftime( tmpbuf, 128, "Today is %A, the %d day of %B in the year %Y.\n", newtime);
-	sprintf(tmpbuf, "%2d:%2d:%2d %s", newtime->tm_hour, newtime->tm_min, newtime->tm_sec, p);  
+	sprintf(tmpbuf, "周%d %2d:%2d:%2d %s", newtime->tm_wday, newtime->tm_hour, newtime->tm_min, newtime->tm_sec, p);
 
 	return tmpbuf;
 }
@@ -632,7 +632,7 @@ CAutoTradeDlg::CAutoTradeDlg(CWnd* pParent /*=NULL*/)
 , m_bAutoSell(FALSE)
 , m_bAutoBuy(FALSE)
 , m_iRateS(2)
-, m_iRateB(2)
+, m_iRateB(4)
 , m_strCopyData(_T(""))
 {
 	//{{AFX_DATA_INIT(CAutoTradeDlg)
@@ -1107,7 +1107,8 @@ void CAutoTradeDlg::OnTimer(UINT nIDEvent)
 		}
 	}
 
-	if ((tm.GetHour() == 23 || tm.GetHour() == 8) && ((tm.GetMinute() == 58) || (tm.GetMinute() == 59) ))
+	if (((tm.GetHour() == 23 || tm.GetHour() == 8) && ((tm.GetMinute() == 58) || (tm.GetMinute() == 59) ))
+		||((tm.GetHour() == 9) && (tm.GetMinute() == 25) && (tm.GetSecond() >= 54))) //集合竞价后杀进程
 	{
 		if (::FindWindow("TdxW_MainFrame_Class", NULL))
 		{

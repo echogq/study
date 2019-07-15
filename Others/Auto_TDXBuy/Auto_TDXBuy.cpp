@@ -193,6 +193,7 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 				idxEdit++;
 				if (idxEdit == 1) // 1 价格
 				{
+					LogTrace16380("获取价格框文本。。。\n");
 					char temp2[256] = { 0 };
 					char tempNew[256] = { 0 };
 					while (strlen(temp2) == 0)
@@ -216,6 +217,7 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 
 					//CWnd::FromHandle(hTDX_QuickTradeWnd)->UpdateWindow();
 					Sleep(200);//问题：【+ 0.001】，不知道何时新的最大可买计算结束（值也可能不变）
+					LogTrace16380("获取价格框文本结束\n");
 				}
 				if (idxEdit == 3) //  3 数量
 				{
@@ -223,6 +225,7 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 
 					if (NULL == pCurRateBtnWnd)
 					{
+						LogTrace16380("设置数量框文本=%s。。。\n", buyCount_Default);
 						::SendMessageA(pWnd->m_hWnd, WM_SETTEXT, 0, (LPARAM)buyCount_Default);
 						char temp2[256] = { 0 };
 						while (strcmp(temp2, buyCount_Default) != 0)
@@ -230,9 +233,11 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 							Sleep(10);
 							::SendMessageA(pWnd->m_hWnd, WM_GETTEXT, 256, (LPARAM)temp2);//EDIT的句柄，消息，接收缓冲区大小，接收缓冲区指针
 						}
+						LogTrace16380("设置数量框文本=%s 结束\n", buyCount_Default);
 					}
 					else
 					{
+						LogTrace16380("点击数量比例按钮。。。\n");
 						char temp2[256] = { 0 };
 						while ((strcmp(temp2, "0") == 0) || (strlen(temp2) == 0))
 						{
@@ -242,6 +247,7 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 							Sleep(10);
 							::SendMessageA(pWnd->m_hWnd, WM_GETTEXT, 256, (LPARAM)temp2);//EDIT的句柄，消息，接收缓冲区大小，接收缓冲区指针
 						}
+						LogTrace16380("点击数量比例按钮结束\n");
 
 					}
 				}
@@ -299,8 +305,11 @@ void OnBuy(char* sCode, char* sRate, float fTotalRate)
 	char buyCount_Default[256] = "19000";
 	char sDlgCaption[256] = "闪电买入";
 	char sBuyBtnTxt[256] = "买 入";
-	int iActionID = 5081;
-	float fPriceOffset = 0.001;
+
+	//int iActionID = 5081;//买一价闪买
+	//float fPriceOffset = 0.001;
+	int iActionID = 5095;//卖五价闪买
+	float fPriceOffset = 0.000;
 
 	DoTrade(sRate, sDlgCaption, iActionID, fPriceOffset, buyCount_Default, sBuyBtnTxt);
 }
@@ -311,8 +320,11 @@ void OnSell(char* sCode, char* sRate, float fTotalRate)
 	char buyCount_Default[256] = "19000";
 	char sDlgCaption[256] = "闪电卖出";
 	char sBuyBtnTxt[256] = "卖  出";
-	int iActionID = 5121;
-	float fPriceOffset = -0.001;
+
+	//int iActionID = 5121;//卖一价闪卖
+	//float fPriceOffset = -0.001;
+	int iActionID = 5115; //买五价闪卖
+	float fPriceOffset = -0.000;
 
 	DoTrade(sRate, sDlgCaption, iActionID, fPriceOffset, buyCount_Default, sBuyBtnTxt);
 }
