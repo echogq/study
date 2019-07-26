@@ -1945,7 +1945,11 @@ LRESULT CAutoTradeDlg::OnTradeMsg( WPARAM wParam, LPARAM lParam )
 {
 	TRACE("Tid=0x%X OnTradeMsg ",::GetCurrentThreadId());
 	CString sAct = ""; 
-	if (m_iLastAction != lParam)
+
+	CTime tm = CTime::GetCurrentTime();
+
+	//if (m_iLastAction != lParam)
+	if (((tm.GetHour()*100+ tm.GetMinute()) >= 931)) //9:31之后收到指令才动作
 	{
 		m_iLastAction = lParam;
 
@@ -1967,7 +1971,7 @@ LRESULT CAutoTradeDlg::OnTradeMsg( WPARAM wParam, LPARAM lParam )
 				NewBuyRate(m_iRateB);
 			}
 			
-			WritePrivateProfileStringA("LastTradeMsg", "Msg", "1", ".\\AutoTrade.ini");
+			//WritePrivateProfileStringA("LastTradeMsg", "Msg", "1", ".\\AutoTrade.ini");
 			break;
 		case 2:
 			sAct = "卖出";
@@ -1981,7 +1985,7 @@ LRESULT CAutoTradeDlg::OnTradeMsg( WPARAM wParam, LPARAM lParam )
 				NewSellRate(m_iRateS);
 			}
 
-			WritePrivateProfileStringA("LastTradeMsg", "Msg", "2", ".\\AutoTrade.ini");
+			//WritePrivateProfileStringA("LastTradeMsg", "Msg", "2", ".\\AutoTrade.ini");
 			break;
 		default:
 			break;
