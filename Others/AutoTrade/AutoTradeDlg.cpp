@@ -747,6 +747,28 @@ ON_BN_CLICKED(ID_RUNTDX, &CAutoTradeDlg::OnBnClickedRuntdx)
 ON_WM_COPYDATA()
 END_MESSAGE_MAP()
 
+void Thread_ClosePopups(PVOID param)
+{
+	while (true)
+	{
+		HWND hPopWnd = NULL;
+		if (hPopWnd = ::FindWindow("#32770", "通达信信息"))
+		{
+			//::MessageBoxA(NULL, "通达信软件", "友好提示", MB_ICONEXCLAMATION);
+			::SendMessage(hPopWnd, WM_CLOSE, 0, 0);
+		}
+
+		hPopWnd = NULL;
+		if (hPopWnd = ::FindWindow("#32770", "通达信软件"))
+		{
+			//::MessageBoxA(NULL, "通达信软件", "友好提示", MB_ICONEXCLAMATION);
+			::SendMessage(hPopWnd, WM_CLOSE, 0, 0);
+		}
+		Sleep(50);
+	}
+
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // CAutoTradeDlg message handlers
 void WriteDailyLog(CString sLog)
@@ -940,6 +962,8 @@ BOOL CAutoTradeDlg::OnInitDialog()
 		else
 			WritePrivateProfileStringA("LastTradeMsg", "Msg", "", ".\\AutoTrade.ini");
 	}
+
+	_beginthread(Thread_ClosePopups, 0, NULL);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -1241,7 +1265,8 @@ void CAutoTradeDlg::OnBnClickedCancel()
 {
 	// TODO: Add your control notification handler code here
 	//WinExec( "cmd /c tskill monitorTDXpool",SW_NORMAL);
-	OnCancel();
+	//OnCancel();
+	ExitProcess(0);
 }
 
 
@@ -1948,7 +1973,7 @@ LRESULT CAutoTradeDlg::OnTradeMsg( WPARAM wParam, LPARAM lParam )
 
 	CTime tm = CTime::GetCurrentTime();
 
-	//if (m_iLastAction != lParam)
+	if (m_iLastAction != lParam)
 	if (((tm.GetHour()*100+ tm.GetMinute()) >= 931)) //9:31之后收到指令才动作
 	{
 		m_iLastAction = lParam;
