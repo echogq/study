@@ -1976,7 +1976,6 @@ LRESULT CAutoTradeDlg::OnTradeMsg( WPARAM wParam, LPARAM lParam )
 	if (m_iLastAction != lParam)
 	if (((tm.GetHour()*100+ tm.GetMinute()) >= 931)) //9:31之后收到指令才动作
 	{
-		m_iLastAction = lParam;
 
 		UpdateData(TRUE);
 		switch(lParam)
@@ -1986,6 +1985,7 @@ LRESULT CAutoTradeDlg::OnTradeMsg( WPARAM wParam, LPARAM lParam )
 			break;
 		case 1:
 			sAct = "买入";
+			m_iLastAction = lParam;
 
 			if (m_bAutoBuy)
 			{
@@ -2000,6 +2000,7 @@ LRESULT CAutoTradeDlg::OnTradeMsg( WPARAM wParam, LPARAM lParam )
 			break;
 		case 2:
 			sAct = "卖出";
+			m_iLastAction = lParam;
 
 			if (m_bAutoSell) 
 			{
@@ -2016,12 +2017,15 @@ LRESULT CAutoTradeDlg::OnTradeMsg( WPARAM wParam, LPARAM lParam )
 			break;
 		}
 
-		m_lstTradeMSG.InsertString(0, PrefixTimeStr(sAct.GetBuffer()));
-	::OutputDebugString("OnTradeMsg " + sAct);
-		m_lstTradeMSG.SetCaretIndex(0, 1);
+		if (lParam != 0)
+		{
+			m_lstTradeMSG.InsertString(0, PrefixTimeStr(sAct.GetBuffer()));
+			::OutputDebugString("OnTradeMsg " + sAct);
+			m_lstTradeMSG.SetCaretIndex(0, 1);
 
-		//GetDlgItem(IDC_STATICCMD)->SetWindowText(PrefixTimeStr(sAct.GetBuffer()));
-		OnScreenfont(PrefixTimeStr(sAct.GetBuffer()));
+			//GetDlgItem(IDC_STATICCMD)->SetWindowText(PrefixTimeStr(sAct.GetBuffer()));
+			OnScreenfont(PrefixTimeStr(sAct.GetBuffer()));
+		}
 	}
 
 	GetDlgItem(IDC_STATICCMD)->SetWindowText(PrefixTimeStr(sAct.GetBuffer()));
