@@ -1,0 +1,62 @@
+http://toutiao.manqian.cn/wz_5cUtQVsjL9Z.html
+
+基于TCAPI的交易程序分享
+公众号：品生文化 作者：某小编 2019-01-05 17:26
+
+
+  前面文章已介绍，早期的交易程序通讯模块集中在TCAPI.dll中，目前仍然有不少券商使用的是这种通讯模式，下面主要介绍基于TCAPI.dll的程序处理流程。
+
+1. 使用TcSdk_InitInstance创建实例，第二个参数指向的是TCAPI缓冲数据的目录，如果为空即在当前目录，目录中内容是解密数据。
+
+2. 设置服务参数,版本信息，终端类型，站点信息等参数创建Client。
+
+3. 设置账号信息。
+
+4. 构造登录参数并发送登录请求。
+
+a.使用TcSdk_GetConstParameterSet创建参数集。
+
+b.使用TcSdk_SetParamLong/TcSdk_SetParam设置参数, 如TcSdk_SetParam((DWORD)pconstparameterset,0x4db, (DWORD)"1", 0);
+第二个参数0x4db作用:TCAPI发送到登录请求数据是以“|”分割的数据，处于不同的位置含义不同，TCAPI内部有张映射表，通过这个参数可以查询TcSdk_SetParam所设置的值存放位置。
+
+TcSdk_SetParam:
+001575C8   05DE75CA
+001575CC   000004EA Login
+001575D0   72CCA7B0  mfc42.72CCA7B0
+001575D4   00000000
+
+00179B7C   14859980
+00179B80   0000025E	下单
+00179B84   0448CAE0
+00179B88   00000000
+
+00179B7C   14859980
+00179B80   000000AD
+00179B84   146EE1D8
+00179B88   00000000
+
+
+
+c.TcSdk_ResumeTcJob执行登录任务。
+
+ 5.接收并处于响应消息。
+
+a.TcSdk_WaitForTcJob等待4步骤任务执行结束。
+
+b.获取错误码，如果出错，获取出错信息并打印，销毁Client, InitInstance退出。
+
+c.获取返回信息并输出。
+
+执行业务请求与4，5步骤类似，只是发送的请求数据内容不同。
+
+下面是登录某商证券英文版服务器的结果(该英文版仍然使用的是TCAPI，版本是2014年发布的2.0)
+
+ 
+
+                          
+
+执行程序共享在网盘中“TdxDemo_BaseTCAPI”目录中
+
+https://pan.baidu.com/s/1vv9P3kmH0NTWouFMF7TM2A
+
+6ywy
