@@ -16,6 +16,155 @@ http://toutiao.manqian.cn/wz_5cUtQVsjL9Z.html
 
 a.使用TcSdk_GetConstParameterSet创建参数集。
 
+【委托撤单】
+Call stack of main thread
+Address    Stack      Procedure / arguments                                        Called from                   Frame
+0019F674   05562369   ? TcApi.TcSdk_SetParam                                       Tc.05562363
+0019F678   1E113C68     Arg1 = 1E113C68
+0019F67C   00000079     Arg2 = 00000079
+0019F680   0502D968     Arg3 = 0502D968 ASCII "120600705"
+0019F688   05561FF2   Includes Tc.05562369                                         Tc.05561FEF
+0019F6B0   05C6A3DE   Includes Tc.05561FF2                                         AddinSto.05C6A3DB
+0019F6FC   05C41313   ? AddinSto.05C6A1A0                                          AddinSto.05C4130E
+0019FA38   05C54E04   ? AddinSto.05C400E0                                          AddinSto.05C54DFF
+0019FA88   0F44841B   Includes AddinSto.05C54E04                                   mfc42.0F448419
+0019FA98   0F43FCDB   ? mfc42.0F448400                                             mfc42.0F43FCD6
+0019FB40   0F43FE40   Includes mfc42.0F43FCDB                                      mfc42.0F43FE3E                0019FB3C
+0019FB6C   05C75CAC   <jmp.&MFC42.#?WindowProc@CWnd@@MAEJIIJ@Z_6374>               AddinSto.05C75CA7             0019FB68
+
+Call stack of main thread
+Address    Stack      Procedure / arguments                                        Called from                   Frame
+0019F698   05562369   ? TcApi.TcSdk_SetParam                                       Tc.05562363
+0019F69C   1E113C68     Arg1 = 1E113C68
+0019F6A0   00000079     Arg2 = 00000079
+0019F6A4   0502D968     Arg3 = 0502D968 ASCII "120600705"
+0019F6AC   05C6A404   Includes Tc.05562369                                         AddinSto.05C6A401
+0019F6FC   05C41313   ? AddinSto.05C6A1A0                                          AddinSto.05C4130E
+0019FA38   05C54E04   ? AddinSto.05C400E0                                          AddinSto.05C54DFF
+0019FA88   0F44841B   Includes AddinSto.05C54E04                                   mfc42.0F448419
+0019FA98   0F43FCDB   ? mfc42.0F448400                                             mfc42.0F43FCD6
+0019FB40   0F43FE40   Includes mfc42.0F43FCDB                                      mfc42.0F43FE3E                0019FB3C
+0019FB6C   05C75CAC   <jmp.&MFC42.#?WindowProc@CWnd@@MAEJIIJ@Z_6374>               AddinSto.05C75CA7             0019FB68
+
+Call stack of main thread
+Address    Stack      Procedure / arguments                                        Called from                   Frame
+0019F698   05562369   ? TcApi.TcSdk_SetParam                                       Tc.05562363
+0019F69C   1E113C68     Arg1 = 1E113C68
+0019F6A0   0000007B     Arg2 = 0000007B
+0019F6A4   1E0AE8AC     Arg3 = 1E0AE8AC ASCII "0602572118"
+0019F6AC   05C6A511   Includes Tc.05562369                                         AddinSto.05C6A50E
+0019F6FC   05C41313   ? AddinSto.05C6A1A0                                          AddinSto.05C4130E
+0019FA38   05C54E04   ? AddinSto.05C400E0                                          AddinSto.05C54DFF
+0019FA88   0F44841B   Includes AddinSto.05C54E04                                   mfc42.0F448419
+0019FA98   0F43FCDB   ? mfc42.0F448400                                             mfc42.0F43FCD6
+0019FB40   0F43FE40   Includes mfc42.0F43FCDB                                      mfc42.0F43FE3E                0019FB3C
+0019FB6C   05C75CAC   <jmp.&MFC42.#?WindowProc@CWnd@@MAEJIIJ@Z_6374>               AddinSto.05C75CA7             0019FB68
+Call stack of main thread
+Address    Stack      Procedure / arguments                                        Called from                   Frame
+0019F698   05562369   ? TcApi.TcSdk_SetParam                                       Tc.05562363
+0019F69C   1E113C68     Arg1 = 1E113C68
+0019F6A0   0000008C     Arg2 = 0000008C
+0019F6A4   05EADEB0     Arg3 = 05EADEB0
+0019F6AC   05C6A524   Includes Tc.05562369                                         AddinSto.05C6A521
+0019F6FC   05C41313   ? AddinSto.05C6A1A0                                          AddinSto.05C4130E
+0019FA38   05C54E04   ? AddinSto.05C400E0                                          AddinSto.05C54DFF
+0019FA88   0F44841B   Includes AddinSto.05C54E04                                   mfc42.0F448419
+0019FA98   0F43FCDB   ? mfc42.0F448400                                             mfc42.0F43FCD6
+0019FB40   0F43FE40   Includes mfc42.0F43FCDB                                      mfc42.0F43FE3E                0019FB3C
+0019FB6C   05C75CAC   <jmp.&MFC42.#?WindowProc@CWnd@@MAEJIIJ@Z_6374>               AddinSto.05C75CA7             0019FB68
+
+Call stack of main thread
+Address    Stack      Procedure / arguments                                        Called from                   Frame
+0019F644   0555DA78   ? TcApi.TcSdk_Send                                           Tc.0555DA72
+0019F688   05562C65   Includes Tc.0555DA78                                         Tc.05562C62
+0019F6A8   05C6B426   Includes Tc.05562C65                                         AddinSto.05C6B423
+0019F6FC   05C41313   AddinSto.05C6A1A0                                            AddinSto.05C4130E
+0019FA38   05C54E04   AddinSto.05C400E0                                            AddinSto.05C54DFF
+0019FA88   0F44841B   Includes AddinSto.05C54E04                                   mfc42.0F448419
+0019FA98   0F43FCDB   ? mfc42.0F448400                                             mfc42.0F43FCD6
+0019FB40   0F43FE40   Includes mfc42.0F43FCDB                                      mfc42.0F43FE3E                0019FB3C
+0019FB6C   05C75CAC   <jmp.&MFC42.#?WindowProc@CWnd@@MAEJIIJ@Z_6374>               AddinSto.05C75CA7             0019FB68
+
+Call stack of main thread
+Address    Stack      Procedure / arguments                                        Called from                   Frame
+0019F654   0555DB16   ? TcApi.TcSdk_UpdateTcJobParameterSet                        Tc.0555DB10
+
+Call stack of main thread
+Address    Stack      Procedure / arguments                                        Called from                   Frame
+0019F650   0555DB1D   ? TcApi.TcSdk_ResumeTcJob                                    Tc.0555DB17
+0019F654   16D52DC0     Arg1 = 16D52DC0
+0019F658   16D52DC0     Arg2 = 16D52DC0
+0019F65C   1E113C68     Arg3 = 1E113C68
+0019F660   05E8EBE4     Arg4 = 05E8EBE4 ASCII "KSQKCX"
+0019F664   003E0422     Arg5 = 003E0422
+0019F668   0B75A610     Arg6 = 0B75A610 ASCII "Credit.wtcd"
+0019F688   05562C65   Includes Tc.0555DB1D                                         Tc.05562C62
+0019F6A8   05C6B426   Includes Tc.05562C65                                         AddinSto.05C6B423
+0019F6FC   05C41313   AddinSto.05C6A1A0                                            AddinSto.05C4130E
+0019FA38   05C54E04   AddinSto.05C400E0                                            AddinSto.05C54DFF
+0019FA88   0F44841B   Includes AddinSto.05C54E04                                   mfc42.0F448419
+0019FA98   0F43FCDB   ? mfc42.0F448400                                             mfc42.0F43FCD6
+0019FB40   0F43FE40   Includes mfc42.0F43FCDB                                      mfc42.0F43FE3E                0019FB3C
+0019FB6C   05C75CAC   <jmp.&MFC42.#?WindowProc@CWnd@@MAEJIIJ@Z_6374>               AddinSto.05C75CA7             0019FB68
+
+
+【资金股份】
+Call stack of main thread
+Address    Stack      Procedure / arguments                                        Called from                   Frame
+0019D91C   05562897   ? TcApi.TcSdk_CreateParameterSet                             Tc.05562891
+0019D920   00000000     Arg1 = 00000000
+0019D924   76DE6710     Arg2 = 76DE6710
+0019D928   05561FD5   Tc.05562800                                                  Tc.05561FD0
+0019D92C   00000000     Arg4 = 00000000
+
+【买入】
+Call stack of main thread
+Address    Stack      Procedure / arguments                                        Called from                   Frame
+0019ECD0   05562897   ? TcApi.TcSdk_CreateParameterSet                             Tc.05562891
+0019ECD4   00000917     Arg1 = 00000003
+0019ECD8   1E120968     Arg2 = 00000000
+0019ECDC   05561FD5   Tc.05562800                                                  Tc.05561FD0
+0019ECE0   00000000     Arg4 = 0154EC44
+
+【卖出】
+Call stack of main thread
+Address    Stack      Procedure / arguments                                        Called from                   Frame
+0019D838   05562897   ? TcApi.TcSdk_CreateParameterSet                             Tc.05562891
+0019D83C   1E175448     Arg1 = 1E175448
+0019D840   00000000     Arg2 = 00000000
+0019D844   05561FD5   Tc.05562800                                                  Tc.05561FD0
+0019D848   00000000     Arg4 = 00000000
+Call stack of main thread
+Address    Stack      Procedure / arguments                                        Called from                   Frame
+0019D868   05562897   ? TcApi.TcSdk_CreateParameterSet                             Tc.05562891
+0019D86C   1E175448     Arg1 = 1E175448
+0019D870   00000000     Arg2 = 00000000
+0019D874   05561FD5   Tc.05562800                                                  Tc.05561FD0
+0019D878   00000000     Arg4 = 00000000
+Call stack of main thread
+Address    Stack      Procedure / arguments                                        Called from                   Frame
+0019F9FC   05562897   ? TcApi.TcSdk_CreateParameterSet                             Tc.05562891
+0019FA00   1E175448     Arg1 = 1E175448
+0019FA04   06ECBD18     Arg2 = 06ECBD18
+0019FA08   05561FD5   Tc.05562800                                                  Tc.05561FD0
+0019FA0C   00000000     Arg4 = 00000000
+
+Call stack of main thread
+Address    Stack      Procedure / arguments                                        Called from                   Frame
+0019F674   05562369   ? TcApi.TcSdk_SetParam                                       Tc.05562363
+0019F678   06E95C10     Arg1 = 06E95C10
+0019F67C   00000079     Arg2 = 00000079
+0019F680   0502D968     Arg3 = 0502D968 ASCII "120600705"
+0019F688   05561FF2   Includes Tc.05562369                                         Tc.05561FEF
+0019F6B0   05C6A3DE   Includes Tc.05561FF2                                         AddinSto.05C6A3DB
+0019F6FC   05C41313   ? AddinSto.05C6A1A0                                          AddinSto.05C4130E
+0019FA38   05C54E04   ? AddinSto.05C400E0                                          AddinSto.05C54DFF
+0019FA88   0F44841B   Includes AddinSto.05C54E04                                   mfc42.0F448419
+0019FA98   0F43FCDB   ? mfc42.0F448400                                             mfc42.0F43FCD6
+0019FB40   0F43FE40   Includes mfc42.0F43FCDB                                      mfc42.0F43FE3E                0019FB3C
+0019FB6C   05C75CAC   <jmp.&MFC42.#?WindowProc@CWnd@@MAEJIIJ@Z_6374>               AddinSto.05C75CA7             0019FB68
+
+
 b.使用TcSdk_SetParamLong/TcSdk_SetParam设置参数, 如TcSdk_SetParam((DWORD)pconstparameterset,0x4db, (DWORD)"1", 0);
 第二个参数0x4db作用:TCAPI发送到登录请求数据是以“|”分割的数据，处于不同的位置含义不同，TCAPI内部有张映射表，通过这个参数可以查询TcSdk_SetParam所设置的值存放位置。
 

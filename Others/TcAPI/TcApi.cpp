@@ -127,6 +127,8 @@ namespace AheadLib
 		::OutputDebugString(stream.str().c_str());
 	}
 
+	DWORD   eeesp0;
+	DWORD   eeesp1;
 
 	// 获取原始函数地址
 	FARPROC WINAPI GetAddress(PCSTR pszProcName)
@@ -164,8 +166,9 @@ namespace AheadLib
 			mov b, eax ;
 			mov eax, [ebp+20] ;
 			mov c, eax ;
-			mov eax, [ebp+24] ;
-			mov d, eax ;
+			mov eax, [ebp + 24];
+			mov d, eax;
+			mov eeesp0, esp;
 		}   //内嵌汇编部分结束... TcSdk_Send
 
 		stringstream stream;  
@@ -197,62 +200,70 @@ namespace AheadLib
 
 		stream.clear();
 		stream.str("");
-		stream<<pszProcName;
-		while (stream.str().length()<32)
+
+		if (!strstr(pszProcName, "onnect"))
 		{
-			stream<<" ";
-		}
-
-
-		memset(s, 0, 12);
-		hex2str(a, s);
-		stream<<"---> a: "<<s; 
-
-		memset(s, 0, 12);
-		hex2str(b, s);
-		stream<<" b: "<<s; 
-
-		memset(s, 0, 12);
-		hex2str(c, s);
-		stream<<" c: "<<s; 
-
-		memset(s, 0, 12);
-		hex2str(d, s);
-		stream<<" d: "<<s; 
-
-
-//		stream<<pszProcName<<" a: "<<hex2str(a)<<" b: "<<hex2str(b)<<" c: "<<hex2str(c)<<" d: "<<hex2str(d); 
-
-		if (strstr(pszProcName, "TcSdk_SetParam") == pszProcName)
-		{
-			if (0 == IsBadReadPtr((void *)c, 4))
+			stream << pszProcName;
+			while (stream.str().length() < 32)
 			{
-				stream << " ==Str:" << (char*)c;
+				stream << " ";
 			}
-		}
-		if (strstr(pszProcName, "TcSdk_SetParamLong") == pszProcName)
-		{
-			{
-				stream << " ==Long:" << (long)c;
-			}
-		}
-		if (strstr(pszProcName, "TcSdk_SetParamFloat") == pszProcName)
-		{
-			{
-				stream << " ==Float:" << (float)c;
-			}
-		}
-// 		if (0 == IsBadReadPtr((void *)b, 4))
-// 		{
-// 			stream<<" bStr:"<<(char*)b; 
-// 		}
-		//stream<< endl; 
 
-// 		stream<<" [";
-// 		
-		//if (stream.str().length() > 1)
-		{
-			::OutputDebugString(stream.str().c_str());
+
+			memset(s, 0, 12);
+			hex2str(eeesp0, s);
+			stream << " esp: " << s;
+
+			memset(s, 0, 12);
+			hex2str(a, s);
+			stream << "---> a: " << s;
+
+			memset(s, 0, 12);
+			hex2str(b, s);
+			stream << " b: " << s;
+
+			memset(s, 0, 12);
+			hex2str(c, s);
+			stream << " c: " << s;
+
+			memset(s, 0, 12);
+			hex2str(d, s);
+			stream << " d: " << s;
+
+
+			//		stream<<pszProcName<<" a: "<<hex2str(a)<<" b: "<<hex2str(b)<<" c: "<<hex2str(c)<<" d: "<<hex2str(d); 
+
+			if (strstr(pszProcName, "TcSdk_SetParam") == pszProcName)
+			{
+				if (0 == IsBadReadPtr((void *)c, 4))
+				{
+					stream << " ==Str:" << (char*)c;
+				}
+			}
+			if (strstr(pszProcName, "TcSdk_SetParamLong") == pszProcName)
+			{
+				{
+					stream << " ==Long:" << (long)c;
+				}
+			}
+			if (strstr(pszProcName, "TcSdk_SetParamFloat") == pszProcName)
+			{
+				{
+					stream << " ==Float:" << (float)c;
+				}
+			}
+			// 		if (0 == IsBadReadPtr((void *)b, 4))
+			// 		{
+			// 			stream<<" bStr:"<<(char*)b; 
+			// 		}
+					//stream<< endl; 
+
+			// 		stream<<" [";
+			// 		
+					//if (stream.str().length() > 1)
+			{
+				::OutputDebugString(stream.str().c_str());
+			}
 		}
 
 
@@ -279,7 +290,34 @@ namespace AheadLib
 
 	VOID WINAPI  PopDbgStrFuncEnd()
 	{
-//		::OutputDebugString("TcAPI::E n d*** ");
+		////unsigned int   *c   =   &a;   
+		//__asm   //下面是内嵌汇编...   
+		//{
+		//	//mov   eax,   c;   //c中存储的a的地址->eax     
+		//	//mov   eax,   [eax];   //a的值->eax   
+		//	//注意直接mov   eax,   [c]是错误的   
+		//	//mov   ebx,   b;   //可以像这样直接对ebx赋值   
+		//	//lea   eax,   [eax+ebx];   
+
+		//	mov eeesp1, esp;
+		//}   //内嵌汇编部分结束... TcSdk_Send
+
+		//char s[12] = { 0 };
+
+
+		//memset(s, 0, 12);
+		//hex2str(eeesp1, s);
+		//::OutputDebugString(s);
+
+		//::OutputDebugString("Params===>");
+		//eeesp1 = (eeesp1 - eeesp0 )/4;
+		//memset(s, 0, 12);
+		//hex2str(eeesp1, s);
+		//::OutputDebugString(s);
+
+
+
+		//		::OutputDebugString("TcAPI::E n d*** ");
 // 		string dbgStr = "TcAPI::E n d--> ";
 // 		ostringstream os;
 // 		if (myStack.size()>0)
