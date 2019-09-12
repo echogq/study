@@ -2799,6 +2799,7 @@ ALCDECL AheadLib_TcSdk_ResumeTcJob(void)
 	// 调用原始函数
 	GetAddress("TcSdk_ResumeTcJob")();
 
+	//::OutputDebugString("TcSdk_ResumeTcJob<====End");
 	PopDbgStrFuncEnd();
 	// 转跳到返回地址
 	__asm JMP m_dwReturn[99 * TYPE long];
@@ -2852,6 +2853,8 @@ ALCDECL AheadLib_TcSdk_Send(void)
 
 	// 调用原始函数
 	GetAddress("TcSdk_Send")();
+
+	//::OutputDebugString("TcSdk_Send<====End");
 
 	PopDbgStrFuncEnd();
 	// 转跳到返回地址
@@ -3680,6 +3683,7 @@ ALCDECL AheadLib_TcSdk_UpdateTcJobParameterSet(void)
 
 	// 调用原始函数
 	GetAddress("TcSdk_UpdateTcJobParameterSet")();
+	//::OutputDebugString("TcSdk_UpdateTcJobParameterSet<====End");
 
 	PopDbgStrFuncEnd();
 	// 转跳到返回地址
