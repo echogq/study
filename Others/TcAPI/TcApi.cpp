@@ -688,6 +688,230 @@ __asm  call eax; //call tc.0x42c40
 	GetAddress("TcSdk_ResumeTcJob")();
 }
 
+void CallTc2()
+{
+	/*
+	地址=04A40000
+		大小=00001000 (4096.)
+		属主=Tc       04A40000 (自身)
+		区段=
+		包含=PE 文件头
+		类型=Imag 01001002
+		访问=R
+		初始访问=RWE
+*/
+	//050AF664    FF52 1C         call dword ptr ds:[edx+0x1C]             ; Tc.04A81F70
+
+	MODULEINFO moduleinfo = {0};
+	GetModuleInformation(GetCurrentProcess(), GetModuleHandle("TC.dll"), &moduleinfo, sizeof(moduleinfo));
+	void *px25E = (void*)((DWORD)moduleinfo.lpBaseOfDll+ 0x41F70);
+	//void *px25ECA = (void*)((DWORD)moduleinfo.lpBaseOfDll + 0x700CA);
+
+	FARPROC   addr;
+	__asm push 0x0;
+	__asm push 0x0;
+	__asm mov ecx, edi;
+	//GetAddress("TcSdk_CreateParameterSet")();
+
+	__asm  mov eax, px25E;
+	__asm  mov ecx,esi;
+	__asm  call eax; //call tc.0x41F70
+
+	__asm mov addr, eax;
+return;
+//	//__asm mov esi,eax;
+//	//__asm push 0x79;
+//	//__asm push eax;
+//	//__asm mov ecx,esi;
+//	//GetAddress("TcSdk_SetParam")();
+//
+//	string tmp = "120600705";
+//	const char* p = tmp.c_str();
+//	__asm mov eax, addr;
+//	__asm  push p;
+//	__asm  push 0x79;
+//	__asm  push eax;
+//	__asm  mov ecx, esi;
+//	GetAddress("TcSdk_SetParam")();
+//
+//	// 				__asm  movsx eax,byte ptr ss:[esp+0x34];
+//	// 				__asm  mov edx,dword ptr ds:[esi];
+//	__asm mov eax, addr;
+//	__asm  push 0x44;	//43->买入即时成交，44->卖出即时成交，01->限价委托
+//	__asm  push 0x82;
+//	__asm  push eax;
+//	__asm  mov ecx, esi;
+//	GetAddress("TcSdk_SetParamLong")();
+//
+//	__asm mov eax, addr;
+//	__asm  push 0x00;
+//	__asm  push 0x7d;
+//	__asm  push eax;
+//	__asm  mov ecx, esi;
+//	GetAddress("TcSdk_SetParamLong")();
+//
+//	tmp = "0602572118";
+//	p = tmp.c_str();
+//	__asm mov eax, addr;
+//	__asm  push p;
+//	__asm  push 0x7b;
+//	__asm  push eax;
+//	__asm  mov ecx, esi;
+//	GetAddress("TcSdk_SetParam")();
+//
+//	tmp = "159915";
+//	p = tmp.c_str();
+//	__asm mov eax, addr;
+//	__asm  push p;
+//	__asm  push 0x8c;
+//	__asm  push eax;
+//	__asm  mov ecx, esi;
+//	GetAddress("TcSdk_SetParam")();
+//
+//	tmp = "创业板";
+//	p = tmp.c_str();
+//	__asm mov eax, addr;
+//	__asm  push p;
+//	__asm  push 0x8d;
+//	__asm  push eax;
+//	__asm  mov ecx, esi;
+//	GetAddress("TcSdk_SetParam")();
+//
+//	__asm mov eax, addr;
+//	__asm  push 0x03;		//？？？小数点后位数？？？
+//	__asm  push 0x3f800000;	//价格浮点数： 1.0或者实际委托价格
+//	__asm  push 0x91;
+//	__asm  push eax;
+//	__asm  mov ecx, esi;
+//	GetAddress("TcSdk_SetParamFloat")();
+//
+//	__asm mov eax, addr;
+//	__asm  push 0x55f0; //股票数量 22000
+//	__asm  push 0x90;
+//	__asm  push eax;
+//	__asm  mov ecx, esi;
+//	GetAddress("TcSdk_SetParamLong")();
+//
+//	__asm mov eax, addr;
+//	__asm  push 0x04; //价格委托方式：0--X，对应选择的combobox
+//	__asm  push 0xa6;
+//	__asm  push eax;
+//	__asm  mov ecx, esi;
+//	GetAddress("TcSdk_SetParamLong")();
+//
+//	DWORD x25E = 0X00000000;
+//	void *px25E = &x25E;
+//	__asm mov eax, px25E;
+//	__asm  push eax;
+//	__asm  push 0x25e;
+//	__asm mov eax, addr;
+//	__asm  push eax;
+//	__asm  mov ecx, esi;
+//	GetAddress("TcSdk_SetParam")();
+//
+//	__asm mov eax, addr;
+//	__asm  push 0x00;
+//	__asm  push 0x85;
+//	__asm  push eax;
+//	__asm  mov ecx, esi;
+//	GetAddress("TcSdk_SetParamLong")();
+//
+//	__asm mov eax, addr;
+//	__asm  push 0x00;
+//	__asm  push 0xad;
+//	__asm  push eax;
+//	__asm  mov ecx, esi;
+//	GetAddress("TcSdk_SetParam")();
+//
+//	//买入 000004c7
+//	//TcSdk_SetParam                  ---> a: 17f00ea8 b: 000004c7 c: 0a82dd40 d: 00000000 cStr:1	
+//	//...
+///*
+//					05979157  |> \8B47 20       mov eax,dword ptr ds:[edi+0x20]          ;  eax 无效地址
+//					0597915A  |>  8B16          mov edx,dword ptr ds:[esi]               ;  edx 调用基地址
+//					0597915C  |.  6A 00         push 0x0
+//					0597915E  |.  68 24030000   push 0x324
+//					05979163  |.  68 88170000   push 0x1788
+//					05979168  |.  50            push eax
+//					05979169  |.  8BCE          mov ecx,esi
+//					0597916B  |.  FF52 64       call dword ptr ds:[edx+0x64]             ;  TC...->Send Call。。。Tc.05092C40(42c40/41c40)
+//					0597916E  |.  85F6          test esi,esi                             ;  TC...->Send Call。。。End
+//*/
+//
+//				//MODULEINFO moduleinfo = {0};
+//				//GetModuleInformation(GetCurrentProcess(), GetModuleHandle("invest.dll"), &moduleinfo, sizeof(moduleinfo));
+//				////_tprintf(TEXT("with GetModuleInformation = 0x%x\r\n"), (DWORD)moduleinfo.EntryPoint+0x42c40);
+//				//px25E = (void*)((DWORD)moduleinfo.lpBaseOfDll+ 0x40744);
+//
+//				//GetModuleInformation(GetCurrentProcess(), GetModuleHandle("tc.dll"), &moduleinfo, sizeof(moduleinfo));
+//				//void *px25E22 = (void*)((DWORD)moduleinfo.lpBaseOfDll+ 0x42c40);
+//
+//				//__asm mov eax,px25E;
+//
+//				//__asm  push 0x0;
+//				//__asm  push 0x324;
+//				//__asm  push 0x1788;
+//				//__asm  push eax;//invest.dll+0x40744
+//				//__asm  mov eax, px25E22;
+//				//__asm  mov ecx,esi;
+//				//__asm  call eax; //call tc.0x42c40
+//
+///*
+//04877C2A    FF75 1C         push dword ptr ss:[ebp+0x1C]	1
+//04877C2D    FF75 18         push dword ptr ss:[ebp+0x18]	0
+//04877C30    FF75 14         push dword ptr ss:[ebp+0x14]	0
+//04877C33    6A 02           push 0x2
+//04877C35    FF75 10         push dword ptr ss:[ebp+0x10]             ; Tc.047900CA
+//04877C38    FF75 0C         push dword ptr ss:[ebp+0xC]  Tc.dll+0x70000            ; Tc.??_C@_0BB@DBEFDDME@chinese?9hongkong?$AA@@estructor?8?$AA@@D@2@@std@@8r@D@2@@std@@8:allocator<std::basic_string<char,std::char_traits<char>,std::allocator<char> > > >::_Iterator<1>::_Iterator<1>>std::char_traits<char>,std::allocator<char> > > ><char...
+//04877C3B    E8 16E8FEFF     call TcApi.04866456                      ; //Real send...
+//04877C40    5D              pop ebp                                  ; Tc.??_C@_0BB@DBEFDDME@chinese?9hongkong?$AA@@estructor?8?$AA@@D@2@@std@@8r@D@2@@std@@8:allocator<std::basic_string<char,std::char_traits<char>,std::allocator<char> > > >::_Iterator<1>::_Iterator<1>>std::char_traits<char>,std::allocator<char> > > ><char...
+//04877C41    C3              retn
+//*/
+//MODULEINFO moduleinfo = {0};
+//GetModuleInformation(GetCurrentProcess(), GetModuleHandle("TC.dll"), &moduleinfo, sizeof(moduleinfo));
+//px25E = (void*)((DWORD)moduleinfo.lpBaseOfDll+ 0x70000);
+//void *px25ECA = (void*)((DWORD)moduleinfo.lpBaseOfDll + 0x700CA);
+//
+//GetModuleInformation(GetCurrentProcess(), GetModuleHandle("TcApiOrg.dll"), &moduleinfo, sizeof(moduleinfo));
+//void *px25E22 = (void*)((DWORD)moduleinfo.lpBaseOfDll+ 0x6456);
+//
+//__asm  push 0x1;
+//__asm  push 0x0;
+//__asm  push 0x0;
+//__asm  push 0x2;
+//__asm  push px25ECA;
+//__asm  push px25E;
+//__asm  mov eax, px25E22;
+//__asm  mov ecx,esi;
+//__asm  call eax; //call tc.0x42c40
+//
+////__asm mov eax,addr;
+////__asm  push eax;
+////__asm  push 0x01;
+////__asm  push 0x00;
+////__asm  push 0x00;
+//////__asm  mov ecx,esi;
+////__asm  push ecx;
+////__asm  push ecx;
+////__asm  push ecx;
+////__asm  mov ecx,esi;
+////GetAddress("TcSdk_Send")();
+//
+//	__asm mov eax, addr;
+//	__asm  push 0x00;
+//	__asm  push eax;
+//	__asm  push 0x00;
+//	__asm  mov ecx, esi;
+//	GetAddress("TcSdk_UpdateTcJobParameterSet")();
+//
+//	__asm mov eax, addr;
+//	__asm  push eax;
+//	__asm  push 0x00;
+//	__asm  push 0x00;
+//	__asm  mov ecx, esi;
+//	GetAddress("TcSdk_ResumeTcJob")();
+}
+
 void CallAddInStock()
 {
 	MODULEINFO moduleinfo = { 0 };
@@ -764,10 +988,13 @@ void CallAddInStock()
 }
 void CallAddInStock2()
 {
+	::OutputDebugStringA("TcSdk_   CallAddInStock2");
 	//卖出按钮入口 Base+0x349690;
 	MODULEINFO moduleinfo = { 0 };
 	GetModuleInformation(GetCurrentProcess(), GetModuleHandleA(".\\TCPlugins\\AddinStock.dll"), &moduleinfo, sizeof(moduleinfo));
-	void *px25E22 = (void*)((DWORD)moduleinfo.lpBaseOfDll + 0x349690);
+	//void *px25E22 = (void*)((DWORD)moduleinfo.lpBaseOfDll + 0xDE600);
+	//void *px25E22 = (void*)((DWORD)moduleinfo.lpBaseOfDll + 0xCD71D);
+	void *px25E22 = (void*)((DWORD)moduleinfo.lpBaseOfDll + 0xC4f30);
 	std::cout << "！！！！！！！！！！！！！！！！！！！::px25E22=" << px25E22 << std::endl;
 
 	//std::string tmp = "外部线程调用";
@@ -778,14 +1005,17 @@ void CallAddInStock2()
 
 	__asm  mov eax, px25E22;
 	__asm  mov ecx, esi;
-	__asm  push lable;
+	//__asm  push lable;
 	//__asm  push 0x0;
 	//__asm  push p;
 	//__asm  push p2;
 	//__asm  push 0x0;
-	__asm  jmp eax; //call 
-	__asm  lable:
+	//__asm  jmp eax; //call 
+	//__asm  lable:
 	//__asm  add esp, 0x10;
+	//__ 
+	__asm  call eax; //call tc.0x42c40
+
 	return;
 
 }
@@ -838,9 +1068,10 @@ BOOL CALLBACK DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		case IDOK:  
 			{  
 // 				MessageBox(hDlg,"哇哈哈...我写出来了","提示",MB_ICONINFORMATION);  
-			CallTcAPI();
+			//CallTcAPI();
 			//CallAddInStock();
 			//CallAddInStock2();
+			CallTc2();
 
 		}
 			return (TRUE);  
