@@ -26,6 +26,26 @@ static char THIS_FILE[] = __FILE__;
 
 #define AUTO_OPEN_ALL "..\\Script\\Auto_OpenAll.exe"
 
+std::vector<float>
+Ema(std::vector<float> &X, int N)
+{
+	std::vector<float> vec;
+	int nLen = X.size();
+	if (nLen >= 1)
+	{
+		if (N > nLen) N = nLen;
+
+		vec.resize(nLen);
+		//vec.reserve(nLen);
+		vec[0] = X[0];
+		for (int i = 1; i < nLen; i++)
+		{
+			vec[i] = (2 * X[i] + (N - 1) * vec[i - 1]) / (N + 1);
+		}
+	}
+	return vec;
+}
+
 char tmpbuf[128];
 char* PrefixTimeStr( char* p )
 {

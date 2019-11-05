@@ -53,6 +53,7 @@ namespace AheadLib
 	HMODULE g_Mdl_TcAPI = NULL;		// 原始模块句柄
 	HMODULE g_Mdl_AddInStock = NULL;		// 原始模块句柄
 	DWORD m_dwReturn[151] = {0};		// 原始函数返回地址
+	DWORD   TcClient = 0;
 
 
 	// 加载原始模块
@@ -130,6 +131,8 @@ namespace AheadLib
 	DWORD   eeesp0;
 	DWORD   eeesp1;
 
+	DWORD   iEAX, ba, ca, da = 0;
+	char ss[12] = { 0 };
 	// 获取原始函数地址
 	FARPROC WINAPI GetAddress(PCSTR pszProcName)
 	{
@@ -150,7 +153,17 @@ namespace AheadLib
 		ESP+08：00178210   72F3A7E4  mfc42.72F3A7E4
 		ESP+12：00178214   00000000
 */
-		DWORD   a,b,c,d;   
+		stringstream stream;
+		char s[12] = { 0 };
+		memset(s, 0, 12);
+		stream.clear();
+		stream.str("");
+
+		hex2str(iEAX, s);
+		stream << " EAX: " << s;
+		stream << endl;
+
+		DWORD   a,b,c,d;
 		//unsigned int   *c   =   &a;   
 		__asm   //下面是内嵌汇编...   
 		{   
@@ -171,8 +184,6 @@ namespace AheadLib
 			mov eeesp0, esp;
 		}   //内嵌汇编部分结束... TcSdk_Send
 
-		stringstream stream;  
-		char s[12] = {0}; 
 
 		/*
 		[8964] TcSdk_SetParam                  ---> a: 05e750c0 b: 000000ad c: 07f888e8 d: 00000000 ==Str:
@@ -183,23 +194,20 @@ namespace AheadLib
 		[8964] TcSdk_ResumeTcJob               ---> a: 0827f8e0 b: 0827f8e0 c: 05e750c0 d: 05ec27e8
 
 		*/
-		if (strstr(pszProcName, "TcSdk_SetParam") == pszProcName) 
-		{
-			outHexString((void*)a);
-		}
-
 		if (strstr(pszProcName, "TcSdk_UpdateTcJobParameterSet") == pszProcName) 
 		{
 			outHexString((void*)b);
 		}
-
-		if (strstr(pszProcName, "TcSdk_ResumeTcJob") == pszProcName) 
+		else if (strstr(pszProcName, "TcSdk_ResumeTcJob") == pszProcName) 
 		{
 			outHexString((void*)c);
 		}
+		else if (strstr(pszProcName, "TcSdk_SetParam") == pszProcName)
+		{
+			outHexString((void*)a);
+		}
 
-		stream.clear();
-		stream.str("");
+
 
 		if (!strstr(pszProcName, "onnect"))
 		{
@@ -233,23 +241,23 @@ namespace AheadLib
 
 			//		stream<<pszProcName<<" a: "<<hex2str(a)<<" b: "<<hex2str(b)<<" c: "<<hex2str(c)<<" d: "<<hex2str(d); 
 
-			if (strstr(pszProcName, "TcSdk_SetParam") == pszProcName)
-			{
-				if (0 == IsBadReadPtr((void *)c, 4))
-				{
-					stream << " ==Str:" << (char*)c;
-				}
-			}
 			if (strstr(pszProcName, "TcSdk_SetParamLong") == pszProcName)
 			{
 				{
 					stream << " ==Long:" << (long)c;
 				}
 			}
-			if (strstr(pszProcName, "TcSdk_SetParamFloat") == pszProcName)
+			else if (strstr(pszProcName, "TcSdk_SetParamFloat") == pszProcName)
 			{
 				{
 					stream << " ==Float:" << (float)c;
+				}
+			}
+			else if (strstr(pszProcName, "TcSdk_SetParam") == pszProcName)
+			{
+				if (0 == IsBadReadPtr((void *)c, 4))
+				{
+					stream << " ==Str:" << (char*)c;
 				}
 			}
 			// 		if (0 == IsBadReadPtr((void *)b, 4))
@@ -287,10 +295,26 @@ namespace AheadLib
 
 		return fpAddress;
 	}
+		//DWORD   aa, ba, ca, da = 0;
 
 	VOID WINAPI  PopDbgStrFuncEnd()
 	{
-		////unsigned int   *c   =   &a;   
+		__asm   //下面是内嵌汇编...   
+		{
+			mov iEAX, eax;
+		}   //内嵌汇编部分结束... 
+
+
+			//memset(ss, 0, 12);
+		////	hex2str(a, s);
+		////	::OutputDebugStringA(s);
+		//	__asm   //下面是内嵌汇编...   
+		//	{
+		//		mov eax, a;
+		//	}   //内嵌汇编部分结束... 
+
+
+				////unsigned int   *c   =   &a;   
 		//__asm   //下面是内嵌汇编...   
 		//{
 		//	//mov   eax,   c;   //c中存储的a的地址->eax     
@@ -488,12 +512,22 @@ void ShowDlg()
 
 void CallTcAPI()
 {
-	FARPROC   addr;
+	//  TcAPI.TcSdk_SetParam (pParamSet, iOpt, Param, NULL)
+	//  TcAPI.TcSdk_SetParamLong (pParamSet, iOpt, Param)
+	//  TcAPI.TcSdk_UpdateTcJobParameterSet (TcJob, pParamSet)
+	//  TcAPI.TcSdk_ResumeTcJob (TcJob)
+	//  TcAPI.TcSdk_DestroyParameterSet (pParamSet)
+
+	FARPROC   pParaSet;
+
+	__asm mov eax, TcClient;
+	__asm mov esi, eax;
 	__asm push 0x0;
 	__asm push 0x0;
 	__asm mov ecx, 0;
 	GetAddress("TcSdk_CreateParameterSet")();
-	__asm mov addr, eax;
+	__asm mov pParaSet, eax;
+	__asm  mov iEAX, eax;
 
 	//__asm mov esi,eax;
 	//__asm push 0x79;
@@ -503,101 +537,113 @@ void CallTcAPI()
 
 	string tmp = "120600705";
 	const char* p = tmp.c_str();
-	__asm mov eax, addr;
+	__asm mov eax, pParaSet;
 	__asm  push p;
 	__asm  push 0x79;
 	__asm  push eax;
 	__asm  mov ecx, esi;
 	GetAddress("TcSdk_SetParam")();
+	__asm  mov iEAX, eax;
 
 	// 				__asm  movsx eax,byte ptr ss:[esp+0x34];
 	// 				__asm  mov edx,dword ptr ds:[esi];
-	__asm mov eax, addr;
+	__asm mov eax, pParaSet;
 	__asm  push 0x44;	//43->买入即时成交，44->卖出即时成交，01->限价委托
 	__asm  push 0x82;
 	__asm  push eax;
 	__asm  mov ecx, esi;
 	GetAddress("TcSdk_SetParamLong")();
+	__asm  mov iEAX, eax;
 
-	__asm mov eax, addr;
+	__asm mov eax, pParaSet;
 	__asm  push 0x00;
 	__asm  push 0x7d;
 	__asm  push eax;
 	__asm  mov ecx, esi;
 	GetAddress("TcSdk_SetParamLong")();
+	__asm  mov iEAX, eax;
 
 	tmp = "0602572118";
 	p = tmp.c_str();
-	__asm mov eax, addr;
+	__asm mov eax, pParaSet;
 	__asm  push p;
 	__asm  push 0x7b;
 	__asm  push eax;
 	__asm  mov ecx, esi;
 	GetAddress("TcSdk_SetParam")();
+	__asm  mov iEAX, eax;
 
 	tmp = "159915";
 	p = tmp.c_str();
-	__asm mov eax, addr;
+	__asm mov eax, pParaSet;
 	__asm  push p;
 	__asm  push 0x8c;
 	__asm  push eax;
 	__asm  mov ecx, esi;
 	GetAddress("TcSdk_SetParam")();
+	__asm  mov iEAX, eax;
 
 	tmp = "创业板";
 	p = tmp.c_str();
-	__asm mov eax, addr;
+	__asm mov eax, pParaSet;
 	__asm  push p;
 	__asm  push 0x8d;
 	__asm  push eax;
 	__asm  mov ecx, esi;
 	GetAddress("TcSdk_SetParam")();
+	__asm  mov iEAX, eax;
 
-	__asm mov eax, addr;
+	__asm mov eax, pParaSet;
 	__asm  push 0x03;		//？？？小数点后位数？？？
 	__asm  push 0x3f800000;	//价格浮点数： 1.0或者实际委托价格
 	__asm  push 0x91;
 	__asm  push eax;
 	__asm  mov ecx, esi;
 	GetAddress("TcSdk_SetParamFloat")();
+	__asm  mov iEAX, eax;
 
-	__asm mov eax, addr;
+	__asm mov eax, pParaSet;
 	__asm  push 0x55f0; //股票数量 22000
 	__asm  push 0x90;
 	__asm  push eax;
 	__asm  mov ecx, esi;
 	GetAddress("TcSdk_SetParamLong")();
+	__asm  mov iEAX, eax;
 
-	__asm mov eax, addr;
+	__asm mov eax, pParaSet;
 	__asm  push 0x04; //价格委托方式：0--X，对应选择的combobox
 	__asm  push 0xa6;
 	__asm  push eax;
 	__asm  mov ecx, esi;
 	GetAddress("TcSdk_SetParamLong")();
+	__asm  mov iEAX, eax;
 
 	DWORD x25E = 0X00000000;
 	void *px25E = &x25E;
 	__asm mov eax, px25E;
 	__asm  push eax;
 	__asm  push 0x25e;
-	__asm mov eax, addr;
+	__asm mov eax, pParaSet;
 	__asm  push eax;
 	__asm  mov ecx, esi;
 	GetAddress("TcSdk_SetParam")();
+	__asm  mov iEAX, eax;
 
-	__asm mov eax, addr;
+	__asm mov eax, pParaSet;
 	__asm  push 0x00;
 	__asm  push 0x85;
 	__asm  push eax;
 	__asm  mov ecx, esi;
 	GetAddress("TcSdk_SetParamLong")();
+	__asm  mov iEAX, eax;
 
-	__asm mov eax, addr;
+	__asm mov eax, pParaSet;
 	__asm  push 0x00;
 	__asm  push 0xad;
 	__asm  push eax;
 	__asm  mov ecx, esi;
 	GetAddress("TcSdk_SetParam")();
+	__asm  mov iEAX, eax;
 
 	//买入 000004c7
 	//TcSdk_SetParam                  ---> a: 17f00ea8 b: 000004c7 c: 0a82dd40 d: 00000000 cStr:1	
@@ -646,46 +692,47 @@ void CallTcAPI()
 MODULEINFO moduleinfo = {0};
 GetModuleInformation(GetCurrentProcess(), GetModuleHandle("TC.dll"), &moduleinfo, sizeof(moduleinfo));
 px25E = (void*)((DWORD)moduleinfo.lpBaseOfDll+ 0x70000);
-void *px25ECA = (void*)((DWORD)moduleinfo.lpBaseOfDll + 0x700CA);
-
-GetModuleInformation(GetCurrentProcess(), GetModuleHandle("TcApiOrg.dll"), &moduleinfo, sizeof(moduleinfo));
-void *px25E22 = (void*)((DWORD)moduleinfo.lpBaseOfDll+ 0x6456);
-
-__asm  push 0x1;
-__asm  push 0x0;
-__asm  push 0x0;
-__asm  push 0x2;
-__asm  push px25ECA;
-__asm  push px25E;
-__asm  mov eax, px25E22;
-__asm  mov ecx,esi;
-__asm  call eax; //call tc.0x42c40
+//void *px25ECA = (void*)((DWORD)moduleinfo.lpBaseOfDll + 0x700CA);
+//
+//GetModuleInformation(GetCurrentProcess(), GetModuleHandle("TcApiOrg.dll"), &moduleinfo, sizeof(moduleinfo));
+//void *px25E22 = (void*)((DWORD)moduleinfo.lpBaseOfDll+ 0x6456);
+//
+//__asm  push 0x1;
+//__asm  push 0x0;
+//__asm  push 0x0;
+//__asm  push 0x2;
+//__asm  push px25ECA;
+//__asm  push px25E;
+//__asm  mov eax, px25E22;
+//__asm  mov ecx,esi;
+//__asm  call eax; //call tc.0x42c40
 
 //__asm mov eax,addr;
 //__asm  push eax;
 //__asm  push 0x01;
 //__asm  push 0x00;
 //__asm  push 0x00;
-////__asm  mov ecx,esi;
-//__asm  push ecx;
-//__asm  push ecx;
-//__asm  push ecx;
-//__asm  mov ecx,esi;
-//GetAddress("TcSdk_Send")();
+//
 
-	__asm mov eax, addr;
-	__asm  push 0x00;
+__asm  mov iEAX, eax;
+//__asm  mov ecx,esi;
+__asm  push px25E;
+__asm  push TcClient;
+//__asm  push ecx;
+__asm  mov ecx,esi;
+GetAddress("TcSdk_Send")(); //(TcClient, Tc.Addr+0x70000)
+__asm  mov iEAX, eax;
+
+	__asm  push pParaSet;
 	__asm  push eax;
-	__asm  push 0x00;
 	__asm  mov ecx, esi;
 	GetAddress("TcSdk_UpdateTcJobParameterSet")();
+	__asm  mov iEAX, eax;
 
-	__asm mov eax, addr;
 	__asm  push eax;
-	__asm  push 0x00;
-	__asm  push 0x00;
 	__asm  mov ecx, esi;
 	GetAddress("TcSdk_ResumeTcJob")();
+	__asm  mov iEAX, eax;
 }
 
 void CallTc2()
@@ -1068,10 +1115,10 @@ BOOL CALLBACK DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		case IDOK:  
 			{  
 // 				MessageBox(hDlg,"哇哈哈...我写出来了","提示",MB_ICONINFORMATION);  
-			//CallTcAPI();
+			CallTcAPI();
 			//CallAddInStock();
 			//CallAddInStock2();
-			CallTc2();
+			//CallTc2();
 
 		}
 			return (TRUE);  
@@ -1373,6 +1420,11 @@ ALCDECL AheadLib_TcSdk_CreateClient(void)
 
 	// 调用原始函数
 	GetAddress("TcSdk_CreateClient")();
+
+	__asm   //下面是内嵌汇编...   
+	{
+		mov TcClient, eax;
+	}   //内嵌汇编部分结束... 
 
 	PopDbgStrFuncEnd();
 	// 转跳到返回地址

@@ -327,6 +327,7 @@ void PostMsgToTradeWnd(LPARAM lParam)
 // 
 // 	}
 // }
+
 //第二版本
 void CalcWin(int DataLen,float* pfOUT,float* currPrice,float* fAction,float* currDay)
 {
@@ -549,6 +550,51 @@ void getReal_BS(int DataLen,float* pfOUT,float* currDay,float* currTime,float* f
 
 		}
 
+	}
+}
+
+//std::vector<float>
+//Ema(std::vector<float> &X, int N)
+//{
+//	std::vector<float> vec;
+//	int nLen = X.size();
+//	if (nLen >= 1)
+//	{
+//		if (N > nLen) N = nLen;
+//
+//		vec.resize(nLen);
+//		//vec.reserve(nLen);
+//		vec[0] = X[0];
+//		for (int i = 1; i < nLen; i++)
+//		{
+//			vec[i] = (2 * X[i] + (N - 1) * vec[i - 1]) / (N + 1);
+//		}
+//	}
+//	return vec;
+//}
+
+/*
+DIF:EMA(CLOSE,SHORT)-EMA(CLOSE,LONG);
+DEA:EMA(DIF,MID);
+MACD:(DIF-DEA)*2,COLORSTICK;
+*/
+
+void testEma(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc)
+{
+	if ((DataLen > 0) )
+	{
+		int N = pfINb[0];
+		if (N > DataLen) N = DataLen;
+		pfOUT[0] = pfINa[0];
+
+		for (int i = 1; i < DataLen; i++)
+		{
+			pfOUT[i]= (2 * pfINa[i] + (N - 1) * pfOUT[i - 1]) / (N + 1);	//EMA计算公式
+			//if (pfINa[i] != 0.0f && pfINb[i] != 0.0f && pfINc[i] != 0.0f)
+			//{
+			//	TraceEx("\r\n[TDX]=- \t%.3f\t%.3f\t%.3f", pfINa[i], pfINb[i], pfINc[i]);
+			//}
+		}
 	}
 }
 
@@ -1031,7 +1077,7 @@ PluginTCalcFuncInfo g_CalcFuncSets[] =
 	{6,(pPluginFUNC)&QueryDB},
 
 	{8,(pPluginFUNC)&PostMsgOf_BS},//向控制台发出买卖指令//(买入，卖出，周期)
-	{9,(pPluginFUNC)&BuyOne},
+	{9,(pPluginFUNC)&testEma},
 
 	{ 10,(pPluginFUNC)&Test99 },
 	{ 11,(pPluginFUNC)&Test99 },
