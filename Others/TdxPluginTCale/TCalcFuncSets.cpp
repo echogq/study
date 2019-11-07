@@ -573,6 +573,34 @@ void getReal_BS(int DataLen,float* pfOUT,float* currDay,float* currTime,float* f
 //	return vec;
 //}
 
+void testDea(int DataLen, float* pfOUT, float* pfINa, int iShort, int iLong, int iMid)
+{
+	if ((DataLen > 0))
+	{
+		if (iShort > DataLen) iShort = DataLen;
+		if (iMid > DataLen) iMid = DataLen;
+		if (iLong > DataLen) iLong = DataLen;
+
+		float* pfTmp1 = new float[DataLen];
+		float* pfTmp2 = new float[DataLen];
+		pfTmp1[0] = pfINa[0];
+		pfTmp2[0] = pfINa[0];
+
+		pfOUT[0] = 0;
+
+		for (int i = 1; i < DataLen; i++)
+		{
+			pfTmp1[i] = (2 * pfINa[i] + (iShort - 1) * pfTmp1[i - 1]) / (iShort + 1);	//EMA计算公式
+			pfTmp2[i] = (2 * pfINa[i] + (iLong - 1) * pfTmp2[i - 1]) / (iLong + 1);		//EMA计算公式
+
+			pfOUT[i] = (2 * (pfTmp1[i] - pfTmp2[i]) + (iMid - 1) * pfOUT[i - 1]) / (iMid + 1);	//EMA计算公式
+		}
+
+		delete[] pfTmp1;
+		delete[] pfTmp2;
+	}
+}
+
 /*
 DIF:EMA(CLOSE,SHORT)-EMA(CLOSE,LONG);
 DEA:EMA(DIF,MID);
@@ -581,21 +609,19 @@ MACD:(DIF-DEA)*2,COLORSTICK;
 
 void testEma(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc)
 {
-	if ((DataLen > 0) )
-	{
-		int N = pfINb[0];
-		if (N > DataLen) N = DataLen;
-		pfOUT[0] = pfINa[0];
+	//if ((DataLen > 0) )
+	//{
+	//	int N = pfINb[0];
+	//	if (N > DataLen) N = DataLen;
+	//	pfOUT[0] = pfINa[0];
 
-		for (int i = 1; i < DataLen; i++)
-		{
-			pfOUT[i]= (2 * pfINa[i] + (N - 1) * pfOUT[i - 1]) / (N + 1);	//EMA计算公式
-			//if (pfINa[i] != 0.0f && pfINb[i] != 0.0f && pfINc[i] != 0.0f)
-			//{
-			//	TraceEx("\r\n[TDX]=- \t%.3f\t%.3f\t%.3f", pfINa[i], pfINb[i], pfINc[i]);
-			//}
-		}
-	}
+	//	for (int i = 1; i < DataLen; i++)
+	//	{
+	//		pfOUT[i]= (2 * pfINa[i] + (N - 1) * pfOUT[i - 1]) / (N + 1);	//EMA计算公式
+	//	}
+	//}
+
+	testDea(DataLen, pfOUT, pfINa, 10, 12, 9);
 }
 
 void OutputN(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc)
