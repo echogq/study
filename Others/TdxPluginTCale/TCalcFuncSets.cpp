@@ -621,7 +621,10 @@ void testEma(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc
 	//	}
 	//}
 
-	testDea(DataLen, pfOUT, pfINa, 10, 12, 9);
+	if ((DataLen > 0))
+	{
+		testDea(DataLen, pfOUT, pfINa, 10* pfINb[0], 12 * pfINb[0], 9);
+	}
 }
 
 void OutputN(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc)
