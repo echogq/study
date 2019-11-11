@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+	<link href="../css/stylesheet.css" rel="stylesheet" type="text/css" />
+
+	<script src="../jquery-1.7.2.min.js" type="text/javascript"></script>
+
+	<style type="text/css">
+
+
+ul{
+	width: 100%;
+}
+
+ul,li{
+	margin:0 2px 0 0;
+	padding:0 3px;
+	list-style: none;
+	list-style-type:none;
+	float: left;
+	text-overflow:ellipsis;
+	white-space:nowrap;
+	overflow: hidden;
+}
+.li1{
+	text-align: left;
+}
+.li2{
+	text-align: right;
+	width: 40px;
+}
+
+</style>
+
+	<script type="text/javascript">
+function Click(){
+window.event.returnValue=false;
+}
+document.oncontextmenu=Click;
+
+
+	$(function(){
+		$(".li1").width($(window).width()-60);
+		var width2 = $(".li1").width();
+		if(width2<250){
+	    	$("a:link").css("font-size","12px");
+	    	$(".li1").width($(window).width());
+	    	$(".li2").css("display","none");
+	    }
+	});
+
+	$(window).resize(function(){
+	    $(".li1").width($(window).width()-60);
+	    var width1 = $(".li1").width();
+	    if(width1<250){
+	    	$("a:link").css("font-size","12px");
+	    	$(".li1").width($(window).width());
+	    	$(".li2").css("display","none");
+
+	    }
+	    if(width1>250){
+	    	$("a:link").css("font-size","14px");
+	    	$(".li1").width($(window).width()-60);
+	    	$(".li2").css("display","block");
+	    }
+	});
+
+
+</script>
+	<title></title>
+</head>
+
+
+<body oncontextmenu="return false">
+<div id="main" onselectstart="return false;">
+<div id="all">
+
+{section$_1}
+
+</div>
+
+</div>
+</body>
+</html>

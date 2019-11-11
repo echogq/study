@@ -1,0 +1,250 @@
+*{
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  border-radius: 0px;
+  background-color: rgba(200, 200, 200, 0);
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 0px;
+  background-color: rgba(200, 200, 200, 0);
+}
+
+.header:hover ::-webkit-scrollbar-thumb {
+  background-color: rgba(200, 200, 200, 0.8);
+}
+.sel-tips{
+  position:absolute;
+  left:320px;
+  top:10px;
+  color:#aaa;
+}
+.sel-menu-box:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(200, 200, 200, 0.9);
+}
+
+body{
+  background:#fff;
+  color:#222;
+  font-size:12px;
+  overflow:hidden;
+  border:none;
+  border-style:none;
+}
+a{
+  color:#666;
+  text-decoration:none;
+}
+.clearfix{
+  float:none;
+  clear:both;
+  width:100%;
+}
+.header{
+  border-bottom:#ddd solid 1px;
+  padding:12px;
+  background:#fff;
+  color:#000;
+  padding-top:8px;
+}
+.header .h3{
+  padding-bottom:4px;
+  font-size:12px;
+  position:relative;
+  color:#000;
+  border-bottom:#fff solid 1px;
+  margin-bottom:4px;
+}
+.header .h3 .sub-tips{
+  font-size:12px;
+  font-family:宋体;
+  font-weight:normal;
+  color:#fff;
+}
+.header .h3 .set-default{
+  position:absolute;
+  right:120px;
+  top:0px;
+  cursor:pointer;
+}
+.header .h3 .set-btn{
+  font-size:12px;
+}
+.header .h3 .set-btn:hover{
+  color:#f00;
+}
+.header .h3 .set-save{
+  position:absolute;
+  right:20px;
+  top:0px;
+  cursor:pointer;
+}
+.no-sels{
+  padding:50px;
+  text-align:center;
+  font-size:14px;
+  color:#aaa;
+}
+#app .set-btn{
+  display:none;
+}
+#app.has-change .set-btn{
+  display:inline-block;
+}
+.empty-menus{
+  text-align:center;
+  width:300px;
+  margin:0 auto;
+  border-radius:0px;
+  padding:8px;
+  border:#eee solid 0px;
+  color:#aaa;
+  font-size:14px;
+}
+.header .my-menu-box{
+  color:#000;
+  max-height:400px;
+  overflow:hidden;
+  overflow-y:auto;
+}
+.header .my-menu-box .my-menus{
+  
+}
+.header .my-menu-box .my-menus .my-menu{
+  display:inline-block;
+  margin-right:2px;
+  margin-top:2px;
+  margin-bottom:2px;
+  padding-left:4px;
+  padding-right:8px;
+  border-radius:0px;
+  line-height:24px;
+  color:#000;
+  overflow:hidden;
+  width:;
+  height:24px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  word-break:break-all;
+  position:relative;
+  text-align:center;
+  font-size:12px;
+  cursor:pointer;
+  background:#DEDEDE;
+  border:#eee solid 1px;
+}
+.firstshow-tips{
+  display:inline-block;
+  width:20px;
+  height:8px;
+  background:#000;
+}
+.header .my-menu-box .my-menus .my-menu.firstshow{
+  background:#000;
+  border:#000 solid 1px;
+  color:#fff;
+}
+.header .my-menu-box .my-menus .my-menu:hover{
+  
+}
+.header .my-menu-box .my-menus .my-menu i{
+  cursor:pointer;
+  display:none;
+  position:absolute;
+  top:0px;
+  right:0px;
+  font-size:10px;
+  font-weight:normal;
+}
+.header .my-menu-box .my-menus .my-menu:hover i{
+  
+}
+.header .my-menu-box .my-menus .my-menu i:hover{
+  color:#f00;
+}
+
+.sel-menu-box{
+  padding:12px;
+  padding-top:0px;
+  padding-bottom:0px;
+  overflow:hidden;
+  overflow-y:auto;
+}
+
+.searchbox{
+  width:;
+  margin:0px auto;
+  position:relative;
+  border-bottom:#ddd dotted 1px;
+  padding-bottom:7px;
+}
+.searchbox input{
+  display:block;
+  border:#ccc solid 1px;
+  height:30px;
+  width:300px;
+  padding-left:12px;
+  font-size:14px;
+  outline:none;
+  margin:10px;
+  margin-bottom:2px;
+}
+.keywords-remove{
+  position:absolute;
+  left:295px;
+  top:8px;
+  color:#666;
+}
+
+.a-restore{
+  position:absolute;
+  right:30px;
+  top:8px;
+  color:#666;
+}
+
+.a-restore:hover{
+  color:#f00;
+}
+
+.sel-menu-box ul{
+  padding-top:4px;
+}
+.sel-menu-box ul.first{
+  /*border-top:none;*/
+}
+.sel-menu-box ul li{
+  font-size:12px;
+  color:#787878;
+  display:inline-block;
+  overflow:hidden;
+  background:#fff;
+  /*
+  white-space:nowrap;
+  word-break:break-all;
+  text-overflow:ellipsis;
+  */
+  margin-right:8px;
+  margin-bottom:6px;
+  cursor:pointer;
+  border:#B3B3B3 solid 1px;
+  line-height:24px;
+  padding-left:4px;  
+  padding-right:4px;
+}
+.sel-menu-box ul li:hover{
+  color:#f00;
+}
+.sel-menu-box ul li.has-sel{
+  color:#666;
+  cursor:default;
+}
+.itembox{
+  margin-bottom:8px;
+}

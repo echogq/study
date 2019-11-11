@@ -1,0 +1,208 @@
+﻿body
+{
+  	border-style:none;
+  	padding:0; /* 清除非IE浏览器页边距 */
+  	margin:0; /* 清除IE浏览器页边距 */
+}
+
+#main
+{
+	position:absolute;
+	left:0;
+	top:0px;
+	width:100%;
+	height:auto;
+	z-index:1;
+}
+#left {
+	position:absolute;
+	left:0;
+	top:20px;
+	width:50%;
+	height:auto;
+	z-index:2;
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:nowrap;
+	margin-right:2px;
+}
+
+#right {
+	position:relative;
+	top:20px;
+	left:50%;
+	width:50%;
+	height:auto;
+	z-index:2;
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:nowrap;
+	margin-left:2px;
+	margin-right:0px;
+}
+
+#all {
+	position:absolute;
+	left:0;
+	top:0;
+	width:100%;
+	height:auto;
+	z-index:2;
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:nowrap;
+	margin-right:2px;
+}
+
+#JudgeCon{
+	position:relative;
+	top:0;
+	left:50%;
+	width:50%;
+	height:auto;
+	z-index:2;
+	margin-left:2px;
+	margin-right:0px;
+}
+
+td
+{
+	font-family:宋体,Helvetica,sans-serif;
+	font-size: 14px;
+}
+
+a
+{
+	color:#F59300;
+	font-family:宋体,Helvetica,sans-serif;
+	font-size: 14px;
+	hide-focus: expression(this.hideFocus=true);
+	outline: none;
+}
+
+a:link
+{
+	text-decoration: none;
+	color:#F59300;
+	font-family:宋体, Helvetica, sans-serif;
+	font-size: 14px;
+}
+
+a:visited
+{
+	text-decoration: none;
+	color:#F59300;
+}
+
+a:hover
+{
+	text-decoration: none;
+	color: #b4b4b4;
+}
+
+a:active
+{
+	text-decoration: none;
+	color: #F59300;
+}
+
+a.new:link
+{
+	color:#FF3232;
+}
+
+a.new:visited
+{
+	text-decoration: none;
+	color:#FF3232;
+}
+
+a.new:hover
+{
+	text-decoration: none;
+	color: #b4b4b4;
+}
+
+a.new:active
+{
+	text-decoration: none;
+	color: #FF3232;
+}
+.column
+{
+	background-color:#000000;
+	text-align:center;
+	color:#c8c8c8;
+	padding:1px;
+}
+
+.row1
+{
+	background-color:#000000;
+	padding:3px;
+	vertical-align:middle;
+	text-overflow:ellipsis;white-space:nowrap;overflow: hidden;
+}
+
+.row2
+{
+	background-color:#000000;
+	padding:3px;
+	vertical-align:middle;
+	text-overflow:ellipsis;white-space:nowrap;overflow: hidden;
+}
+
+html
+{
+	scrollbar-face-color: #000000;
+	scrollbar-shadow-color: #333333;
+	scrollbar-highlight-color: #000000;
+	scrollbar-3dlight-color: #333333;
+	scrollbar-darkshadow-color: #000000;
+	scrollbar-track-color: #000000;
+	scrollbar-arrow-color: #808080;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	font-size: 14px;
+	font-family:宋体, Helvetica, sans-serif;
+	color: #F59300;
+	background-color: #000000;
+	background-position: left top;
+}
+li{
+	width: 100%;
+}
+@media only screen
+and (min-width : 615px) {
+
+	.row2
+	{
+		background-color:#000000;
+	}
+	li
+	{
+		width: 49%;
+	}
+}
+
+/*滚动条样式*/
+::-webkit-scrollbar {
+	background-color: #000;
+  width:14px;
+  height:14px;
+}
+
+::-webkit-scrollbar-thumb {
+	background-color: #000;
+  border:#202020 solid 1px;
+}
+::-webkit-scrollbar-button:start:vertical{
+    background: url(../cfg/imgs/scroll_up.png) center center no-repeat;
+    height: 14px;
+    border:#202020 solid 1px;
+}
+::-webkit-scrollbar-button:end:vertical{
+    background: url(../cfg/imgs/scroll_down.png) center center no-repeat;
+    height: 14px;
+    border:#202020 solid 1px;
+}

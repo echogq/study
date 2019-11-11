@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<link href="../css/stylesheet.css" rel="stylesheet" type="text/css" />
+<script Language=javascript>
+function Click(){
+window.event.returnValue=false;
+}
+document.oncontextmenu=Click;
+</script>
+<title></title>
+</head>
+
+<body oncontextmenu="return false">
+<div class="column" style="z-index: 1000;position: fixed;width: 100%;">
+{title}
+</div>
+<div id="main" onselectstart="return false;">
+<div id="left">
+{section$_1}
+</div>
+
+<div id="right">
+{section$_2}
+</div>
+
+</div>
+</body>
+</html>

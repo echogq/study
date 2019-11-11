@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<link href="../css/stylesheet.css" rel="stylesheet" type="text/css" />
+<script Language=javascript>
+function Click(){
+window.event.returnValue=false;
+}
+document.oncontextmenu=Click;
+</script>
+<title></title>
+</head>
+
+<body oncontextmenu="return false">
+<div id="main">
+<table style="z-index:1000;position: fixed;width: 100%;left:0px;top:0px;right:0px;_position:absolute;_bottom: auto;_top:expression(eval(document.documentElement.scrollTop));"  cellspacing=0 cellpadding=0 >
+<tr>
+<td width="50%">
+<div class="column">公告和新闻</div>
+</td>
+<td>
+<div class="column">分析和研究</div>
+</td>
+</tr>
+</table>
+<div id="left" onselectstart="return false;">
+{section$_1}
+</div>
+
+<div id="right" onselectstart="return false;">
+{section$_2}
+</div>
+</div>
+</body>
+</html>

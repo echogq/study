@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<style>
+[v-cloak]{display:none;}
+</style>
+<link rel="stylesheet" href="../css/awesome.css"/>
+<link rel="stylesheet" href="../css/coledit.css"/>
+</head>
+
+<body oncontextmenu="self.event.returnValue=false" onselectstart="return false">
+  <div id="app" v-show="loadFinish" v-cloak :class="{'has-change':hasChange}">
+  
+    <div class="header">
+      <div class="h3" v-cloak >
+      <span>拖动可排序，当前{{myMenus.length}}个。自定义板块的行情栏目由板块内的第一个品种的属性决定<!--（<i class="firstshow-tips"></i> 首屏可见）--></span>
+      <span class="set-btn set-default" @click="setDefault()"><i class="fa fa-undo"></i> 恢复初始</span>
+      <span class="set-btn set-save" @click="saveMe()"><i class="fa fa-save"></i> 保存方案</span>
+      </div>
+      <div class="my-menu-box">
+        <p class="empty-menus" v-cloak v-if="myMenus.length==0" v-html="emptyText"></p>
+        <ul class="my-menus" id="sortul">
+          <li draggable="true" class="my-menu droggle" :id="'my_'+menu.mid" v-for="menu,index in myMenus" 
+          v-cloak v-if="myMenus.length>0" @dblclick="delMenu(menu,$event)" 
+          :title="menu.mid+','+menu.title" onmouseover="mouseover(this)" onmouseout="mouseout(this)">
+            {{menu.title}} <i class="fa fa-times" @click="delMenu(menu,$event)"></i>
+          </li>
+        </ul>
+        <div class="clearfix"></div>
+      </div>
+    </div>
+    <div class="searchbox">
+        <input type="text" placeholder="请输入栏目名称搜索" v-model="keywords"/>
+        <a class="keywords-remove" v-if="keywords.length>0" href="javascript:;" 
+        @click="clearKeywords()"><i class="fa fa-close"></i> </a>
+        <span class="sel-tips">点击下面的备选栏目，即可加入到当前栏目中。</span>
+        <a class="a-restore" href="javascript:;"><i class="fa fa-retweet"></i> 恢复所有栏目为缺省顺序</a>
+    </div>
+    <div class="sel-menu-box" :style="{height:H2}">
+      <div class="itembox" v-for="subitem,subindex in _selMenus" v-cloak >
+        <ul v-cloak v-if="filterList(subitem.list).length>0" :class="{first:subindex==0}">
+          <li class="can-sel-item" v-for="item,index in filterList(subitem.list)" @click="addMenu(item)" :class="{'has-sel':item.my==1}">
+            <span>{{item.title}}</span>
+          </li>
+        </ul>
+        <div class="clearfix"></div>
+      </div>
+      <p v-if="nosels" class="no-sels" >没有可用表头栏目。</p>
+    </div>
+  
+  </div>
+  
+  <script src="../jquery-1.7.2.min.js"></script>
+  <script src="../js/vue.js"></script>
+  <script src="../js/sortable.js"></script>
+  <script src="../js/req.js"></script>
+  <script src="../js/coledit.js"></script>
+  
+</body>
+</html>
