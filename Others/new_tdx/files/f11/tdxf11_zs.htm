@@ -1,0 +1,228 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>图文F10</title>
+
+
+<style type="text/css">
+		body,html {overflow-y:hidden;height:100%;width:100%;}
+	*{margin: 0;padding: 0;}
+	.left {height:100%;float: left;width: 160px;background-color: #fff;border-right:1px solid #eeeeee;}
+	.content {height:100%;background-color: #fff;margin-left: 164px;}
+	.leftmenu UL{PADDING: 0px; MARGIN: 0px;display:block;}
+	.leftmenu li{cursor:pointer;PADDING: 0px; MARGIN: 0px;list-style-type:none;list-style-image:none;color:#5a3300;font-size:14px;word-break:keep-all;display:block;}
+	.leftmenu div{padding-left:20px;font-size:14px;word-break:keep-all;}
+	.leftmenu .lev1{BACKGROUND: url(images/item.png) no-repeat 0px 2px;padding-left:22px;margin-left:3px;padding-top:5px;}
+	.leftmenu .folder{LINE-HEIGHT: 24px; BACKGROUND: url(images/close.png) no-repeat 0px 2px;padding-left:12px;}
+	.leftmenu .folder div{padding-left:12px;cursor:hand;display:block;clear:both;}
+	.leftmenu .hover{background-color:#eeeeee;}
+	.leftmenu .folder li{padding-left:12px;display:block;}
+	.leftmenu .current_folder{LINE-HEIGHT: 22px; BACKGROUND: url(images/open.png) no-repeat 0px 2px;padding-left:10px;}
+	.leftmenu .current_item{BACKGROUND-color:#f0e6cd;}
+	.leftmenu a{text-decoration:none;color:#5a3300;padding-left:12px;height:21px;cursor:hand;display:block;clear:both;}
+	.leftmenu .bt li{ float: left; width:45px;}
+	.leftmenu .bt a{ padding:0px; background:none;}
+	.leftmenu .tittle1{ padding-left:21px;}
+</style>
+<script src="../lib/jquery.min.js" type="text/javascript"></script>
+
+</head>
+<script type="text/javascript">
+function setCookie(name,value){
+	document.cookie = name + "="+ escape (value); /*+ ";expires=" + exp.toGMTString();*/
+}
+function getCookie(name){
+	var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+
+	if(arr=document.cookie.match(reg))
+	    return unescape(arr[2]);
+	else
+	    return null;
+}
+
+$(document).ready(function(){
+	
+	$(".folder ul li").parent().parent().children("a").show();
+	$(".folder ul li").parent().parent().children("div").show();
+	$(".folder ul li").parent().parent().addClass("current_folder");
+	$(".folder ul li").click(function(){
+		if($(this).parent().parent().hasClass("current_folder")){ 
+			$(this).parent().parent().removeClass("current_folder");
+			$(this).parent().parent().children("a").hide();
+			$(this).parent().parent().children("div").hide();
+			return;
+
+		}
+		$(this).parent().parent().children("a").show();
+		$(this).parent().parent().children("div").show();
+		$(this).parent().parent().addClass("current_folder");
+		$(this).parent().parent().siblings().each(function(){
+			if($(this).hasClass("current_folder")){
+				$(this).removeClass("current_folder");
+				$(this).find("a").hide();
+				$(this).find("div").hide();
+			}
+		});
+	});
+	$(".folder").children("a").click(function(){
+		if($(this).hasClass("folder")) return;
+		$(".current_item").removeClass("current_item");
+		$(this).addClass("current_item");
+	});
+	$(".lev1").click(function(){
+		$(".current_item").removeClass("current_item");
+		$(this).addClass("current_item");
+	});
+	$("a").bind('mouseenter mouseleave', function() {
+		$(this).toggleClass("hover");
+	});
+
+	readcfg()
+});
+
+function readcfg() {
+	$.ajax({  
+        type: "GET",  
+        url: "tdxf11_cfg.xml",  
+        dataType: "xml",
+        cache:false,
+        error:function() {
+        	
+        },
+        success: function (ResponseText) {
+        	var address = $(ResponseText).find('address')
+        	var url = $(address).find('url').text()
+        	
+            var path = $(address).find('path').text() || "site/f11";
+            setFrameSrc(url+"/"+path+"/")
+        }  
+    });  
+}
+function setFrameSrc(curfunurl) {
+	var str = window.location.href; 
+	var localhrefParam = {}
+	var parastr = str.split("?")[1];
+	if(typeof parastr !== 'undefined') {
+		var arr = parastr.split("&");
+		for (var i=0;i<arr.length;i++){
+			localhrefParam[arr[i].split("=")[0]] = arr[i].split("=")[1]
+		}
+	}
+	var pc = 1;
+	if(window.location.href.indexOf("http")==0){
+		pc = 0
+	}
+	if(pc){
+		$("#close").css("display","")
+		$("#close").bind("click",function(){
+			window.open('http://www.treeid/closemyview','_parent')
+			
+		})
+	}
+    var aK = []
+    for(var key in localhrefParam){
+        if(key !="feature" && key != "zs") {
+            aK.push(key + "=" + localhrefParam[key])
+        }
+    }
+    var strOpts = aK.join("&")
+	var curfun =getCookie("zsfnname")||"zs_tzrl.html";
+	if( (typeof localhrefParam["feature"] !=='undefined') && localhrefParam["feature"].length != 0 ) {
+        if(localhrefParam["feature"] == "zs_gszx"){
+            if(strOpts.length){
+                curfun = localhrefParam["feature"] + ".html?zs="+(localhrefParam["zs"]||"xw")
+            } else {
+                curfun = localhrefParam["feature"] + ".html?zs="+(localhrefParam["zs"]||"xw")
+            }
+        }
+
+
+        else
+            curfun = localhrefParam["feature"] + ".html"
+    }
+
+	$("#container a").bind("click",function(){
+		curfun = $(this).attr("value")
+		var index = curfun.indexOf(".")
+		var funName = curfun.substring(0,index);
+		setCookie("zsfnname",curfun)
+		document.getElementById("tdxzsf10").src=curfunurl+curfun+speTrans(funName,pc,curfunurl,"");
+	})
+	$(".current_item").removeClass("current_item");
+	$("#container a").each(function() {
+		if($(this).attr("value") == curfun) {
+			$(this).addClass('current_item')
+		}
+
+	})
+	
+	if(curfun == undefined)
+		curfun = "zs_tzrl.html"
+	var index = curfun.indexOf(".")
+	var funName = curfun.substring(0,index);
+	document.getElementById("tdxzsf10").src=curfunurl+curfun+speTrans(funName,pc,curfunurl,strOpts);
+}
+function speTrans(name,pc,curfunurl,opts) {
+	var sw = ""
+	if(name == "zs_gszx") {
+        if(opts.length)
+		    sw += ("&"+opts+"&pc="+pc+"&urlpath="+curfunurl+"&"+getRnd())
+        else
+            sw += ("&pc="+pc+"&urlpath="+curfunurl+"&"+getRnd())
+	} else {
+        if(opts.length)
+		    sw = "?"+opts+"&pc="+pc+"&urlpath="+curfunurl+"&"+getRnd()
+        else
+            sw = "?pc="+pc+"&urlpath="+curfunurl+"&"+getRnd()
+	}
+	return sw
+}
+function getRnd() {
+    return parseInt(Math.random() * 10000) + "=" + parseInt(Math.random() * 10000);
+}
+
+</script>
+</head>
+<body>
+	<div class="left">
+	<div class="leftmenu" style="height:100%;overflow:hidden">
+		<div id="top" style="width:161px;line-height:21px;background:url(images/bg.png) repeat-x;height:26px;padding:3px 2px;text-align:center">
+			<table width=100% height=21><tr><td align=center valign=middle><a href="tdxf11_zs.htm" style="font-size:14px;padding:0;font-weight:bold;">数据纵览</a></td><td align=center valign=middle><span id="close" style="padding-left: 3px;cursor: pointer;display: none">×</span></td><tr></table>
+		</div>
+		<div id="container" style="width:153px;height:650px;border-right:#cccccc solid 0px;BACKGROUND:0;padding-left:10px;">
+			<a class="lev1" value="zs_tzrl.html" href="javascript:void(0)">投资日历</a>
+			<a class="lev1" value="zs_jylhb.html" href="javascript:void(0)">交易龙虎榜</a>
+			<a class="lev1" value="zs_qzlhb.html" href="javascript:void(0)">期指龙虎榜</a>
+			<a class="lev1" value="zs_dzjy.html" href="javascript:void(0)">大宗交易</a>
+			<a class="lev1" value="zs_ggcgbd.html" href="javascript:void(0)">股东增减持</a>
+			<a class="lev1" value="zs_gdrs.html" href="javascript:void(0)">股东人数</a>
+			<a class="lev1" value="zs_rzrq.html" href="javascript:void(0)">融资融券</a>
+			<a class="lev1" value="zs_dxfjj.html" href="javascript:void(0)">大小非解禁</a>
+			<a class="lev1" value="zs_zdsx.html" href="javascript:void(0)">重大事项</a>
+			<a class="lev1" value="zs_yjyg.html" href="javascript:void(0)">业绩预告</a>
+			<a class="lev1" value="zs_zxcb.html" href="javascript:void(0)">财报披露</a>
+			<a class="lev1" value="zs_zxpj.html" href="javascript:void(0)">最新评级</a>
+			
+			<a class="lev1" value="zs_jzfx.html" href="javascript:void(0)">价值统计</a>
+			<a class="lev1" value="zs_jgcg.html" href="javascript:void(0)">机构持股</a>
+			<a class="lev1" value="zs_ztfx.html" href="javascript:void(0)">涨跌停分析</a>
+			<a class="lev1" value="zs_xgzx.html" href="javascript:void(0)">新股中心</a>
+			<div class="folder"><ul><li>公司资讯</li></ul>
+				<a value="zs_gszx.html?zs=xw" href="javascript:void(0)">公司新闻</a>
+				<a value="zs_gszx.html?zs=gg" href="javascript:void(0)">公司公告</a>
+				<a value="zs_gszx.html?zs=yj" href="javascript:void(0)">公司研究</a>
+			   	<a value="zs_gszx.html?zs=dp" href="javascript:void(0)">个股点评</a>
+			</div>
+			<a class="lev1" value="zs_sczl.html" href="javascript:void(0)">市场总览</a>
+			<a class="lev1" value="zs_sczj.html" href="javascript:void(0)">市场资金</a>
+			<a class="lev1" value="zs_schg.html" href="javascript:void(0)">市场回顾</a>
+			<a class="lev1" value="zs_zdtj.html" href="javascript:void(0)">中登统计</a>
+			<a class="lev1" value="zs_hgfx.html" href="javascript:void(0)">宏观分析</a>
+		</div>
+	</div>
+</div>
+	<div class="content"><iframe frameBorder=0  width="100%" height="100%" id="tdxzsf10"></iframe></div>
+</body>
+
+</html>
