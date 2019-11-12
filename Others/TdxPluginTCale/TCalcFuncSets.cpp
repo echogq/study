@@ -573,8 +573,14 @@ void getReal_BS(int DataLen,float* pfOUT,float* currDay,float* currTime,float* f
 //	return vec;
 //}
 
-void testDea(int DataLen, float* pfOUT, float* pfINa, int iShort, int iLong, int iMid)
+float* pfDIF1 = NULL;
+
+void testDea(int DataLen, float* pfOUT, float* pfINa, int iMultiple)
 {
+	int iShort = 10 * iMultiple;
+	int iLong = 12 * iMultiple;
+	int iMid = 9;
+
 	if ((DataLen > 0))
 	{
 		if (iShort > DataLen) iShort = DataLen;
@@ -593,7 +599,8 @@ void testDea(int DataLen, float* pfOUT, float* pfINa, int iShort, int iLong, int
 			pfTmp1[i] = (2 * pfINa[i] + (iShort - 1) * pfTmp1[i - 1]) / (iShort + 1);	//EMA计算公式
 			pfTmp2[i] = (2 * pfINa[i] + (iLong - 1) * pfTmp2[i - 1]) / (iLong + 1);		//EMA计算公式
 
-			pfOUT[i] = (2 * (pfTmp1[i] - pfTmp2[i]) + (iMid - 1) * pfOUT[i - 1]) / (iMid + 1);	//EMA计算公式
+			float fDIF = pfTmp1[i] - pfTmp2[i];
+			pfOUT[i] = (2 * (fDIF) + (iMid - 1) * pfOUT[i - 1]) / (iMid + 1);	//EMA计算公式
 		}
 
 		delete[] pfTmp1;
@@ -623,7 +630,24 @@ void testEma(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc
 
 	if ((DataLen > 0))
 	{
-		testDea(DataLen, pfOUT, pfINa, 10* pfINb[0], 12 * pfINb[0], 9);
+		if (pfINb[0] >= 1)
+		{
+			testDea(DataLen, pfOUT, pfINa, pfINb[0]); //数据正常输出
+		}
+		else {
+			float* pfDIF1 = new float[DataLen];
+			for (int i = 0; i < DataLen; i++)
+			{
+				pfDIF1[i] = 0.0f;
+			}
+
+			for (int i = 1; i < 10; i++)
+			{
+				testDea(DataLen, pfOUT, pfINa, i);//数据用于测试结果
+			}
+			delete[] pfDIF1;
+			pfDIF1 = NULL;
+		}
 	}
 }
 
