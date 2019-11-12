@@ -10,15 +10,15 @@ ZDLogoPopURL=
 LastestVer=7.35
 HKTLogoPopURL=
 LeadLogoPopURL=
-QuitInfoUrl=
-QuitInfoUrl_Free=
-SwitchADStr=
-SwitchADStr_Free=
-SwitchADUrl=
-SwitchADUrl_Free=
+QuitInfoUrl=http://www.tdx.com.cn/softad/freepop_ex.htm
+QuitInfoUrl_Free=http://www.tdx.com.cn/softad/freepop_ex.htm
+SwitchADStr=双十一狂欢节 点此订购
+SwitchADStr_Free=双十一狂欢节 点此订购
+SwitchADUrl=http://vip.tdx.com.cn/site/app/level2/hd/20191111/?hd=20191111&tmp=201911111639&rnd_click=20191029.1708
+SwitchADUrl_Free=http://vip.tdx.com.cn/site/app/level2/hd/20191111/?hd=20191111&tmp=201911111639&rnd_click=20191029.1708
 [Mail]
 MailContent1=通达信个人版商城 http://vip.tdx.com.cn/site/app/level2/
 MailContent2=关注通达信微博 http://weibo.com/tongdaxin
 [Data]
-SpecFgName=外资背景,高校背景,养老金,股份回购,被举牌,国开持股,股权转让,送转潜力,预高送转,已高送转,股权分散,MSCI成份,中小银行,壳资源,要约收购,
-RecentHSHoliday=20181001,20181002,20181003,20181004,20181005,20181231,20190101,20190204,20190205,20190206,20190207,20190208,20190405,20190501,20190502,20190503,20190607,20190913,20191001,20191002,20191003,20191004,20191005,
+SpecFgName=外资背景,高校背景,养老金,股份回购,被举牌,国开持股,股权转让,送转潜力,预高送转,已高送转,股权分散,MSCI成份,中小银行,壳资源,要约收购,海外业务,基金独门,密集调研,
+RecentHSHoliday=20181231,20190101,20190204,20190205,20190206,20190207,20190208,20190405,20190501,20190502,20190503,20190607,20190913,20191001,20191002,20191003,20191004,20191007
