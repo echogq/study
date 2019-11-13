@@ -10,12 +10,12 @@ ZDLogoPopURL=
 LastestVer=7.35
 HKTLogoPopURL=
 LeadLogoPopURL=
-QuitInfoUrl=http://www.tdx.com.cn/softad/freepop_ex.htm
-QuitInfoUrl_Free=http://www.tdx.com.cn/softad/freepop_ex.htm
-SwitchADStr=双十一狂欢节 点此订购
-SwitchADStr_Free=双十一狂欢节 点此订购
-SwitchADUrl=http://vip.tdx.com.cn/site/app/level2/hd/20191111/?hd=20191111&tmp=201911111639&rnd_click=20191029.1708
-SwitchADUrl_Free=http://vip.tdx.com.cn/site/app/level2/hd/20191111/?hd=20191111&tmp=201911111639&rnd_click=20191029.1708
+QuitInfoUrl=
+QuitInfoUrl_Free=
+SwitchADStr=
+SwitchADStr_Free=
+SwitchADUrl=
+SwitchADUrl_Free=
 [Mail]
 MailContent1=通达信个人版商城 http://vip.tdx.com.cn/site/app/level2/
 MailContent2=关注通达信微博 http://weibo.com/tongdaxin
