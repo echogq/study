@@ -5,6 +5,7 @@
 #include<string>
 #include<sstream>
 #define CDLL_ extern "C" __declspec(dllexport) 
+#define INIT_MONEY 100000 
 
 void TraceEx(const wchar_t *strOutputString, ...)
 {

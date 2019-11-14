@@ -7,7 +7,7 @@
 float* pfDIF1 = NULL;
 float lastBuyDate = 0;
 float lastBuyPrice = 0;
-float curMoney = 100000;
+float curMoney = INIT_MONEY;
 float curStocks = 0;
 
 void testDea(int DataLen, float* pfOUT, float* pfINa, int iMultiple, float* pfDate, BOOL bTestCalc)
@@ -45,7 +45,7 @@ void testDea(int DataLen, float* pfOUT, float* pfINa, int iMultiple, float* pfDa
 			}
 			pfOUT[i] = (2 * (pfTmp1[i] - pfTmp2[i]) + (iMid - 1) * pfOUT[i - 1]) / (iMid + 1);	//EMA计算公式
 
-																								//TraceEx("\r\n[TDX]======testDea \tiMultiple=%d 测算=%d\t%.3f\t%.3f\t%.3f\t%.3f", iMultiple, bTestCalc, pfOUT[i], pfDIF1[i], pfTmp1[i], pfTmp2[i]);
+			//TraceEx("\r\n[TDX]======testDea \tiMultiple=%d 测算=%d\t%.3f\t%.3f\t%.3f\t%.3f", iMultiple, bTestCalc, pfOUT[i], pfDIF1[i], pfTmp1[i], pfTmp2[i]);
 			if (bTestCalc)
 			{
 				//////////////////////////////////////Calc Win
@@ -77,7 +77,7 @@ void testDea(int DataLen, float* pfOUT, float* pfINa, int iMultiple, float* pfDa
 
 				if (i == DataLen - 1)
 				{
-					TraceEx("\r\n[TDX]===盈[%.3f%%] 次[%d] \t%d\t可%.3f\t总%.3f\t%d\tdif=%.3f\tout=%.3f", (curMoney + (curStocks * pfINa[i]) - 100000) / 1000, iBS, iMultiple, curMoney, curMoney + (curStocks * pfINa[i]), (int)pfDate[i] + 19000000, pfDIF1[i], pfOUT[i]);
+					TraceEx("\r\n[TDX]===盈[%.3f%%] 次[%d] \t%d\t可%.3f\t总%.3f\t%d\tdif=%.3f\tout=%.3f", (curMoney + (curStocks * pfINa[i]) - INIT_MONEY) / 1000, iBS, iMultiple, curMoney, curMoney + (curStocks * pfINa[i]), (int)pfDate[i] + 19000000, pfDIF1[i], pfOUT[i]);
 				}
 				//////////////////////////////////////Calc Win DONE.
 			}
@@ -107,7 +107,7 @@ CDLL_ void MyEMA(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* p
 			{
 				lastBuyDate = 0;
 				lastBuyPrice = 0;
-				curMoney = 100000;
+				curMoney = INIT_MONEY;
 				curStocks = 0;
 
 				testDea(DataLen, pfOUT, pfINa, i, pfINc, TRUE);//数据用于测试结果
