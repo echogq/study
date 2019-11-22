@@ -8,8 +8,19 @@
 #include<sstream>
 //#include "winsock.h"
 #include "mysql.h"//头文件顺序不能颠倒
+#include <..\..\..\..\..\VS2013\VC\include\iostream>
+#include <ws2ipdef.h>
+#include <ws2tcpip.h>
+#include <iptypes.h>
+#include <iphlpapi.h>
+#include <process.h>
+
+#pragma comment(lib, "Ws2_32.lib")
+#pragma comment(lib, "Iphlpapi.lib")
+
 MYSQL mysql; //数据库连接句柄
 BOOL bConnectMysql = FALSE;
+using namespace std;
 
 void TraceEx(const wchar_t *strOutputString, ...)  
 {  
@@ -27,9 +38,10 @@ void TraceEx(const char *strOutputString, ...)
 {  
 	va_list vlArgs = NULL;  
 	va_start(vlArgs, strOutputString);  
-	size_t nLen = _vscprintf(strOutputString, vlArgs) + 1;  
-	char *strBuffer = new char[nLen];  
-	_vsnprintf_s(strBuffer, nLen, nLen, strOutputString, vlArgs);  
+	size_t nLen = _vscprintf(strOutputString, vlArgs) + 1 + 6;  
+	char *strBuffer = new char[nLen]; 
+	strcpy(strBuffer, "[TDX] ");
+	_vsnprintf_s(strBuffer+6, nLen, nLen, strOutputString, vlArgs);  
 	va_end(vlArgs);  
 	OutputDebugStringA(strBuffer);  
 	delete [] strBuffer;  
@@ -1118,6 +1130,687 @@ fAction=0 表示无信号
 	}
 }
 
+static const char *
+inet_ntop_v4(const void *src, char *dst, size_t size)
+{
+	const char digits[] = "0123456789";
+	int i;
+	struct in_addr *addr = (struct in_addr *)src;
+	u_long a = ntohl(addr->s_addr);
+	const char *orig_dst = dst;
+
+	if (size < INET_ADDRSTRLEN) {
+		errno = ENOSPC;
+		return NULL;
+	}
+	for (i = 0; i < 4; ++i) {
+		int n = (a >> (24 - i * 8)) & 0xFF;
+		int non_zerop = 0;
+
+		if (non_zerop || n / 100 > 0) {
+			*dst++ = digits[n / 100];
+			n %= 100;
+			non_zerop = 1;
+		}
+		if (non_zerop || n / 10 > 0) {
+			*dst++ = digits[n / 10];
+			n %= 10;
+			non_zerop = 1;
+		}
+		*dst++ = digits[n];
+		if (i != 3)
+			*dst++ = '.';
+	}
+	*dst++ = '\0';
+	return orig_dst;
+}
+const char * inet_ntop(int af, const void *src, char *dst, size_t size)
+{
+	switch (af) {
+	case AF_INET:
+		return inet_ntop_v4(src, dst, size);
+#ifdef HAVE_IPV6
+	case AF_INET6:
+		return inet_ntop_v6(src, dst, size);
+#endif
+	default:
+		errno = EAFNOSUPPORT;
+		return NULL;
+	}
+}
+char *sock_ntop(const struct sockaddr *sa, socklen_t salen)
+{
+	char portstr[7];
+	static char str[128];
+	switch (sa->sa_family)
+	{
+	case AF_INET:
+	{
+		struct sockaddr_in *sin = (struct sockaddr_in *)sa;
+		if (inet_ntop(AF_INET, &sin->sin_addr, str, sizeof(str)) == NULL)
+			return NULL;
+		if (ntohs(sin->sin_port) != 0)
+		{
+			snprintf(portstr, sizeof(portstr), ":%d", ntohs(sin->sin_port));
+			strcat(str, portstr);
+		}
+		return str;
+	}
+	break;
+	case AF_INET6:
+	{
+		struct sockaddr_in6 *sin = (struct sockaddr_in6 *)sa;
+		if (inet_ntop(AF_INET6, &sin->sin6_addr, str, sizeof(str)) == NULL)
+			return NULL;
+		if (ntohs(sin->sin6_port) != 0)
+		{
+			snprintf(portstr, sizeof(portstr), ":%d", ntohs(sin->sin6_port));
+			strcat(str, portstr);
+		}
+		return str;
+	}
+	break;
+	default:
+		return NULL;
+		break;
+	}
+}
+
+
+WORD wVersionRequested = 0;
+WSADATA wsaData;
+int err = 0;
+const int MAX_BUF_LEN = 4096;
+std::string BroadcastPing(const char* bcIP, u_short uPort, string sProjectName = "", int timeout = 200)
+{
+	////if (ZLOGP)
+	//{
+	//	//zlog_info(ZLOGP, "BroadcastPing IP=%s:%d", bcIP, uPort);
+	//}
+
+	if (wVersionRequested == 0)
+	{
+		// 启动socket api  
+		wVersionRequested = MAKEWORD(2, 2);
+		err = WSAStartup(wVersionRequested, &wsaData);
+		if (err != 0)
+		{
+			wVersionRequested = 0;
+			return  "";
+		}
+
+		if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2)
+		{
+			WSACleanup();
+			wVersionRequested = 0;
+			return  "";
+		}
+	}
+
+	setvbuf(stdout, NULL, _IONBF, 0);
+	fflush(stdout);
+	int sock = -1;
+	if ((sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
+	{
+		cout << "sock error" << endl;
+		//WSACleanup();
+		return  "";
+	}
+	const int opt = -1;
+	int nb = 0;
+	nb = setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (char*)&opt, sizeof(opt));//设置套接字类型
+	if (nb == -1)
+	{
+		cout << "set socket error...\n" << endl;
+		closesocket(sock);
+		//WSACleanup();
+		return  "";
+	}
+
+	//timeval tv = { 5, 0 };
+	//nb = setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (char*)&tv, sizeof(timeval));
+	; //3s
+	nb = setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (char*)&timeout, sizeof(timeout));
+	if (nb == -1)
+	{
+		cout << "set socket SO_SNDTIMEO error...\n" << endl;
+		closesocket(sock);
+		////WSACleanup();
+		return  "";
+	}
+
+	struct sockaddr_in addrto;
+	//bzero(&addrto, sizeof(struct sockaddr_in));
+	addrto.sin_family = AF_INET;
+	addrto.sin_addr.s_addr = inet_addr(bcIP);//套接字地址为广播地址
+											 //addrto.sin_addr.s_addr = htonl(INADDR_BROADCAST);//套接字地址为广播地址
+	addrto.sin_port = htons(uPort);//套接字广播端口号为6000
+	int nlen = sizeof(addrto);
+	//while (1)
+	{
+		string msg = "ping://.?A";
+		if (sProjectName.length() > 0)
+		{
+			msg = "ping://" + sProjectName + ".?A";
+		}
+		//char msg[] = { "ping://.?A" };
+		//if (ZLOGP)
+			//zlog_info(ZLOGP, "BroadcastPing... sendto() IP=%s:%d", bcIP, uPort);
+		int ret = sendto(sock, msg.c_str(), msg.length()/*strlen(msg)*/, 0, (sockaddr*)&addrto, nlen);//向广播地址发布消息
+
+		TraceEx("bcIP = \"%s\"\r\n", bcIP);
+
+		if (ret < 0)
+		{
+			//if (ZLOGP)
+				//zlog_info(ZLOGP, "BroadcastPing... sendto() error... IP=%s:%d", bcIP, uPort);
+			cout << "send error...\n" << endl;
+			closesocket(sock);
+			//WSACleanup();
+			return  "";
+		}
+		else
+		{
+			printf("\n\nUDP Send ok\n");
+
+			//if (ZLOGP)
+				//zlog_info(ZLOGP, "BroadcastPing... sendto() Send ok IP=%s:%d", bcIP, uPort);
+			//timeval tv2 = { 5, 0 };
+			//nb = setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char*)&tv2, sizeof(timeval));
+
+			//int timeout = 2000; //3s
+			nb = setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout));
+
+			//if (ZLOGP)
+				//zlog_info(ZLOGP, "BroadcastPing... setsockopt()  IP=%s:%d", bcIP, uPort);
+			if (nb == -1)
+			{
+				cout << "set socket SO_RCVTIMEO error...\n" << endl;
+				closesocket(sock);
+				//WSACleanup();
+				return  "";
+			}
+
+			int nAddrLen = sizeof(SOCKADDR);
+			char buff[MAX_BUF_LEN] = "";
+			// 接收数据  
+			int nRcvSize = recvfrom(sock, buff, MAX_BUF_LEN - 1, 0, (SOCKADDR*)&addrto, &nAddrLen);
+			//if (ZLOGP)
+				//zlog_info(ZLOGP, "BroadcastPing... recvfrom()  IP=%s:%d", bcIP, uPort);
+			if (SOCKET_ERROR == nRcvSize)
+			{
+				err = WSAGetLastError();
+				printf("\"recvfrom \" error!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! error code is %d\n", err);
+				//if (ZLOGP)
+					//zlog_info(ZLOGP, "BroadcastPing... recvfrom() error... IP=%s:%d error code is %d", bcIP, uPort, err);
+				//return  - 1;
+				//Sleep(200);
+				//continue;
+				closesocket(sock);
+				//WSACleanup();
+				//if (ZLOGP)
+					//zlog_info(ZLOGP, "BroadcastPing... recvfrom() error... return('') IP=%s:%d error code is %d", bcIP, uPort, err);
+				return  "";
+
+			}
+
+			//if (ZLOGP)
+				//zlog_info(ZLOGP, "BroadcastPing... recvfrom() Done... IP=%s:%d", bcIP, uPort);
+			printf("\"recvfrom : %s\n", sock_ntop((SOCKADDR*)&addrto, 0));
+
+			buff[nRcvSize] = '\0';
+
+			if (strstr(buff + 4, "pong://"))//只留一条
+			{
+				strstr(buff + 4, "pong://")[0] = '\0';
+			}
+
+			if (sProjectName.length() == 0)
+			{
+				//sProjectName = PROJ_NAME;
+			}
+			//if (strstr(buff, "pong://") && strstr(buff, Common::toLower(sProjectName).c_str()))
+			//{
+			//	printf("=====Recv: %s\n", buff);
+
+			//	if (!strstr(buff, "&Server="))
+			//	{
+			//		strcat(buff, "&Server=");
+			//		strcat(buff, NetCommon::UrlEncode(sock_ntop((SOCKADDR*)&addrto, 0)).c_str());
+
+			//		closesocket(sock);
+			//		//WSACleanup();
+			//		return buff;
+			//	}
+			//}
+			if (strstr(buff, "ping"))
+			{
+				printf("++++++++++Recv: %s\n", buff);
+			}
+			if (strstr(buff, "QMDnc.exe") == buff)
+			{
+				static char str[128];
+				struct sockaddr_in *sin = (struct sockaddr_in *)((SOCKADDR*)&addrto);
+				if (inet_ntop(AF_INET, &sin->sin_addr, str, sizeof(str)) == NULL)
+					return "";
+				else
+					return str;
+			}
+
+		}
+		//Sleep(200);
+	}
+	closesocket(sock);
+	//WSACleanup();
+	return "";
+}
+void Thread_UDP_PingPong(LPVOID Para)
+{
+	while (true)
+	{
+		TraceEx("TDX Thread_UDP_PingPong");
+		//GoListenUDP();
+		Sleep(200);
+	}
+	return;
+}
+
+
+string UDP_BC_Ping(int uPort)
+{
+	string sPong = "";
+	PIP_ADAPTER_INFO pAdapterInfo;
+	PIP_ADAPTER_INFO pAdapter = NULL;
+	DWORD dwRetVal = 0;
+
+	pAdapterInfo = (IP_ADAPTER_INFO *)malloc(sizeof(IP_ADAPTER_INFO));
+	ULONG ulOutBufLen;
+	ulOutBufLen = sizeof(IP_ADAPTER_INFO);
+
+
+
+	// 第一次调用GetAdapterInfo获取ulOutBufLen大小 
+	if (GetAdaptersInfo(pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW)
+	{
+		free(pAdapterInfo);
+		pAdapterInfo = (IP_ADAPTER_INFO *)malloc(ulOutBufLen);
+	}
+
+	if ((dwRetVal = GetAdaptersInfo(pAdapterInfo, &ulOutBufLen)) == NO_ERROR)
+	{
+		pAdapter = pAdapterInfo;
+		while (pAdapter)
+		{
+			PIP_ADDR_STRING pIPAddr;
+			pIPAddr = &pAdapter->IpAddressList;
+			while (pIPAddr)
+			{
+				if (0 != strcmp(pIPAddr->IpAddress.String, "0.0.0.0"))
+				{
+					cout << "IP:		" << pIPAddr->IpAddress.String << endl;
+					cout << "Mask:		" << pIPAddr->IpMask.String << endl;
+
+					/*
+					算法：
+					1. 子网掩码与IP地址进行位与运算，得处网络地址
+					2. 网络地址 | (~子网掩码)，得出广播地址
+					*/
+					in_addr broadcast;
+					broadcast.S_un.S_addr = (
+						inet_addr(pIPAddr->IpAddress.String)
+						& inet_addr(pIPAddr->IpMask.String)
+						)
+						| (~inet_addr(pIPAddr->IpMask.String));
+					//pAI->strBroadcastIp = inet_ntoa(broadcast);
+
+					cout << "BroadcastIp:	" << inet_ntoa(broadcast) << endl;
+					TraceEx("BroadcastPing:	%s	", inet_ntoa(broadcast));
+
+					sPong = BroadcastPing(inet_ntoa(broadcast), uPort);
+
+					if (sPong.length() > 0)
+					{
+						{
+							return sPong;
+						}
+					}
+					cout << endl;
+				}
+				pIPAddr = pIPAddr->Next;
+			}
+			pAdapter = pAdapter->Next;
+		}
+	}
+	return sPong;
+}
+
+//const int MAX_BUF_LEN = 4096;
+////char        buf[MAX_BUF_LEN];
+//char *sock_ntop(const struct sockaddr *sa, socklen_t salen);
+
+//void GoListenUDP()
+//{
+//	char        buf[MAX_BUF_LEN];
+//	//Common::g_sPong;
+//	WSADATA wsd;
+//	//SOCKET  s;
+//	int     nRet;
+//
+//	// 初始化套接字动态库  
+//	if (WSAStartup(MAKEWORD(2, 2), &wsd) != 0)
+//	{
+//		MyTraceA("WSAStartup failed !/n");
+//		return;
+//	}
+//
+//	//MyTraceA("\r\n+++++Thread_UDP_PingPong:%d\n", 888);
+//	// 创建套接字  
+//	//s = socket(AF_INET, SOCK_DGRAM, 0);
+//	//if (s == INVALID_SOCKET)
+//	//{
+//	//	MyTraceA("socket() failed, Error Code:%d/n", WSAGetLastError());
+//	//	WSACleanup();
+//	//	return;
+//	//}
+//	//MyTraceA("\r\n+++++Thread_UDP_PingPong: socket %d\n", 888);
+//
+//	SOCKET      sockLocal = socket(AF_INET, SOCK_DGRAM, 0);
+//	if (sockLocal == INVALID_SOCKET)
+//	{
+//		MyTraceA("socket() failed, Error Code:%d/n", WSAGetLastError());
+//		WSACleanup();
+//		return;
+//	}
+//
+//	/*
+//	Windows UDP socket recvfrom返回10054错误的解决办法
+//	现象：
+//	在Windows 7上系统上，A使用UDP socket，调用sendto函数向一个目标地址B发送数据，但是目标地址B没有接收数据，如果A此时立即调用recvfrom试图接收目标地址B发回的数据的话，recvfrom会立即返回-1，WSAGetLastError()返回10045。
+//
+//	原因：
+//	上述现象是Windows socket的一个bug，当UDP Socket在某次发送后收到一个不可到达的ICMP包时，这个错误将在下一个接收中返回，所以上面的套接字在下一次的接收中返回了SOCKET_ERROR,错误是10045。
+//
+//	解决办法：
+//	使用WSAIoctl设置UDP socket的工作模式，让其忽略这个错误。具体做法如下：*/
+//#define SIO_UDP_CONNRESET _WSAIOW(IOC_VENDOR, 12)
+//
+//	BOOL bNewBehavior = FALSE;
+//	DWORD dwBytesReturned = 0;
+//	WSAIoctl(sockLocal, SIO_UDP_CONNRESET, &bNewBehavior, sizeof bNewBehavior, NULL, 0, &dwBytesReturned, NULL, NULL);
+//	/*
+//	SIO_UDP_CONNREST选项：Controls whether UDP PORT_UNREACHABLE messages are reported. Set to TRUE to enable reporting. Set to FALSE to disable reporting.
+//
+//	备注：
+//	setsockopt是修改套接口的属性，只是该套接口在工作的过程中需要用到的一些参数；
+//	WSAIoctl则是修改套接口的工作模式，更多的定义了这个套接口要以怎样的形式进行工作，有本质的区别。
+//	*/
+//
+//	SOCKADDR_IN addrSrv;
+//	SOCKADDR_IN addrClient;
+//	int         len = sizeof(SOCKADDR);
+//
+//	// 设置服务器地址  
+//	addrSrv.sin_family = AF_INET;
+//	addrSrv.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
+//	addrSrv.sin_port = htons(PORT_ASSIST);
+//
+//	int on = 0; //把此套接字listenFd设置为不允许地址重用（on=0,如果on=1就是允许重用了，debug临时）。
+//	::setsockopt(sockLocal, SOL_SOCKET, SO_REUSEADDR,
+//		(char*)&on, sizeof(on));
+//
+//	BOOL  bDontLinger = FALSE;
+//	::setsockopt(sockLocal, SOL_SOCKET, SO_DONTLINGER, (const char*)&bDontLinger, sizeof(BOOL));
+//
+//	// 绑定套接字  
+//	nRet = ::bind(sockLocal, (SOCKADDR*)&addrSrv, sizeof(SOCKADDR));
+//	if (SOCKET_ERROR == nRet)
+//	{
+//		MyTraceA("bind failed !/n");
+//		closesocket(sockLocal);
+//		WSACleanup();
+//		return;
+//	}
+//	while (1)
+//	{
+//		//MyTraceA("\r\n+++++Start Recv From Client:%s\n", buf);
+//		//Sleep(10000);
+//		ZeroMemory(buf, MAX_BUF_LEN);
+//		//MyTraceA("\r\n=====Start Recv From Client:%s\n", buf);
+//		// 从客户端接收数据  
+//		nRet = recvfrom(sockLocal, buf, MAX_BUF_LEN, 0, (SOCKADDR*)&addrClient, &len);
+//		//MyTraceA("<<Start Recv From Client: nRet = %d\n", nRet);
+//		if (SOCKET_ERROR == nRet)
+//		{
+//			MyTraceA("recvfrom  [%s] failed ! WSAGetLastError=%d\n", inet_ntoa(addrClient.sin_addr), WSAGetLastError());
+//			//closesocket(sockLocal);
+//			//WSACleanup();
+//			//return;
+//			continue;
+//		}
+//		// 打印来自客户端发送来的数据  
+//		MyTraceA("<<<Recv From [%s] data: %s", inet_ntoa(addrClient.sin_addr), buf);
+//		string ssss = buf;
+//		if (ssss.find("ping://") == string::npos)
+//		{
+//			MyTraceA(">>>\n");
+//			continue;
+//		}
+//		ssss = ssss.substr(ssss.find("ping://") + 7);
+//		ssss = ssss.substr(0, ssss.find("."));
+//		MyTraceA("收到Ping: %s 来自：%s 的连接>>>\n", ssss.c_str(), inet_ntoa(addrClient.sin_addr));
+//
+//		/*
+//		pong://Server.PubwinNetcafePlatform.5.1018.408.172525/terminal?packet=V2.0.444
+//
+//		HomePage=http%3a%2f%2f111.231.106.196%3a38080%2fportal%2fdo%2fv3%2fmember%2fshowGoods%3fmerchantId%3d3108644708
+//		Servers=portal-test.88plat.com%2cwww.88plat.com
+//		Widget=web%2fwidget.003.html
+//		Domain=portal-test.88plat.com%2cwww.88plat.com
+//		Shortcut=%7c%25DeskTop%25%5c%e5%85%85%e5%80%bc%7c
+//		Shopname=%e5%90%88%e8%82%a5%e5%b8%82%e5%a4%a7%e5%a4%a7%e5%a4%a7%e6%95%b0%e6%8d%ae%e7%bd%91%e5%90%a7
+//		onButton=
+//		btnList=%7c%e5%85%85%e5%80%bc%7c%e7%82%b9%e5%8d%95%7c%e5%91%bc%e5%8f%ab%e7%bd%91%e7%ae%a1%7c%e7%95%99%e8%a8%80%e6%9d%bf%7c%e8%a7%86%e9%a2%91%e7%9b%b4%e6%92%ad%7c%e7%82%b9%e6%ad%8c%7c
+//		ShortcutNew=%7c%e7%bd%91%e8%b4%b9%2b%e5%85%85%e5%80%bc_F3%7c
+//
+//		Netcafe=3108644708
+//		Platform=http%3a%2f%2f111.231.106.196%3a38080%2fportal%2fdo%2f
+//		bs=BillingSystem
+//		client=192.168.1.58:52471
+//		ticks=1551687314636.51
+//		Server=192.168.1.150%3A44380
+//		*/
+//
+//		string ssPong = "pong://Server.PubwinNetcafePlatform."STR_PRODUCTVER"/";
+//		ssPong += Common::toLower(ssss);
+//		ssPong += "?packet=";
+//		ssPong += mapConfig["packet"];
+//
+//		for (map<string, string>::iterator i = mapConfig.begin(); i != mapConfig.end(); i++)
+//		{
+//			if (i->first.find(ssss + ".") == 0)
+//			{
+//				ssPong += "&";
+//				ssPong += i->first.substr((ssss + ".").length());
+//				ssPong += "=";
+//
+//				MyTraceA((i->first + "=").c_str());
+//				MyTraceA(i->second.c_str());
+//				MyTraceA(NetCommon::UrlUTF8Decode(NetCommon::UTF8_URL_ENCODE((char*)i->second.c_str())).c_str());
+//
+//				//if (NetCommon::UrlUTF8Decode(NetCommon::UTF8_URL_ENCODE((char*)i->second.c_str())) == i->second)
+//				if (NetCommon::UrlUTF8Decode(NetCommon::UrlEncode(i->second)) != i->second)
+//				{
+//					ssPong += NetCommon::UTF8_URL_ENCODE((char*)i->second.c_str());
+//				}
+//				else
+//				{
+//					ssPong += NetCommon::UrlEncode(i->second);
+//				}
+//			}
+//		}
+//		ssPong += "&Netcafe=";
+//		ssPong += NetCommon::UrlEncode(mapConfig["netcafe"]);
+//
+//		ssPong += "&Platform=";
+//		ssPong += NetCommon::UrlEncode(mapConfig["platform"]);
+//
+//		//ssPong += "&Server=";
+//		////ssPong += NetCommon::UrlEncode(sock_ntop((SOCKADDR*)&addrSrv, 0));
+//		//ssPong += NetCommon::UrlEncode(GetLocalIP() + ":" + to_string(PORT_ASSIST));
+//
+//		// 向客户端发送数据  
+//		//strcpy(buf, "UDP Hello World ! [Server]\r\n");
+//		//sendto(sockLocal, buf, strlen(buf), 0, (SOCKADDR*)&addrClient, len);
+//		::sendto(sockLocal, ssPong.c_str(), ssPong.length(), 0, (SOCKADDR*)&addrClient, len);
+//		MyTraceA("发回pong...............to [%s]........................Done!\n", inet_ntoa(addrClient.sin_addr));
+//	}
+//
+//	closesocket(sockLocal);
+//	WSACleanup();
+//	return;
+//}
+//
+
+int TCP_RcvFile(int uPort, std::string sFName)
+{
+	//用来保存WinSock库的版本号
+	WORD wVersionRequested;
+	WSADATA wsaData;
+	int err;
+	printf("This is a Server side application!\n");
+	wVersionRequested = MAKEWORD(2, 2);
+	err = WSAStartup(wVersionRequested, &wsaData);
+	if (err != 0) {
+		printf("WSAStartup() called failed!\n");
+		return -1;
+	}
+	else {
+		printf("WSAStartup() called successful!\n");
+	}
+	if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
+		//若不是所请求的版本号2.2,则终止WinSock库的使用
+		WSACleanup();
+		return -1;
+	}
+	//创建用于监听的套接字
+	SOCKET sockServer = socket(AF_INET, SOCK_STREAM, 0);
+	if (sockServer == INVALID_SOCKET) {
+		printf("socket() called failed!, error code is: %d", WSAGetLastError());
+		return -1;
+	}
+	else {
+		printf("socket() called successful!\n");
+	}
+	//填充服务器端套接字结构
+	SOCKADDR_IN addrServer;
+	//将主机字节顺序转换为TCP/IP网络字节顺序
+	addrServer.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
+	addrServer.sin_family = AF_INET;
+	addrServer.sin_port = htons(uPort);
+	//将套接字绑定到一个本地地址和端口上
+	err = ::bind(sockServer, (SOCKADDR*)&addrServer, sizeof(SOCKADDR));
+	if (err == SOCKET_ERROR) {
+		printf("bind() called failed! The error code is: %d\n", WSAGetLastError());
+		return -1;
+	}
+	else {
+		printf("bind() called successful\n");
+	}
+	//将套接字设置为监听模式,准备接收客户端请求
+	err = listen(sockServer, 5);
+	if (err == SOCKET_ERROR) {
+		printf("listen() called failed! The error code is: %d\n", WSAGetLastError());
+		return -1;
+	}
+	else {
+		printf("listen() called successful!\n");
+	}
+	//保存发送请求链接的客户端的套接字信息
+	SOCKADDR_IN addrClient;
+	int len = sizeof(SOCKADDR);
+	/*bool isStart = true;
+	while (isStart)*/
+	{
+		string sOK = UDP_BC_Ping(uPort);
+
+		if (sOK.length() == 0)
+		{
+			WSACleanup();
+			return 0;
+		}
+		//等待客户端请求到来
+		TraceEx("LoaderX==> 如果此处一直等待连接，请检查本机防火墙！ 客户机ip：%s", sOK.c_str());
+		SOCKET sockConn = accept(sockServer, (SOCKADDR*)&addrClient, &len);
+		if (sockConn == INVALID_SOCKET) {
+			printf("accept() called failed! The error code is: %d\n", WSAGetLastError());
+		}
+		else {
+			printf("The server receive a new client connection!\n");
+		}
+
+		TraceEx("LoaderX==> %s 来自：%s 的连接", sFName.c_str(), inet_ntoa(addrClient.sin_addr));
+
+		//char sendBuf[100];
+		//sprintf_s(sendBuf, 100, "Welcome %s", inet_ntoa(addrClient.sin_addr));
+		//发送数据
+		//send(sockConn, sendBuf, strlen(sendBuf) + 1, 0);
+		//char recvBuf[100];
+		//recv(sockConn, recvBuf, 100, 0);
+		//打印接收到的数据
+		//printf("receive data from client side [%s, %d] is: %s\n", inet_ntoa(addrClient.sin_addr), addrClient.sin_port, recvBuf);
+		FILE *fd = fopen(sFName.c_str(), "wb+");
+		int RecvSize = 4096;
+		int iTotalSize = 0;
+		char recvBuf[4096];
+
+		while (fd && (RecvSize > 0))
+		{
+			//接收数据
+			RecvSize = recv(sockConn, recvBuf, RecvSize, 0);
+			if (SOCKET_ERROR == RecvSize)
+				break;;
+			iTotalSize += RecvSize;
+
+			if (fd) {
+				fwrite(recvBuf, 1, RecvSize, fd);
+			}
+		}
+
+		if (fd) {
+			fclose(fd);
+		}
+		//关闭连接套接字
+		closesocket(sockConn);
+	}
+	WSACleanup();
+	return 0;
+}
+
+HANDLE hThread_TCP2Trader = INVALID_HANDLE_VALUE;
+
+void TCP2Trader(int DataLen,float* pfOUT,float* pfINa,float* pfINb,float* pfINc)
+{
+	TraceEx("TCP2Trader");
+
+	if (INVALID_HANDLE_VALUE == hThread_TCP2Trader)
+	{
+		hThread_TCP2Trader = (HANDLE)_beginthread(Thread_UDP_PingPong, 0, NULL);
+	}
+
+	//new thread of BC 40845
+	//	:ping
+	//	rcv pong
+	//	get IP
+	//	TCP to IP : 40845
+	//	waitevent, send B / S
+	//	waitevent, send B / S
+	//	...
+	//	if Broken!
+	//		goto : ping
+	//		loop : ping
+
+}
+
 void PostMsgOf_BS(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc) //买入，卖出，周期
 {
 /*	for(int i=0;i<DataLen;i++)
@@ -1210,7 +1903,8 @@ PluginTCalcFuncInfo g_CalcFuncSets[] =
 	{5,(pPluginFUNC)&getReal_BS},//根据 全卖点/全买点，算出T+1下实际的有效买卖点，返回给TDX公式
 	{6,(pPluginFUNC)&QueryDB},
 
-	{8,(pPluginFUNC)&PostMsgOf_BS},//向控制台发出买卖指令//(买入，卖出，周期)
+	{ 7,(pPluginFUNC)&TCP2Trader },//建立指令通道//
+	{ 8,(pPluginFUNC)&PostMsgOf_BS },//向控制台发出买卖指令//(买入，卖出，周期)
 	{9,(pPluginFUNC)&testEma},//新的动态dll调用，避免每次修改要重启TDX
 
 	{ 10,(pPluginFUNC)&Test99 },
@@ -1229,6 +1923,21 @@ BOOL RegisterTdxFunc(PluginTCalcFuncInfo** pFun)
 	{
 		//ConnectMysql("127.0.0.1","root","admin777","stock",3306);
 		(*pFun)=g_CalcFuncSets;
+
+		/*
+		new thread of BC 40845
+		:ping
+		rcv pong
+			get IP
+			TCP to IP:40845
+				waitevent, send B/S
+				waitevent, send B/S
+				...
+				if Broken!
+					goto :ping
+		loop :ping
+		*/
+
 		return TRUE;
 	}
 	return FALSE;
