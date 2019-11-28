@@ -93,7 +93,7 @@ static char sMainClass[256] = "TdxW_MainFrame_Class";
 
 void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset, char * buyCount_Default, char * sBuyBtnTxt)
 {
-	LogTrace16380("DoTrade\n");
+	LogTrace16380("DoTrade sRate=%s iActionID=%d\n", sRate, iActionID);
 	char sRefreshBtnTxt[256] = "刷";
 	char sRateBtnTxt[256] = { 0 };
 
@@ -237,10 +237,11 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 					}
 					else
 					{
-						LogTrace16380("点击数量比例按钮。。。\n");
+						LogTrace16380("点击数量比例按钮。。。%08x %08x\n", pCurRateBtnWnd, pCurRateBtnWnd->m_hWnd);
 						char temp2[256] = { 0 };
 						while ((strcmp(temp2, "0") == 0) || (strlen(temp2) == 0))
 						{
+							//偶发死循环 BUG ,待查。。。
 							SendMessage(pCurRateBtnWnd->m_hWnd, BM_CLICK, 0, 0L);
 							Sleep(10);
 							SendMessage(pCurRateBtnWnd->m_hWnd, BM_CLICK, 0, 0L);
@@ -293,7 +294,8 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 			//hTDX_MainWnd = ::FindWindowA(sMainClass, NULL);
 			if (hTDX_MainWnd)
 			{
-				::SendMessage((HWND)hTDX_MainWnd, WM_COMMAND, MAKEWPARAM(5333, 0), NULL);
+				//新的华安会赢里，5333变成弹出了，待修改
+				//::SendMessage((HWND)hTDX_MainWnd, WM_COMMAND, MAKEWPARAM(5333, 0), NULL);
 			}
 		}
 	}
