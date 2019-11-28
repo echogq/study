@@ -1098,14 +1098,16 @@ BOOL IsExistProcess(const char*  szProcessName)
 }
 
 
-void Run_HuaAnTDX()
+void CAutoTradeDlg::Run_HuaAnTDX()
 {
 	char buf[MAX_PATH] = { 0 };
 	GetPrivateProfileStringA("LastTradeMsg", "HA_TDXPath", "", buf, sizeof(buf), ".\\AutoTrade.ini");
 	if (strlen(buf) > 0)
 	{
 		//WinExec(buf, SW_NORMAL);
+		this->GetDlgItem(IDC_BUTTONRUNHUAAN)->EnableWindow(0);
 		RunApp2End("Auto_OpenHuaAn.exe", buf);
+		this->GetDlgItem(IDC_BUTTONRUNHUAAN)->EnableWindow(1);
 	}
 }
 
@@ -2079,7 +2081,9 @@ void CAutoTradeDlg::OnBnClickedButtonrunhuaan()
 {
 	//CString sPara = " 2 "; 
 	//RunApp2End(AUTO_OPEN_ALL, sPara);
+	//this->GetDlgItem(IDC_BUTTONRUNHUAAN)->EnableWindow(0);
 	Run_HuaAnTDX();
+	//this->GetDlgItem(IDC_BUTTONRUNHUAAN)->EnableWindow(1);
 }
 
 void CAutoTradeDlg::OnBnClickedButtonruntdx1()

@@ -81,6 +81,7 @@ protected:
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 	void OnReadLV();
+	void Run_HuaAnTDX();
 public:
 	afx_msg void OnEnChange_RcvInHandStock();
 	void GetInHandList();
