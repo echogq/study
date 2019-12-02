@@ -652,7 +652,7 @@ CAutoTradeDlg::CAutoTradeDlg(CWnd* pParent /*=NULL*/)
 , m_bAutoSell(FALSE)
 , m_bAutoBuy(FALSE)
 , m_iRateS(2)
-, m_iRateB(4)
+, m_iRateB(5)
 , m_strCopyData(_T(""))
 {
 	//{{AFX_DATA_INIT(CAutoTradeDlg)

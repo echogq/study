@@ -151,7 +151,15 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 			hTDX_QuickTradeWnd = ::FindWindowA("#32770", sDlgCaption);
 		}
 		LogTrace16380("获取闪电窗=0x%x\n", hTDX_QuickTradeWnd);
+		Sleep(200);
 
+		DWORD_PTR dwResult = 0;
+		while (!::SendMessageTimeout(hTDX_QuickTradeWnd, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_BLOCK, 50, &dwResult))// 已经停止响应了（俗话说的窗口挂死了）  
+		{
+			LogTrace16380("窗口死了？？？。。。。。。。。。。\n");
+			Sleep(50);
+		}
+		
 		CWnd *pWnd = CWnd::FromHandle(hTDX_QuickTradeWnd)->GetWindow(GW_CHILD);
 
 		CWnd *pCurRateBtnWnd = NULL;
