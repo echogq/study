@@ -40,6 +40,7 @@ public:
 	CString	m_buyCode2;
 	CString	m_saleCode;
 	BOOL	m_bAutoUpdate;
+	BOOL	m_bDrawRedTxt;
 	BOOL	m_bLimitPercent;
 	int		m_iLimitPercent;
 	double	m_fCurPercent;

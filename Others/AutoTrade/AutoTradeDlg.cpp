@@ -660,6 +660,7 @@ CAutoTradeDlg::CAutoTradeDlg(CWnd* pParent /*=NULL*/)
 	m_buyCode2 = _T("");
 	m_saleCode = _T("");
 	m_bAutoUpdate = FALSE;
+	m_bDrawRedTxt = FALSE;
 	m_bLimitPercent = TRUE;
 	m_iLimitPercent = 10;
 	m_fCurPercent = 0.0f;
@@ -691,6 +692,7 @@ void CAutoTradeDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_RCVBUYCODE2, m_buyCode2);
 	DDX_Text(pDX, IDC_RCVSALECODE, m_saleCode);
 	DDX_Check(pDX, IDC_AUTOUPDATE, m_bAutoUpdate);
+	DDX_Check(pDX, IDC_REDTEXT_ONSCREEN, m_bDrawRedTxt);
 	DDX_Check(pDX, IDC_CB_PERCENT, m_bLimitPercent);
 
 	DDX_Check(pDX, IDC_CB_AUTOSELL, m_bAutoSell);
@@ -2046,7 +2048,11 @@ LRESULT CAutoTradeDlg::OnTradeMsg( WPARAM wParam, LPARAM lParam )
 			m_lstTradeMSG.SetCaretIndex(0, 1);
 
 			//GetDlgItem(IDC_STATICCMD)->SetWindowText(PrefixTimeStr(sAct.GetBuffer()));
-			OnScreenfont(PrefixTimeStr(sAct.GetBuffer()));
+
+			if (m_bDrawRedTxt)
+			{
+				OnScreenfont(PrefixTimeStr(sAct.GetBuffer()));
+			}
 		}
 	}
 
