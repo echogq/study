@@ -108,9 +108,9 @@
       <HeaderFileName />
     </Midl>
     <ClCompile>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -144,7 +144,7 @@
       <OutputFile>.\Release/AutoTrade.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>copy /y $(TargetPath) ..\..\mytool\AutoTrade.exe</Command>
+      <Command>copy /y $(TargetPath) $(ProjectDir)..\Auto_OK\$(TargetFileName) </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
