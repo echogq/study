@@ -124,7 +124,10 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 			SendMessage(hTDX_QuickTradeWnd, WM_CLOSE, 0, 0L);
 			hTDX_QuickTradeWnd = ::FindWindowA("#32770", sDlgCaption);
 		}
-
+		
+		::SendMessage(hTDX_MainWnd,WM_LBUTTONDOWN,0,0x770055);//鼠标按下消息 13 
+		::SendMessage(hTDX_MainWnd,WM_LBUTTONUP,0,0x770055); //鼠标抬起消息
+		
 		/*iActionID=
 		买一价闪买5081买二价闪买5082买三价闪买5083买四价闪买5084买五价闪买5085
 		买六价闪买5086买七价闪买5087买八价闪买5088买九价闪买5089买十价闪买5090
