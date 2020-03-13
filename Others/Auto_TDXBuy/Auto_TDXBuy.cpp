@@ -45,6 +45,47 @@ void LogTrace16380(LPCTSTR pszFormat, ...)
 
 	OutputDebugString(szapipath);
 }
+
+//遍历所有子窗口的子窗口 , Z序遍历
+void print_window2(HWND parent, int level)
+{
+	HWND child = NULL;
+	TCHAR buf[MAX_PATH];
+	DWORD pid = 0, tid = 0;
+	do {
+		child = FindWindowEx(parent, child, NULL, NULL);
+		int ret = GetWindowText(child, buf, MAX_PATH);
+		buf[ret] = 0;
+		tid = GetWindowThreadProcessId(child, &pid);
+		for (int i = 0; i < level; ++i)
+			_tprintf("\t");
+		_tprintf("%s ,  pid:%d, tid:%d\n", buf, pid, tid);
+		if (child)
+			print_window2(child, level + 1);
+	} while (child);
+}
+
+//遍历所有 explore 下的窗口 , Z序遍历
+void print_window()
+{
+	HWND child = NULL;
+	TCHAR buf[MAX_PATH];
+	DWORD pid = 0, tid = 0;
+
+	do {
+		//查找 Explore 下的一个窗口,如果能找到则根据 Explore 下的child 继续找
+		child = FindWindowEx(NULL, child, NULL, NULL);
+		int ret = GetWindowText(child, buf, MAX_PATH);
+		buf[ret] = 0;
+		tid = GetWindowThreadProcessId(child, &pid);
+		_tprintf("%s ,  pid:%d, tid:%d\n", buf, pid, tid);
+
+		//遍历子窗口们
+		if (child)
+			print_window2(child, 1);
+	} while (child);
+}
+
 // CAuto_TDXBuyApp
 
 BEGIN_MESSAGE_MAP(CAuto_TDXBuyApp, CWinApp)
