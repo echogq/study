@@ -10,8 +10,8 @@ import android.provider.Settings;//µ¼°ü
 
 
 public class MainActivity extends Activity {
-
-        private static final String ACTION = "action";
+	public static int iAction = -1;
+	private static final String ACTION = "action";
         private static final String ACTION_START_ACCESSIBILITY_SETTING = "action_start_accessibility_setting";
     @Override
     protected void onCreate(Bundle savedInstanceState) {

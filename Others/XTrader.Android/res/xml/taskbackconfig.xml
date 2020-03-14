@@ -14,7 +14,7 @@ description 这个就是对你那个申请服务的时候说明了，可以写�
     android:accessibilityEventTypes="typeAllMask"
     android:notificationTimeout="10"
     android:packageNames="com.huaanzq.dzh"
-    android:accessibilityFeedbackType="feedbackHaptic"
+    android:accessibilityFeedbackType="feedbackGeneric"
     android:canRetrieveWindowContent="true"
     android:description="@string/hint" />
 

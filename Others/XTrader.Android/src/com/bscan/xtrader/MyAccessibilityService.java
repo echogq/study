@@ -36,15 +36,15 @@ public class MyAccessibilityService extends AccessibilityService {
     protected void onServiceConnected() {
         super.onServiceConnected();
         //Configure these here for compatibility with API 13 and below.
-        AccessibilityServiceInfo config = new AccessibilityServiceInfo();
-        config.eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED;
-        config.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
-        //config.packageNames=["com.huaanzq.dzh"];
-        if (Build.VERSION.SDK_INT >= 16)
-            //Just in case this helps
-            config.flags = AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS;
-
-        setServiceInfo(config);
+//        AccessibilityServiceInfo config = new AccessibilityServiceInfo();
+//        config.eventTypes = AccessibilityEvent.TYPES_ALL_MASK/*.TYPE_WINDOW_STATE_CHANGED*/;
+//        config.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
+//        //config.packageNames=["com.huaanzq.dzh"];
+//        if (Build.VERSION.SDK_INT >= 16)
+//            //Just in case this helps
+//            config.flags = AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS;
+//
+//        setServiceInfo(config);
         
         Toast toast=Toast.makeText(this,"onServiceConnected()...辅助开启成功鸟",Toast.LENGTH_SHORT    );
         toast.setGravity(Gravity.CENTER, 0, 0);
@@ -66,7 +66,7 @@ public class MyAccessibilityService extends AccessibilityService {
     	switch (event.getEventType()) {
     	
         case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
-        case AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED:
+        //case AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED:
             //这个地方没什么好说的 你就理解成 找到当前界面 包含有安装 这个关键词的 所有节点就可以了。返回这些节点的list
             //注意这里的find 其实是contains的意思，比如你界面上有2个节点，一个节点内容是安装1 一个节点内容是安装2，那这2个节点是都会返回过来的
             //除了有根据Text找节点的方法 还有根据Id找节点的方法。考虑到众多手机rom都不一样，这里需要大家多测试一下，有的rom packageInstall
@@ -75,68 +75,105 @@ public class MyAccessibilityService extends AccessibilityService {
             if (className.equals("com.android.dazhihui.ui.screen.InitScreen")) {
                 //getPacket();
             } else if (className.equals("com.android.dazhihui.ui.screen.stock.MainScreen")) {
+        		
+
+        		if(!findNodesById(event.getSource(), "com.huaanzq.dzh:id/btn_login").isEmpty())
+        		{
+        			Log.i("XXOO", className + " -> 登录界面..." );
+	         		Log.i("XXOO", className + " -> doLogin..." );
+	            	doLogin(event); 
+	            	Log.i("XXOO", className + " -> doLogin..Done" );
+        		}
+        		else if(!findNodesById(event.getSource(), "com.huaanzq.dzh:id/ll_dbpmr").isEmpty())
+        		{
+        			Log.i("XXOO", className + " -> 交易		界面..." );
+        		
+	            	if(MainActivity.iAction == 1)
+	            	{
+	            		//========================================================
+	            		List<AccessibilityNodeInfo> listBuy  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/ll_dbpmr");
+	                 	clickIt(listBuy); 
+	            	}
+	            	else if(MainActivity.iAction == -1)
+	            	{
+	            		//========================================================
+	            		List<AccessibilityNodeInfo> listSell  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/ll_dbpmc");
+	                 	clickIt(listSell); 
+	            	}
+        		}
+        		else if(!findNodesById(event.getSource(), "com.huaanzq.dzh:id/bottom_menu_button5").isEmpty())
+        		{
+        			Log.i("XXOO", className + " -> 主界面..." );
+	        		List<AccessibilityNodeInfo> jyBtn  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/bottom_menu_button5");
+	        		if ((null != jyBtn) && (!jyBtn.isEmpty())){
+	        		    clickIt(jyBtn); //首页右下角交易按钮
+	        		}
+        		}
                 //List<AccessibilityNodeInfo> list  = event.getSource().findAccessibilityNodeInfosByText("登录");
-            	Log.i("XXOO", className + " -> doLogin..." );
-            	doLogin(event); 
-            	Log.i("XXOO", className + " -> doLogin..Done" );
             } else if (className.equals("com.android.dazhihui.ui.delegate.screen.margin.MarginCommonScreen")) {
-               //close();
-	        	//doBuy(event); 
+        		List<AccessibilityNodeInfo> btnBS = findNodesById(event.getSource(), "com.huaanzq.dzh:id/btn_entrust");
+        		if(!btnBS.isEmpty())
+        			if(btnBS.get(0).getText().equals("买入"))
+        				Log.i("XXOO", className + " -> 		买入界面..." );
+        			else if(btnBS.get(0).getText().equals("卖出"))
+        				Log.i("XXOO", className + " -> 		卖出界面..." );
+
+//            	switch(MainActivity.iAction){
+//            	case -1:
+//                    break; 
+//            	case 0:
+//                    break; 
+//            	case 1:
+//		        	doBuy(event); 
+//                    break; 
+//                default : //可选
+//            	}
+//            	MainActivity.iAction = 0;
             } else if (className.equals("android.app.Dialog")) {
+            	
+            	if(event.getSource().findAccessibilityNodeInfosByText("当日不再提示").isEmpty())
+            		return;
             	Log.i("XXOO", className + " -> ClosePpup..." );
-        		List<AccessibilityNodeInfo> okBtn  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/cancel");
+            	//List<AccessibilityNodeInfo> okBtn  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/cancel");
+            	List<AccessibilityNodeInfo> okBtn  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/cancel");
         		if ((null != okBtn) && (!okBtn.isEmpty())){
         		    clickIt(okBtn); //公告的确定按钮
         		}
             	Log.i("XXOO", className + " -> ClosePpup..Done" );
-        		
             }
-
-            //
-          //
-          //com.android.dazhihui.ui.delegate.screen.margin.MarginCommonScreen
-            //
-            //
-            
-
     	}
     }
 
 	private void doBuy(AccessibilityEvent event) {
 		//========================================================
-		List<AccessibilityNodeInfo> listBuy  = waitAndFindNodes(event.getSource(), "com.huaanzq.dzh:id/ll_dbpmr");
-		
-//
+		List<AccessibilityNodeInfo> listBuy  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/ll_dbpmr");
      	clickIt(listBuy); 
 		//========================================================
 		List<AccessibilityNodeInfo> listCode  = waitAndFindNodes(event.getSource(), "com.huaanzq.dzh:id/et_code");
-		List<AccessibilityNodeInfo> listNum  = waitAndFindNodes(event.getSource(), "com.huaanzq.dzh:id/et_num");
 		pasteInto(listCode, "159915"); 
 		
-		List<AccessibilityNodeInfo> listAvaNum = waitAndFindNodes(event.getSource(), "com.huaanzq.dzh:id/tv_ava_num");//可买179800张
+		//List<AccessibilityNodeInfo> listAvaNum = waitAndFindNodes(event.getSource(), "com.huaanzq.dzh:id/tv_ava_num");//可买179800张
 		
-		List<AccessibilityNodeInfo> listEnTrust  = waitAndFindNodes(event.getSource(), "com.huaanzq.dzh:id/btn_entrust");
-		List<AccessibilityNodeInfo> listConfirm  = waitAndFindNodes(event.getSource(), "com.huaanzq.dzh:id/confirm");
 		
-		if ((null != listAvaNum) && (!listAvaNum.isEmpty())){
-		    for (AccessibilityNodeInfo info : listAvaNum) {
-		        if (info.getText().toString().length()>0) {
-		        	
+		//if ((null != listAvaNum) && (!listAvaNum.isEmpty()))
+		{
+		    //for (AccessibilityNodeInfo info : listAvaNum) 
+		    {
+		        //if (info.getText().toString().length()>0) 
+		        {
+		List<AccessibilityNodeInfo> listNum  = waitAndFindNodes(event.getSource(), "com.huaanzq.dzh:id/et_num");
 		        	pasteInto(listNum, "10800"); 
 		        	//pasteInto(listNum, info.getText().toString()); 
+		List<AccessibilityNodeInfo> listEnTrust  = waitAndFindNodes(event.getSource(), "com.huaanzq.dzh:id/btn_entrust");
 		        	clickIt(listEnTrust); 
 		        	//clickIt(listConfirm); 
+		List<AccessibilityNodeInfo> listConfirm  = waitAndFindNodes(event.getSource(), "com.huaanzq.dzh:id/confirm");
 		        }
 		    }
 		}
 	}
 
 	private void doLogin(AccessibilityEvent event) {
-		
-		List<AccessibilityNodeInfo> jyBtn  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/bottom_menu_button5");
-		if ((null != jyBtn) && (!jyBtn.isEmpty())){
-		    clickIt(jyBtn); //首页右下角交易按钮
-		}
 		
 		List<AccessibilityNodeInfo> list  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/tv_yzm");
 		List<AccessibilityNodeInfo> listYZM  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/et_yzm");
