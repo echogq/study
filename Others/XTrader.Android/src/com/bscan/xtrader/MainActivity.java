@@ -1,11 +1,16 @@
 package com.bscan.xtrader;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 import android.provider.Settings;//导包
 
 
@@ -54,5 +59,18 @@ public class MainActivity extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+    
+    public void click(View v){
+        Toast.makeText(MainActivity.this,((Button)findViewById(v.getId())).getText().toString(),Toast.LENGTH_LONG).show();
+        iAction = v.getId();
+        
+//        ComponentName comp = new ComponentName("com.huaanzq.dzh", "com.android.dazhihui.ui.delegate.screen.margin.MarginCommonScreen");//第一个参数是app包名，第二个是你要掉的activity的包名
+//        Intent intent = new Intent(Intent.ACTION_MAIN);
+//        intent.setComponent(comp);
+        PackageManager packageManager = this.getPackageManager();   
+        Intent intent = packageManager.getLaunchIntentForPackage("com.huaanzq.dzh");
+        startActivity(intent);
+        
     }
 }

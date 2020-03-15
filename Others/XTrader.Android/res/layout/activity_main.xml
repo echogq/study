@@ -8,9 +8,105 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.bscan.xtrader.MainActivity" >
 
+   <LinearLayout
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="2">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/hello_world" />
-
+    
+       <LinearLayout
+      android:orientation="horizontal"
+      android:layout_width="wrap_content"
+      android:layout_height="fill_parent"
+      android:layout_weight="1">
+    <Button
+        android:id="@+id/b1_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+      	android:background="#883333"
+        android:onClick="click"
+        android:text="买1/4"/>
+      <Button
+        android:id="@+id/b1_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+      	android:background="#883333"
+        android:onClick="click"
+        android:text="买1/3"/>
+      <Button
+        android:id="@+id/b1_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+      	android:background="#883333"
+        android:onClick="click"
+        android:text="买1/2"/>
+      <Button
+        android:id="@+id/b1_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+      	android:background="#883333"
+        android:onClick="click"
+        android:text="全买"/>
+      <Button
+        android:id="@+id/b10800"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+      	android:background="#883333"
+        android:onClick="click"
+        android:text="10800"/>
+      </LinearLayout>
+        <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="=================================" />
+    
+    <LinearLayout
+      android:orientation="horizontal"
+      android:layout_width="wrap_content"
+      android:layout_height="fill_parent"
+      android:layout_weight="1">
+    <Button
+        android:id="@+id/s1_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+      	android:background="#338833"
+        android:onClick="click"
+        android:text="卖1/4"/>
+      <Button
+        android:id="@+id/s1_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+      	android:background="#338833"
+        android:onClick="click"
+        android:text="卖1/3"/>
+      <Button
+        android:id="@+id/s1_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+      	android:background="#338833"
+        android:onClick="click"
+        android:text="卖1/2"/>
+      <Button
+        android:id="@+id/s1_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+      	android:background="#338833"
+        android:onClick="click"
+        android:text="全卖"/>
+    </LinearLayout>
+        
+  </LinearLayout>
 </RelativeLayout>
