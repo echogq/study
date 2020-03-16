@@ -30,7 +30,7 @@
         android:textColor="#ffffff"
       	android:background="#883333"
         android:onClick="click"
-        android:text="买1/4"/>
+        android:text="0.25"/>
       <Button
         android:id="@+id/b1_3"
         android:layout_width="wrap_content"
@@ -38,7 +38,7 @@
         android:textColor="#ffffff"
       	android:background="#883333"
         android:onClick="click"
-        android:text="买1/3"/>
+        android:text="0.33"/>
       <Button
         android:id="@+id/b1_2"
         android:layout_width="wrap_content"
@@ -46,7 +46,7 @@
         android:textColor="#ffffff"
       	android:background="#883333"
         android:onClick="click"
-        android:text="买1/2"/>
+        android:text="0.50"/>
       <Button
         android:id="@+id/b1_1"
         android:layout_width="wrap_content"
@@ -54,7 +54,7 @@
         android:textColor="#ffffff"
       	android:background="#883333"
         android:onClick="click"
-        android:text="全买"/>
+        android:text="1.00"/>
       <Button
         android:id="@+id/b10800"
         android:layout_width="wrap_content"
@@ -81,7 +81,7 @@
         android:textColor="#ffffff"
       	android:background="#338833"
         android:onClick="click"
-        android:text="卖1/4"/>
+        android:text="-0.25"/>
       <Button
         android:id="@+id/s1_3"
         android:layout_width="wrap_content"
@@ -89,7 +89,7 @@
         android:textColor="#ffffff"
       	android:background="#338833"
         android:onClick="click"
-        android:text="卖1/3"/>
+        android:text="-0.33"/>
       <Button
         android:id="@+id/s1_2"
         android:layout_width="wrap_content"
@@ -97,7 +97,7 @@
         android:textColor="#ffffff"
       	android:background="#338833"
         android:onClick="click"
-        android:text="卖1/2"/>
+        android:text="-0.50"/>
       <Button
         android:id="@+id/s1_1"
         android:layout_width="wrap_content"
@@ -105,7 +105,7 @@
         android:textColor="#ffffff"
       	android:background="#338833"
         android:onClick="click"
-        android:text="全卖"/>
+        android:text="-1.00"/>
     </LinearLayout>
         
   </LinearLayout>

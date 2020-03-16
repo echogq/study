@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,7 +16,9 @@ import android.provider.Settings;//导包
 
 
 public class MainActivity extends Activity {
-	public static int iAction = -1;
+	public static float fAction = 0;
+	public static float fAvaMoney = 0;
+	//public static float iAction000 = 0;
 	private static final String ACTION = "action";
         private static final String ACTION_START_ACCESSIBILITY_SETTING = "action_start_accessibility_setting";
     @Override
@@ -63,11 +66,9 @@ public class MainActivity extends Activity {
     
     public void click(View v){
         Toast.makeText(MainActivity.this,((Button)findViewById(v.getId())).getText().toString(),Toast.LENGTH_LONG).show();
-        iAction = v.getId();
-        
-//        ComponentName comp = new ComponentName("com.huaanzq.dzh", "com.android.dazhihui.ui.delegate.screen.margin.MarginCommonScreen");//第一个参数是app包名，第二个是你要掉的activity的包名
-//        Intent intent = new Intent(Intent.ACTION_MAIN);
-//        intent.setComponent(comp);
+        fAction = Float.parseFloat(((Button)v).getText().toString());
+        Log.i("XXOO", fAction + " -> 		click..." );
+
         PackageManager packageManager = this.getPackageManager();   
         Intent intent = packageManager.getLaunchIntentForPackage("com.huaanzq.dzh");
         startActivity(intent);
