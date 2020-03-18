@@ -334,7 +334,7 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 				hWnd0 = ::FindWindowExA(hTDX_QuickTradeWnd, NULL, "Button", sBuyBtnTxt);
 			}
 			//Sleep(100);
-			while (NULL != hWnd0)
+			while ((NULL != hWnd0) && ::IsWindowVisible(hTDX_QuickTradeWnd))
 			{
 				SendMessage(hWnd0, BM_CLICK, 0, 0L);
 				Sleep(100);
