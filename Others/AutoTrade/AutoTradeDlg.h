@@ -135,6 +135,7 @@ public:
 	afx_msg void OnBnClickedKilltdx();
 	BOOL m_bAutoSell;
 	BOOL m_bAutoBuy;
+	BOOL m_bUDP;
 	afx_msg void OnBnClickedButtonrunhuaan();
 	afx_msg void OnBnClickedButtonruntdx1();
 	afx_msg void OnBnClickedButtonruntdx();

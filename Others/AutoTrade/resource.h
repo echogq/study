@@ -66,6 +66,7 @@
 #define IDC_BUTTONRUNTDX1               1040
 #define IDC_BUTTONRUNTDX                1041
 #define IDC_REDTEXT_ONSCREEN            1042
+#define IDC_CB_UDP                      1043
 #define IDC_RCVSALECODE                 1061
 #define IDC_RCVBUYCODE2                 1062
 #define IDC_RCVBUYCODE3                 1063
