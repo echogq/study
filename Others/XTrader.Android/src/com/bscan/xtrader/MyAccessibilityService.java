@@ -270,15 +270,15 @@ public class MyAccessibilityService extends AccessibilityService {
 		String sPrice = "";
 
 		MainActivity.updateData2MainUI(Thread.currentThread().getName() + " ...获取价格：");
-		for (int i = 0; i < 40; i++)//最长等待2秒，如果价格还没更新就放弃
+		for (int i = 0; i < 40; i++)//最长40次，如果价格还没更新就放弃
 		{
-			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				MainActivity.updateData2MainUI(Thread.currentThread().getName() + " Thread.sleep(50)...异常了！！！");
-				e.printStackTrace();
-			}
+//			try {//此处sleep完全无效
+//				Thread.sleep(50);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				MainActivity.updateData2MainUI(Thread.currentThread().getName() + " Thread.sleep(50)...异常了！！！");
+//				e.printStackTrace();
+//			}
 
 			if (MainActivity.fAction > 0)
 			{
@@ -321,14 +321,16 @@ public class MyAccessibilityService extends AccessibilityService {
 		}
 		else if (MainActivity.fAction < 0)
 		{
-			MainActivity.updateData2MainUI(Thread.currentThread().getName() + " ..sleep(150)" );
-			try {
-				Thread.sleep(150); //待优化。。。待优化。。。待优化。。。待优化。。。
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//			MainActivity.updateData2MainUI(Thread.currentThread().getName() + " ..sleep(150)" );
+//			try {//此处sleep完全无效
+//				Thread.sleep(150); //待优化。。。待优化。。。待优化。。。待优化。。。
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+			
 			List<AccessibilityNodeInfo> listAvaNum = findNodesById(event.getSource(), "com.huaanzq.dzh:id/tv_ava_num");//可*179800张
+			
 			if ((null != listAvaNum) && (!listAvaNum.isEmpty()))
 			{
 			    for (AccessibilityNodeInfo info : listAvaNum) 
