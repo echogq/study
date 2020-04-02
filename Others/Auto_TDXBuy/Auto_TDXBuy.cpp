@@ -44,6 +44,18 @@ void LogTrace16380(LPCTSTR pszFormat, ...)
 	strcat(szapipath, szMessageBuffer);
 
 	OutputDebugString(szapipath);
+	//死循环，暂时屏蔽
+	HWND hTradeWnd = ::FindWindow(NULL, "自动化交易控制中心");
+	if (hTradeWnd != NULL)
+	{
+		COPYDATASTRUCT cds;
+		cds.dwData = 0;
+		cds.lpData = szapipath;
+		cds.cbData = strlen(szapipath) + 1; //字符串请记得把'\0'加上, 不然就错了, 这里是ANSI字符串
+
+		::PostMessage(hTradeWnd, WM_COPYDATA, 0, (LPARAM)&cds);
+	}
+
 }
 
 //遍历所有子窗口的子窗口 , Z序遍历
@@ -327,17 +339,32 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 
 		{
 			LogTrace16380("点击买卖按钮\n");
+			Sleep(200);
 			HWND hWnd0 = NULL;
 			while (NULL == hWnd0)
 			{
 				Sleep(10);
 				hWnd0 = ::FindWindowExA(hTDX_QuickTradeWnd, NULL, "Button", sBuyBtnTxt);
 			}
-			//Sleep(100);
-			while ((NULL != hWnd0) && ::IsWindowVisible(hTDX_QuickTradeWnd))
+			if ((NULL != hWnd0) && ::IsWindowVisible(hTDX_QuickTradeWnd))
 			{
+				LogTrace16380("点了一次。。。\n");
 				SendMessage(hWnd0, BM_CLICK, 0, 0L);
-				Sleep(100);
+				Sleep(200);
+				hWnd0 = ::FindWindowExA(hTDX_QuickTradeWnd, NULL, "Button", sBuyBtnTxt);
+			}
+			if ((NULL != hWnd0) && ::IsWindowVisible(hTDX_QuickTradeWnd))
+			{
+				LogTrace16380("点了一次。。。\n");
+				SendMessage(hWnd0, BM_CLICK, 0, 0L);
+				Sleep(200);
+				hWnd0 = ::FindWindowExA(hTDX_QuickTradeWnd, NULL, "Button", sBuyBtnTxt);
+			}
+			if ((NULL != hWnd0) && ::IsWindowVisible(hTDX_QuickTradeWnd))
+			{
+				LogTrace16380("点了一次。。。\n");
+				SendMessage(hWnd0, BM_CLICK, 0, 0L);
+				Sleep(200);
 				hWnd0 = ::FindWindowExA(hTDX_QuickTradeWnd, NULL, "Button", sBuyBtnTxt);
 			}
 

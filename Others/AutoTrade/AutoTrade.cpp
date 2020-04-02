@@ -39,6 +39,7 @@ CAutoTradeApp theApp;
 /////////////////////////////////////////////////////////////////////////////
 // CAutoTradeApp initialization
 
+
 BOOL CAutoTradeApp::InitInstance()
 {
 	AfxEnableControlContainer();

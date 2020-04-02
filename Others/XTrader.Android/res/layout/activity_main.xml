@@ -8,105 +8,152 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.bscan.xtrader.MainActivity" >
 
-   <LinearLayout
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_weight="2">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
-    
-       <LinearLayout
-      android:orientation="horizontal"
-      android:layout_width="wrap_content"
-      android:layout_height="fill_parent"
-      android:layout_weight="1">
-    <Button
-        android:id="@+id/b1_4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#ffffff"
-      	android:background="#883333"
-        android:onClick="click"
-        android:text="0.25"/>
-      <Button
-        android:id="@+id/b1_3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#ffffff"
-      	android:background="#883333"
-        android:onClick="click"
-        android:text="0.33"/>
-      <Button
-        android:id="@+id/b1_2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#ffffff"
-      	android:background="#883333"
-        android:onClick="click"
-        android:text="0.50"/>
-      <Button
-        android:id="@+id/b1_1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#ffffff"
-      	android:background="#883333"
-        android:onClick="click"
-        android:text="1.00"/>
-      <Button
-        android:id="@+id/b10800"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#ffffff"
-      	android:background="#883333"
-        android:onClick="click"
-        android:text="10800"/>
-      </LinearLayout>
-        <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="=================================" />
-    
     <LinearLayout
-      android:orientation="horizontal"
-      android:layout_width="wrap_content"
-      android:layout_height="fill_parent"
-      android:layout_weight="1">
-    <Button
-        android:id="@+id/s1_4"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:orientation="vertical" android:id="@+id/linearLayout1">
+
+    <RadioButton
+        android:id="@+id/svrIP"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#ffffff"
-      	android:background="#338833"
-        android:onClick="click"
-        android:text="-0.25"/>
-      <Button
-        android:id="@+id/s1_3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#ffffff"
-      	android:background="#338833"
-        android:onClick="click"
-        android:text="-0.33"/>
-      <Button
-        android:id="@+id/s1_2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#ffffff"
-      	android:background="#338833"
-        android:onClick="click"
-        android:text="-0.50"/>
-      <Button
-        android:id="@+id/s1_1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#ffffff"
-      	android:background="#338833"
-        android:onClick="click"
-        android:text="-1.00"/>
-    </LinearLayout>
+        android:layout_marginTop="36dp"
+            android:layout_gravity="center"
+        android:clickable="false"
+        android:text="服务器IP" />
+
+        <CheckBox
+            android:id="@+id/cbAct"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:checked="true"
+            android:text="行动" />
+
+        <TextView
+            android:id="@+id/tvLocalIP"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="本机IP" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/b1_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#883333"
+                android:onClick="click"
+                android:text="0.25"
+                android:textColor="#ffffff" />
+
+            <Button
+                android:id="@+id/b1_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#993333"
+                android:onClick="click"
+                android:text="0.33"
+                android:textColor="#ffffff" />
+
+            <Button
+                android:id="@+id/b1_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#aa3333"
+                android:onClick="click"
+                android:text="0.50"
+                android:textColor="#ffffff" />
+
+            <Button
+                android:id="@+id/b1_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#bb3333"
+                android:onClick="click"
+                android:text="1.00"
+                android:textColor="#ffffff" />
+
+            <Button
+                android:id="@+id/b10800"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#cc3333"
+                android:onClick="click"
+                android:text="10800"
+                android:textColor="#ffffff" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="===============================" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/s1_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#33bb33"
+                android:onClick="click"
+                android:text="-0.25"
+                android:textColor="#ffffff" />
+
+            <Button
+                android:id="@+id/s1_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#33aa33"
+                android:onClick="click"
+                android:text="-0.33"
+                android:textColor="#ffffff" />
+
+            <Button
+                android:id="@+id/s1_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#339933"
+                android:onClick="click"
+                android:text="-0.50"
+                android:textColor="#ffffff" />
+
+            <Button
+                android:id="@+id/s1_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#338833"
+                android:onClick="click"
+                android:text="-1.00"
+                android:textColor="#ffffff" />
+        </LinearLayout>
         
-  </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="===============================" />
+        
+        <TextView    
+		    android:id="@+id/tvLog"    
+		    android:layout_width="fill_parent"    
+		    android:layout_height="fill_parent"
+        	android:layout_weight="1.0"    
+		    android:scrollbars="vertical" 
+		    android:fadeScrollbars="false"
+		    android:singleLine="false"      
+		             
+		    android:textColor="#882200"  
+		    />   <!-- android:maxLines="15000" -->  
+    </LinearLayout>
+
+
 </RelativeLayout>

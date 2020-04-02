@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <sstream>
 #include<set>
+#include <list>
 
 using std::random_shuffle;
 using std::vector;
@@ -37,6 +38,8 @@ static char THIS_FILE[] = __FILE__;
 
 CString g_sCMD = "ping";
 using namespace std;
+list<HANDLE> g_Event_BS_Action;
+int g_iTcpClientsCount = 0;
 
 void TraceEx(const wchar_t *strOutputString, ...)
 {
@@ -168,10 +171,19 @@ void ThreadProcess_TCP_Send(LPVOID pSock)
 {
 	SOCKET sock_TCP_Send = *(SOCKET*)pSock;
 	int tid = ::GetCurrentThreadId();
+	HANDLE hhh = CreateEvent(NULL, FALSE, FALSE, NULL);//自动，无信号
+	g_Event_BS_Action.push_back(hhh);
+
+	g_iTcpClientsCount++;
+	CString str; 
+	str.Format(_T("%d"), g_iTcpClientsCount);
+	AfxGetApp()->GetMainWnd()->GetDlgItem(IDC_CLIENTS)->SetWindowText(str);
+	
 	while (true)
 	{
-		extern HANDLE g_Event_BS_Action;
-		DWORD res = WaitForSingleObject(g_Event_BS_Action, 3000);
+		//extern HANDLE g_Event_BS_Action;
+
+		DWORD res = WaitForSingleObject(hhh, 3000);
 		string msg = g_sCMD;
 		char sendBuf[100] = { 0 };
 		int xxx = 0;
@@ -192,11 +204,6 @@ void ThreadProcess_TCP_Send(LPVOID pSock)
 			xxx = send(sock_TCP_Send, sendBuf, strlen(sendBuf), 0);
 			TraceEx("\nTid=%d [WS_WAIT_TIMEOUT],-------发送心跳 %s, res = %d\n", tid, (xxx>0)?"成功":"失败!!!", xxx);
 
-			if (xxx == SOCKET_ERROR)
-			{
-				closesocket(sock_TCP_Send);
-				return;
-			}
 			break;
 		case WAIT_ABANDONED:
 			printf("\n[WS_WAIT_ABANDONED]当hHandle为mutex时，如果拥有mutex的线程在结束时没有释放核心对象会引发此返回值\n");
@@ -225,6 +232,19 @@ void ThreadProcess_TCP_Send(LPVOID pSock)
 		default:
 			break;
 
+		}
+
+		if (xxx == SOCKET_ERROR)//连接出现问题，退出线程
+		{
+			//最好删除前面建立的event。。。并且从list内去除
+			closesocket(sock_TCP_Send);
+
+			g_iTcpClientsCount--;
+			CString str;
+			str.Format(_T("%d"), g_iTcpClientsCount);
+			AfxGetApp()->GetMainWnd()->GetDlgItem(IDC_CLIENTS)->SetWindowText(str);
+
+			return;
 		}
 	}
 
@@ -1096,12 +1116,13 @@ CAutoTradeDlg::CAutoTradeDlg(CWnd* pParent /*=NULL*/)
 , m_ZTCode(_T(""))
 , m_iSaleAbleCount(0)
 , m_buyCode3(_T(""))
-, m_bAutoSell(FALSE)
-, m_bAutoBuy(FALSE)
-, m_bUDP(FALSE)
-, m_iRateS(2)
-, m_iRateB(5)
+, m_bAutoSell(TRUE)
+, m_bAutoBuy(TRUE)
+, m_bUDP(TRUE)
+, m_iRateS(1)
+, m_iRateB(2)
 , m_strCopyData(_T(""))
+
 {
 	//{{AFX_DATA_INIT(CAutoTradeDlg)
 	m_buyCode = _T("");
@@ -1124,6 +1145,8 @@ CAutoTradeDlg::CAutoTradeDlg(CWnd* pParent /*=NULL*/)
 	m_iStocksInHand = 0;
 	m_iInBuyPoolCount = 0;
 	m_iLastAction = -1;
+	g_iTcpClientsCount = 0;
+
 	//}}AFX_DATA_INIT
 	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MF2);
@@ -1166,6 +1189,7 @@ void CAutoTradeDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_RATES, m_iRateS);
 	DDX_Text(pDX, IDC_RATEB, m_iRateB);
 	DDX_Text(pDX, IDC_COPYDATA, m_strCopyData);
+	//DDX_Text(pDX, IDC_CLIENTS, g_iTcpClientsCount);
 }
 
 BEGIN_MESSAGE_MAP(CAutoTradeDlg, CDialog)
@@ -1569,7 +1593,6 @@ string UDP_BC_Ping(int uPort)
 	return sPong;
 }
 
-HANDLE g_Event_BS_Action = NULL;
 
 //void Thread_UDP(PVOID param)
 //{
@@ -1700,10 +1723,10 @@ BOOL CAutoTradeDlg::OnInitDialog()
 	::OutputDebugString(" CAutoTradeDlg::OnInitDialog() ");
 	CDialog::OnInitDialog();
 
-	if (NULL == g_Event_BS_Action)
-	{
-		g_Event_BS_Action = CreateEvent(NULL, TRUE, FALSE, NULL);//手动，无信号
-	}
+	//if (NULL == g_Event_BS_Action)
+	//{
+	//	g_Event_BS_Action = CreateEvent(NULL, TRUE, FALSE, NULL);//手动，无信号
+	//}
 
 
 /*	//    LoadLibrary(_T("Kernel32.dll"));
@@ -2718,14 +2741,22 @@ HBRUSH CAutoTradeDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 		pDC->SelectObject(&fontTitle);
 		pDC->SetTextColor(RGB(0,188,0));  //你当然可以修改字体颜色
 	} 
-	else if(pWnd-> GetDlgCtrlID()== IDC_CB_AUTOBUY)
-	{ 
-		pDC-> SetBkMode(TRANSPARENT);   //你可以修改背景模式
-		//pDC-> SetBkColor(m_bkcolor); //你可以修改背景颜色
-		//hbr=CreateSolidBrush(m_bkcolor);  //你可以修改画刷
+	else if (pWnd->GetDlgCtrlID() == IDC_CB_AUTOBUY)
+	{
+		pDC->SetBkMode(TRANSPARENT);   //你可以修改背景模式
+									   //pDC-> SetBkColor(m_bkcolor); //你可以修改背景颜色
+									   //hbr=CreateSolidBrush(m_bkcolor);  //你可以修改画刷
 		pDC->SelectObject(&fontTitle);
-		pDC->SetTextColor(RGB(255,0,0));  //你当然可以修改字体颜色
-	} 
+		pDC->SetTextColor(RGB(255, 0, 0));  //你当然可以修改字体颜色
+	}
+	else if (pWnd->GetDlgCtrlID() == IDC_CLIENTS)
+	{
+		pDC->SetBkMode(TRANSPARENT);   //你可以修改背景模式
+									   //pDC-> SetBkColor(m_bkcolor); //你可以修改背景颜色
+									   //hbr=CreateSolidBrush(m_bkcolor);  //你可以修改画刷
+		pDC->SelectObject(&fontTitle);
+		pDC->SetTextColor(RGB(255, 0, 0));  //你当然可以修改字体颜色
+	}
 
 	// TODO:  Return a different brush if the default is not desired
 	return hbr;
@@ -2749,10 +2780,13 @@ void CAutoTradeDlg::NewBuyRate(int iRate)
 	UpdateData(TRUE);
 	if (m_bUDP)
 	{
-		extern HANDLE g_Event_BS_Action;
+		//extern HANDLE g_Event_BS_Action;
 		g_sCMD.Format("%.2f", 1.0f/iRate);
-		SetEvent(g_Event_BS_Action);
-		ResetEvent(g_Event_BS_Action);
+
+		for (list<HANDLE>::iterator it = g_Event_BS_Action.begin(); it != g_Event_BS_Action.end(); ++it)
+			SetEvent(*it);
+
+		//ResetEvent(g_Event_BS_Action);
 		return;
 	}
 
@@ -2790,10 +2824,12 @@ void CAutoTradeDlg::NewSellRate( int iRate )
 	UpdateData(TRUE);
 	if (m_bUDP)
 	{
-		extern HANDLE g_Event_BS_Action;
+		//extern HANDLE g_Event_BS_Action;
 		g_sCMD.Format("-%.2f", 1.0f / iRate);
-		SetEvent(g_Event_BS_Action);
-		ResetEvent(g_Event_BS_Action);
+
+		for (list<HANDLE>::iterator it = g_Event_BS_Action.begin(); it != g_Event_BS_Action.end(); ++it)
+			SetEvent(*it);
+
 		return;
 	}
 	Lock();

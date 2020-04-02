@@ -1,5 +1,6 @@
 package com.bscan.xtrader;
 
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -26,6 +28,9 @@ import android.widget.Toast;
  * 我这里只实现最基本的功能 且没有做冗余和异常处理，只包含基础功能，不能作为实际业务上线！
  */
 public class MyAccessibilityService extends AccessibilityService {
+	private UDPUtils udpUtils;
+	private boolean bWaitPopup = false;
+	
     public MyAccessibilityService() {
     }
 
@@ -49,11 +54,29 @@ public class MyAccessibilityService extends AccessibilityService {
 //
 //        setServiceInfo(config);
         
-        Toast toast=Toast.makeText(this,"onServiceConnected()...辅助开启成功鸟",Toast.LENGTH_SHORT    );
+        //udpUtils = new UDPUtils("192.168.1.255", 17077);
+        udpUtils = new UDPUtils("255.255.255.255", 17077);
+        //udpUtils.sendControInfo("ppppppppppabc");
+        (new Thread(udpUtils)).start();
+        
+        String sTextLog = "";
+		if (MainActivity.cbAction.isChecked()) {
+			sTextLog = "辅助开启成功鸟，【行动】OK.";
+		}
+		else
+		{
+			sTextLog = "辅助开启成功鸟，请复查【行动】框";
+		}
+
+        MainActivity.updateData2MainUI(sTextLog);
+
+        Toast toast=Toast.makeText(this,"onServiceConnected()..." + sTextLog, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
+        
 
+   
     /**
      * 当你这个服务正常开启的时候，就可以监听事件了，当然监听什么事件，监听到什么程度 都是由给这个服务的属性来决定的，
      * 我的那些属性写在xml里了。
@@ -65,7 +88,7 @@ public class MyAccessibilityService extends AccessibilityService {
          * 把这个type的int 值取出来 并转成16进制，然后去AccessibilityEvent 源码里find。顺便看注释 ，这样是迅速理解type类型的方法
          */
             String className = event.getClassName().toString();
-    	Log.i("XXOO", className + " -> " + event.eventTypeToString(event.getEventType()) );
+    	Log.v("XXOO", className + " -> " + event.eventTypeToString(event.getEventType()) );
 //    	ListView xxxx = (ListView)(event.getSource().getChild(0));
 //    	xxxx.perf
 //    	if (className.equals("android.widget.ListView")) {
@@ -83,6 +106,10 @@ public class MyAccessibilityService extends AccessibilityService {
             //除了有根据Text找节点的方法 还有根据Id找节点的方法。考虑到众多手机rom都不一样，这里需要大家多测试一下，有的rom packageInstall
             //定制的比较深入，可能和官方rom里差的很远 这里就要做冗余处理，可以告诉大家一个小技巧 你就把这些rom的 安装器打开 然后
             //通过ddms里 看view结构的按钮 直接进去看就行了，可以直接看到那个界面属于哪个包名，也可以看到你要捕获的那个按钮的id是什么 很方便！
+        	
+        	if(MainActivity.fAction == 0.0f)
+        		bWaitPopup = false;
+    		
             if (className.equals("com.android.dazhihui.ui.screen.InitScreen")) {
                 //getPacket();
             } else if (className.equals("com.android.dazhihui.ui.screen.stock.MainScreen")) {
@@ -90,79 +117,50 @@ public class MyAccessibilityService extends AccessibilityService {
 
         		if(!findNodesById(event.getSource(), "com.huaanzq.dzh:id/btn_login").isEmpty())
         		{
-        			Log.i("XXOO", className + " -> 登录界面..." );
-	         		Log.i("XXOO", className + " -> doLogin..." );
+        			Log.d("XXOO", className + " -> 登录界面..." );
+	         		Log.d("XXOO", className + " -> doLogin..." );
 	            	doLogin(event); 
-	            	Log.i("XXOO", className + " -> doLogin..Done" );
+	            	Log.d("XXOO", className + " -> doLogin..Done" );
         		}
         		else if(!findNodesById(event.getSource(), "com.huaanzq.dzh:id/ll_dbpmr").isEmpty())
         		{
-        			//com.huaanzq.dzh:id/tv_33
-        			Log.i("XXOO", className + " -> 交易		界面..." );
+        			Log.d("XXOO", className + " -> 交易..界面..." );
         			
+        			//com.huaanzq.dzh:id/trade_right_string "退出" //点击它退出，重复一次登录，防止超时180分钟问题
+
+    	        	String sAvaMoney = getTextByIDTxt(event, "com.huaanzq.dzh:id/tv_33");//可用资金
+    	    		if(sAvaMoney.length() > 0)
+    	    			MainActivity.fAvaMoney = Float.parseFloat(sAvaMoney);
+    	    		else
+    	    			MainActivity.fAvaMoney = 0.0f;
+
         	        if (MainActivity.fAction > 0){
-        	        	
-        	        	String sAvaMoney = getTextByIDTxt(event, "com.huaanzq.dzh:id/tv_33");//可用资金
-        	    		if(sAvaMoney.length() > 0)
-        	    			MainActivity.fAvaMoney = Float.parseFloat(sAvaMoney);
-        	    		else
-        	    			MainActivity.fAvaMoney = 0.0f;
-
-
-	            		List<AccessibilityNodeInfo> listBuy  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/ll_dbpmr");
-	                 	clickIt(listBuy); 
+        	        	findAndClick(event, "com.huaanzq.dzh:id/ll_dbpmr"); //普通买入
         	        }
         	        else if (MainActivity.fAction < 0){
-	            		List<AccessibilityNodeInfo> listSell  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/ll_dbpmc");
-	                 	clickIt(listSell); 
+        	        	findAndClick(event, "com.huaanzq.dzh:id/ll_dbpmc"); //普通卖出
         	        }
-//                    case R.id.b10800:
-//                    case R.id.b1_1:
-//                    case R.id.b1_2:
-//                    case R.id.b1_3:
-//                    case R.id.b1_4:
-	            		//========================================================
-//                        break;
-//                    case R.id.s1_1:
-//                    case R.id.s1_2:
-//                    case R.id.s1_3:
-//                    case R.id.s1_4:
-	            		//========================================================
-//                        break;
-
-        		
-//	            	if(MainActivity.iAction == 1)
-//	            	{
-//	            	}
-//	            	else if(MainActivity.iAction == -1)
-//	            	{
-//	            	}
         		}
         		else if(!findNodesById(event.getSource(), "com.huaanzq.dzh:id/bottom_menu_button5").isEmpty())
         		{
-        			Log.i("XXOO", className + " -> 主界面..." );
-	        		List<AccessibilityNodeInfo> jyBtn  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/bottom_menu_button5");
-	        		if ((null != jyBtn) && (!jyBtn.isEmpty())){
-	        		    clickIt(jyBtn); //首页右下角交易按钮
-	        		}
+        			Log.d("XXOO", className + " -> 主界面..." );
+        			
+        			findAndClick(event, "com.huaanzq.dzh:id/bottom_menu_button5");//首页右下角交易按钮
         		}
                 //List<AccessibilityNodeInfo> list  = event.getSource().findAccessibilityNodeInfosByText("登录");
             } else if (className.equals("com.android.dazhihui.ui.delegate.screen.margin.MarginCommonScreen")) {
         		List<AccessibilityNodeInfo> btnBS = findNodesById(event.getSource(), "com.huaanzq.dzh:id/btn_entrust");
         		if(!btnBS.isEmpty())
         			if(btnBS.get(0).getText().equals("买入"))
-        				Log.i("XXOO", className + " -> 		买入界面..." );
+        				Log.d("XXOO", className + " -> 		买入界面..." );
         			else if(btnBS.get(0).getText().equals("卖出"))
-        				Log.i("XXOO", className + " -> 		卖出界面..." );
+        				Log.d("XXOO", className + " -> 		卖出界面..." );
 
     	        if (MainActivity.fAction > 0){
     	        	
     	        	if(MainActivity.fAvaMoney == 0.0f)
     	        	{
-    	            	List<AccessibilityNodeInfo> okBtn  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/head_left");
-    	        		if ((null != okBtn) && (!okBtn.isEmpty())){
-    	        		    clickIt(okBtn); //回退按钮
-    	        		}
+        	        	findAndClick(event, "com.huaanzq.dzh:id/head_left");//回退按钮
     	        		return;
     	        	}
 
@@ -170,8 +168,7 @@ public class MyAccessibilityService extends AccessibilityService {
             			if(!btnBS.get(0).getText().equals("买入"))
             			{
 		            		//========================================================
-		            		List<AccessibilityNodeInfo> listBuy  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/tv_buy");
-		                 	clickIt(listBuy); 
+            	        	findAndClick(event, "com.huaanzq.dzh:id/tv_buy"); 
 		                 	return;
             			}
             		doTrade(event); 
@@ -181,87 +178,80 @@ public class MyAccessibilityService extends AccessibilityService {
             			if(!btnBS.get(0).getText().equals("卖出"))
             			{
 		            		//========================================================
-		            		List<AccessibilityNodeInfo> listSell  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/tv_sell");
-		                 	clickIt(listSell); 
+            	        	findAndClick(event, "com.huaanzq.dzh:id/tv_sell");
 		                 	return;
             			}
             		doTrade(event); 
     	        }
-//        		switch (MainActivity.iAction){
-//                case R.id.b10800:
-//                case R.id.b1_1:
-//                case R.id.b1_2:
-//                case R.id.b1_3:
-//                case R.id.b1_4:
-//            		//MainActivity.iAction = 0;
-//                    break;
-//                case R.id.s1_1:
-//                case R.id.s1_2:
-//                case R.id.s1_3:
-//                case R.id.s1_4:
-//            		//MainActivity.iAction = 0;
-//                    break;
-//    	        }
-    	        
-
-
-
-//            	switch(MainActivity.iAction){
-//            	case -1:
-//                    break; 
-//            	case 0:
-//                    break; 
-//            	case 1:
-//		        	doTrade(event); 
-//                    break; 
-//                default : //可选
-//            	}
-//            	MainActivity.iAction = 0;
             } else if (className.equals("android.app.Dialog")) {
+ 	        	List<AccessibilityNodeInfo> nodeContent = findNodesById(event.getSource(), "com.huaanzq.dzh:id/content");
+        		if(!nodeContent.isEmpty())
+        		{
+        			MainActivity.updateData2MainUI(nodeContent.get(0).getText().toString());
+        		}
+           	
+            	//com.huaanzq.dzh:id/content　　委托请求提交成功。合同号为：870
+            	//com.huaanzq.dzh:id/confirm 确定
+            	if((!event.getSource().findAccessibilityNodeInfosByText("委托请求提交成功。合同号为").isEmpty()) ||
+                    	(!event.getSource().findAccessibilityNodeInfosByText("不能超过").isEmpty()))
+            	{
+    	        	findAndClick(event, "com.huaanzq.dzh:id/confirm"); //确定
+    	        	return;
+            	}
             	
             	if((!event.getSource().findAccessibilityNodeInfosByText("您确认买入吗？").isEmpty()) ||
             	(!event.getSource().findAccessibilityNodeInfosByText("您确认卖出吗？").isEmpty()))
             	{
-            		MainActivity.fAction = 0;
-            		List<AccessibilityNodeInfo> listConfirm  = waitAndFindNodes(event.getSource(), "com.huaanzq.dzh:id/confirm");
-		        	//clickIt(listConfirm); 
-					//MainActivity.fAvaMoney = 0;
-					//MainActivity.fAction = 0;
-
+            		bWaitPopup = false;
+            		MainActivity.setAction(0.0f);
+					MainActivity.fAvaMoney = 0.0f;
+					
+					MainActivity.updateData2MainUI(Thread.currentThread().getName() + " ...点击委托确认");
+    	        	findAndClick(event, "com.huaanzq.dzh:id/confirm"); //委托确认
+            		return;
             	}
 
-            	if(event.getSource().findAccessibilityNodeInfosByText("当日不再提示").isEmpty())
+            	if(!event.getSource().findAccessibilityNodeInfosByText("当日不再提示").isEmpty()  ||
+            			!event.getSource().findAccessibilityNodeInfosByText("超时保护").isEmpty())
+            	{
+            		Log.d("XXOO", className + " -> ClosePpup..." );
+            		findAndClick(event, "com.huaanzq.dzh:id/cancel");//公告的确定按钮 //超时保护
+            		Log.d("XXOO", className + " -> ClosePpup..Done" );
             		return;
-            	Log.i("XXOO", className + " -> ClosePpup..." );
-            	//List<AccessibilityNodeInfo> okBtn  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/cancel");
-            	List<AccessibilityNodeInfo> okBtn  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/cancel");
-        		if ((null != okBtn) && (!okBtn.isEmpty())){
-        		    clickIt(okBtn); //公告的确定按钮
-        		}
-            	Log.i("XXOO", className + " -> ClosePpup..Done" );
+            	}
             }
     	}
     }
 
-	private String getTextByIDTxt(AccessibilityEvent event, String sAvaMoney) {
-		List<AccessibilityNodeInfo> listUsableM = findNodesById(event.getSource(), sAvaMoney);
-		sAvaMoney = "";
+	public void findAndClick(AccessibilityEvent event, String sViewId) {
+		List<AccessibilityNodeInfo> listBuy  = findNodesById(event.getSource(), sViewId);
+		clickIt(listBuy);
+	}
+
+	private String getTextByIDTxt(AccessibilityEvent event, String sInOutStr) {
+		List<AccessibilityNodeInfo> listUsableM = findNodesById(event.getSource(), sInOutStr);
+		sInOutStr = "";
 		if ((null != listUsableM) && (!listUsableM.isEmpty()))
 		{
 		    for (AccessibilityNodeInfo info : listUsableM) 
 		    {
 		        if ((null != info.getText()) && (getNumeric(info.getText().toString()).length()>0) )
 		        {
-		        	sAvaMoney = getNumeric(info.getText().toString()) ;
-		        	Log.i("XXOO", "getTextByIDTxt -> " + sAvaMoney);
+		        	sInOutStr = getNumeric(info.getText().toString()) ;
+		        	Log.i("XXOO", "getTextByIDTxt -> " + sInOutStr);
 		        	break;
 		        }
 		    }
 		}
-		return sAvaMoney;
+		return sInOutStr;
 	}
 
 	private void doTrade(AccessibilityEvent event) {
+		MainActivity.updateData2MainUI(Thread.currentThread().getName() + " doTrade...fAct=" + MainActivity.fAction);
+		
+		if(bWaitPopup)
+			return;
+		
 		//com.huaanzq.dzh:id/tv_cc
 		//com.huaanzq.dzh:id/avaliable_text
 		//========================================================
@@ -278,21 +268,44 @@ public class MyAccessibilityService extends AccessibilityService {
 		//com.huaanzq.dzh:id/tv_sell5_price
 		//com.huaanzq.dzh:id/tv_buy5_price
 		String sPrice = "";
-		if (MainActivity.fAction > 0)
+
+		MainActivity.updateData2MainUI(Thread.currentThread().getName() + " ...获取价格：");
+		for (int i = 0; i < 40; i++)//最长等待2秒，如果价格还没更新就放弃
 		{
-			sPrice = getTextByIDTxt(event, "com.huaanzq.dzh:id/tv_sell5_price");
-			if(sPrice.length() == 0)
-				sPrice = getTextByIDTxt(event, "com.huaanzq.dzh:id/tv_sell1_price");
-		}
-		else if (MainActivity.fAction < 0)
-		{
-			sPrice = getTextByIDTxt(event, "com.huaanzq.dzh:id/tv_buy5_price");
-			if(sPrice.length() == 0)
-				sPrice = getTextByIDTxt(event, "com.huaanzq.dzh:id/tv_buy1_price");
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				MainActivity.updateData2MainUI(Thread.currentThread().getName() + " Thread.sleep(50)...异常了！！！");
+				e.printStackTrace();
+			}
+
+			if (MainActivity.fAction > 0)
+			{
+				sPrice = getTextByIDTxt(event, "com.huaanzq.dzh:id/tv_sell5_price");
+				if(sPrice.length() == 0)
+					sPrice = getTextByIDTxt(event, "com.huaanzq.dzh:id/tv_sell1_price");
+			}
+			else if (MainActivity.fAction < 0)
+			{
+				sPrice = getTextByIDTxt(event, "com.huaanzq.dzh:id/tv_buy5_price");
+				if(sPrice.length() == 0)
+					sPrice = getTextByIDTxt(event, "com.huaanzq.dzh:id/tv_buy1_price");
+			}
+			if(sPrice.length() > 0)
+			{
+				MainActivity.updateData2MainUI(Thread.currentThread().getName() + " i = " + i);
+				break;
+			}
 		}
 		
+		MainActivity.updateData2MainUI(Thread.currentThread().getName() + " ..sPrice = " + sPrice + " ..Len = " + sPrice.length());
+		if(sPrice.length() == 0)
+			return;
+
     	Log.i("XXOO", event.getClassName().toString() + " -> doTrade......" + sPrice );
 		List<AccessibilityNodeInfo> listPrice  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/et_price");
+		MainActivity.updateData2MainUI(Thread.currentThread().getName() + " ..pasteInto(listPrice, sPrice)" );
 		pasteInto(listPrice, sPrice); 
 		
 		List<AccessibilityNodeInfo> listNum  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/et_num");
@@ -308,13 +321,14 @@ public class MyAccessibilityService extends AccessibilityService {
 		}
 		else if (MainActivity.fAction < 0)
 		{
+			MainActivity.updateData2MainUI(Thread.currentThread().getName() + " ..sleep(150)" );
 			try {
-				Thread.sleep(150);
+				Thread.sleep(150); //待优化。。。待优化。。。待优化。。。待优化。。。
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			List<AccessibilityNodeInfo> listAvaNum = findNodesById(event.getSource(), "com.huaanzq.dzh:id/tv_ava_num");//可买179800张
+			List<AccessibilityNodeInfo> listAvaNum = findNodesById(event.getSource(), "com.huaanzq.dzh:id/tv_ava_num");//可*179800张
 			if ((null != listAvaNum) && (!listAvaNum.isEmpty()))
 			{
 			    for (AccessibilityNodeInfo info : listAvaNum) 
@@ -339,23 +353,28 @@ public class MyAccessibilityService extends AccessibilityService {
 		}
 		
         if (Math.abs(MainActivity.fAction) >= 100){//number
-        	pasteInto(listNum, "" + (int)Math.abs(MainActivity.fAction)); 
+        	iNum = (int)Math.abs(MainActivity.fAction); 
         }
         else if (Math.abs(MainActivity.fAction) > 0){//rate
-			Log.i("XXOO", "---" + iNum );
+			Log.d("XXOO", "---" + iNum );
         	iNum = (int) Math.floor(iNum * Math.abs(MainActivity.fAction)/100);
-			Log.i("XXOO", "===" + iNum );
+			Log.d("XXOO", "===" + iNum );
         	iNum *= 100;
-			Log.i("XXOO", "..." + iNum );
-        	pasteInto(listNum, "" + iNum); 
+			Log.d("XXOO", "..." + iNum );
         }
+		MainActivity.updateData2MainUI(Thread.currentThread().getName() + " ..填写数量：" + iNum);
+        pasteInto(listNum, "" + iNum); 
 
-		List<AccessibilityNodeInfo> listEnTrust  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/btn_entrust");
-		//clickIt(listEnTrust); 
+		MainActivity.updateData2MainUI(Thread.currentThread().getName() + " ..btn_entrust" );
+		findAndClick(event, "com.huaanzq.dzh:id/btn_entrust");
+		bWaitPopup = true;
+
+		MainActivity.updateData2MainUI(Thread.currentThread().getName() + " doTrade...[DONE]");
 
 	}
 
 	private void doLogin(AccessibilityEvent event) {
+		MainActivity.updateData2MainUI("doLogin...");
 		
 		List<AccessibilityNodeInfo> list  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/tv_yzm");
 		List<AccessibilityNodeInfo> listYZM  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/et_yzm");
@@ -393,16 +412,16 @@ public class MyAccessibilityService extends AccessibilityService {
 		return listNodes;
 	}
 
-	private void clickIt(List<AccessibilityNodeInfo> listLogin) {
-		if (null != listLogin) {
-		    for (AccessibilityNodeInfo info : listLogin) {
-		    	
-		        //if (info2.getText().toString().equals("登录")) {
+	private void clickIt(List<AccessibilityNodeInfo> listTmp) {
+		if ((null != listTmp) && (!listTmp.isEmpty())){
+		    for (AccessibilityNodeInfo info : listTmp) {
 		            //找到你的节点以后 就直接点击他就行了
 		            info.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
 		            info.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+		            
+		    		MainActivity.updateData2MainUI(Thread.currentThread().getName() + " 找到..已经点了 " );
+
 		            break;
-		        //}
 		    }
 		}
 	}
@@ -411,6 +430,15 @@ public class MyAccessibilityService extends AccessibilityService {
 		if (null != listPass) {
 		    for (AccessibilityNodeInfo info : listPass) {
 		    	
+		    	CharSequence txt = info.getText();
+		    	if(txt == null) txt = "";
+		    	if(txt.toString().equals(sText) )
+		    	{
+		    		txt = "";
+		    		int xxx=88;
+		    			break;
+		    	}
+		    	  
 		    	//android>21 = 5.0时可以用ACTION_SET_TEXT
 		    	//android>18 3.0.1可以通过复制的手段,先确定焦点，再粘贴ACTION_PASTE
 		    	//使用剪切板
@@ -418,15 +446,6 @@ public class MyAccessibilityService extends AccessibilityService {
 		    	ClipData clip = ClipData.newPlainText("text", sText);  
 		    	clipboard.setPrimaryClip(clip);  
 		    	
-		    	CharSequence txt = info.getText();
-		    	if(txt == null) txt = "";
-		    	if(txt.toString().equals("159915") )
-		    	{
-		    		txt = "";
-		    		int xxx=88;
-		    			break;
-		    	}
-		    	  
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                     Bundle arguments = new Bundle();
                     arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 0);
@@ -469,6 +488,8 @@ public class MyAccessibilityService extends AccessibilityService {
     }
     @Override
     public void onInterrupt() {
+        //关闭线程
+        //udpUtils.setKeepRunning(false); 
 
     }
     /**
