@@ -1,5 +1,7 @@
 package com.bscan.xtrader;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -10,6 +12,8 @@ import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +22,7 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -88,7 +93,20 @@ public class MyAccessibilityService extends AccessibilityService {
          * 把这个type的int 值取出来 并转成16进制，然后去AccessibilityEvent 源码里find。顺便看注释 ，这样是迅速理解type类型的方法
          */
             String className = event.getClassName().toString();
-    	Log.v("XXOO", className + " -> " + event.eventTypeToString(event.getEventType()) );
+    	
+    	if(className.contains("Text"))
+    	{
+        	//Log.d("XXOO", className + " -> " + event.eventTypeToString(event.getEventType()) + " - " + (event.getSource()));
+        	Log.d("XXOO", className + " -> " + event.eventTypeToString(event.getEventType()) + " - " + (event.getSource()).getText());
+        	//Log.d("XXOO", className + " -> " + event.eventTypeToString(event.getEventType()) + " - " + (event.getSource()).getText().toString());
+    	}
+    	else
+	    	Log.d("XXOO", className + " -> " + event.eventTypeToString(event.getEventType()) );//+ event.getSource().getText().toString());
+    		
+    	//android.widget.TextView -> TYPE_WINDOW_CONTENT_CHANGED - 
+    	//android.widget.EditText -> TYPE_VIEW_TEXT_CHANGED - 
+    	//android.widget.EditText -> TYPE_VIEW_TEXT_SELECTION_CHANGED - 
+    	
 //    	ListView xxxx = (ListView)(event.getSource().getChild(0));
 //    	xxxx.perf
 //    	if (className.equals("android.widget.ListView")) {
@@ -292,7 +310,7 @@ public class MyAccessibilityService extends AccessibilityService {
 				if(sPrice.length() == 0)
 					sPrice = getTextByIDTxt(event, "com.huaanzq.dzh:id/tv_buy1_price");
 			}
-			if(sPrice.length() > 0)
+			if((sPrice.length() > 0)|| (i==39))
 			{
 				MainActivity.updateData2MainUI(Thread.currentThread().getName() + " i = " + i);
 				break;
@@ -301,7 +319,10 @@ public class MyAccessibilityService extends AccessibilityService {
 		
 		MainActivity.updateData2MainUI(Thread.currentThread().getName() + " ..sPrice = " + sPrice + " ..Len = " + sPrice.length());
 		if(sPrice.length() == 0)
+		{
+			reEvent();
 			return;
+		}
 
     	Log.i("XXOO", event.getClassName().toString() + " -> doTrade......" + sPrice );
 		List<AccessibilityNodeInfo> listPrice  = findNodesById(event.getSource(), "com.huaanzq.dzh:id/et_price");
@@ -337,7 +358,7 @@ public class MyAccessibilityService extends AccessibilityService {
 			    {
 			        if ((null != info.getText()) && (getNumeric(info.getText().toString()).length()>0) )
 			        {
-			        	Log.i("XXOO", event.getClassName().toString() + " -> doTrade......10800" );
+			        	Log.i("XXOO", event.getClassName().toString() + " -> doTrade......" + info.getText().toString() );
 						//pasteInto(listNum, "10800"); 
 						
 						//可卖38100.00张  mText	"可买190100张"[延时无用] (id=73)	
@@ -364,7 +385,14 @@ public class MyAccessibilityService extends AccessibilityService {
         	iNum *= 100;
 			Log.d("XXOO", "..." + iNum );
         }
-		MainActivity.updateData2MainUI(Thread.currentThread().getName() + " ..填写数量：" + iNum);
+		MainActivity.updateData2MainUI(Thread.currentThread().getName() + " ..可填数量：" + iNum);
+		if(iNum == 0)
+		{
+			reEvent();
+			
+			return;
+		}
+
         pasteInto(listNum, "" + iNum); 
 
 		MainActivity.updateData2MainUI(Thread.currentThread().getName() + " ..btn_entrust" );
@@ -373,6 +401,42 @@ public class MyAccessibilityService extends AccessibilityService {
 
 		MainActivity.updateData2MainUI(Thread.currentThread().getName() + " doTrade...[DONE]");
 
+	}
+
+	public void reEvent() {
+		MainActivity.updateData2MainUI(Thread.currentThread().getName() + " ..界面事件手动触发。。。" );
+		
+        PackageManager packageManager = this.getPackageManager();   
+        Intent intent = packageManager.getLaunchIntentForPackage("com.huaanzq.dzh");
+        startActivity(intent);
+
+//		Constructor<AccessibilityEvent> constructor;
+//		try {
+//			constructor = AccessibilityEvent.class.getDeclaredConstructor();
+//			constructor.setAccessible(true);
+//			AccessibilityEvent accessibilityEvent;
+//			try {
+//				accessibilityEvent = constructor.newInstance();
+//				accessibilityEvent.setEventType(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+//				accessibilityEvent.setClassName("com.android.dazhihui.ui.delegate.screen.margin.MarginCommonScreen");
+//				
+//			} catch (InstantiationException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} catch (IllegalAccessException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} catch (IllegalArgumentException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} catch (InvocationTargetException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		} catch (NoSuchMethodException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 	private void doLogin(AccessibilityEvent event) {
@@ -421,7 +485,12 @@ public class MyAccessibilityService extends AccessibilityService {
 		            info.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
 		            info.performAction(AccessibilityNodeInfo.ACTION_CLICK);
 		            
-		    		MainActivity.updateData2MainUI(Thread.currentThread().getName() + " 找到..已经点了 " );
+			        if ((null != info.getText()) && ((info.getText().toString()).length()>0) )
+			        {
+			    		MainActivity.updateData2MainUI(Thread.currentThread().getName() + " 找到已点 [" +  info.getText().toString() + "]");
+			        }
+			        else
+			        	MainActivity.updateData2MainUI(Thread.currentThread().getName() + " 找到点了.. "  +  info.getViewIdResourceName());
 
 		            break;
 		    }
