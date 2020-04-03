@@ -482,7 +482,11 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
 		MainActivity.setAction(Float.parseFloat(sAction));
         Log.i("XXOO", fAction + " -> 		click..." );
 
-        PackageManager packageManager = this.getPackageManager();   
+        runHAZQapp();
+	}
+
+	public void runHAZQapp() {
+		PackageManager packageManager = this.getPackageManager();   
         Intent intent = packageManager.getLaunchIntentForPackage("com.huaanzq.dzh");
         startActivity(intent);
 	}

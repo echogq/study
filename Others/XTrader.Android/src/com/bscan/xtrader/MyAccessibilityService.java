@@ -406,7 +406,7 @@ public class MyAccessibilityService extends AccessibilityService {
 	public void reEvent() {
 		MainActivity.updateData2MainUI(Thread.currentThread().getName() + " ..界面事件手动触发。。。" );
 		
-        PackageManager packageManager = this.getPackageManager();   
+		PackageManager packageManager = this.getPackageManager();   
         Intent intent = packageManager.getLaunchIntentForPackage("com.huaanzq.dzh");
         startActivity(intent);
 
