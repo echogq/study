@@ -12,12 +12,21 @@ import java.util.regex.Pattern;
 
 import org.apache.http.conn.util.InetAddressUtils;
 
+//import com.bscan.notificationlistener.NotificationMonitor.ScreenOffReceiver;
+
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.Activity;
+import android.app.KeyguardManager;
+import android.app.KeyguardManager.KeyguardLock;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -64,12 +73,21 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
 	public static final String TAG = "XXOO";
 	public static final String TAG_SVR = "SVR: ";
 
+    @SuppressWarnings("deprecation")
+    private static KeyguardManager  km;
+    static KeyguardLock kl;
+    static PowerManager pm;
+    static PowerManager.WakeLock wl;
+	private ScreenBroadcastReceiver screenOffReceiver;
+    
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
                 
+        this.wakeAndUnlock(true);
+        
         ((TextView) findViewById(R.id.tvLocalIP)).setText(Html.fromHtml("本机IP: <font color='#0000FF'>" + getLocalHostIp() + "</font>"));
         
         cbAction = (CheckBox) findViewById(R.id.cbAct);
@@ -267,7 +285,7 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
 			        ((RadioButton) findViewById(R.id.svrIP)).setText(Html.fromHtml(rcvstr));
 				}
 			    
-		        Toast.makeText(MainActivity.this, rcvstr, Toast.LENGTH_LONG).show();
+		        //Toast.makeText(MainActivity.this, rcvstr, Toast.LENGTH_LONG).show();
 //		        Toast toast=Toast.makeText(MainActivity.this,rcvstr, Toast.LENGTH_SHORT);
 //		        toast.setGravity(Gravity.CENTER, 0, 0);
 //		        toast.show();
@@ -488,9 +506,127 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
 	public void ActionByStrCMD(String sAction) {
 		MainActivity.setAction(Float.parseFloat(sAction));
         Log.i("XXOO", fAction + " -> 		click..." );
-
+        
+		// 点亮屏幕并解开锁屏，解锁的原理是把锁屏关闭掉
+		this.wakeAndUnlock(true);
+        //runHAZQapp();
+//		try {
+//			openApp("com.gfjgj.dzh");
+//		} catch (NameNotFoundException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+		
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         runHAZQapp();
+		//playAudio(this, 10);
+
+		// 这里监听一下系统广播，判断如果屏幕熄灭就把系统锁屏还原
+	   IntentFilter intentFilter = new IntentFilter();
+	   intentFilter.addAction("android.intent.action.SCREEN_OFF");
+	   screenOffReceiver = new ScreenBroadcastReceiver();
+	   registerReceiver(screenOffReceiver, intentFilter);
+
 	}
+
+	 class ScreenBroadcastReceiver extends BroadcastReceiver {
+		 private String action=null;
+
+		  @Override
+		  public void onReceive(Context context, Intent intent) {
+			   if (kl != null) {
+				    // 还原锁屏
+		               //锁屏
+		               //kl.reenableKeyguard();
+		          }
+			   if (wl != null && wl.isHeld()) {
+				    // 还原锁屏
+		               //释放wakeLock，关灯
+		               wl.release();
+				   }
+			   
+		        action=intent.getAction();
+		        if(Intent.ACTION_SCREEN_ON.equals(action)){
+		            Toast.makeText(context,"屏幕开屏",Toast.LENGTH_SHORT).show();
+		            //runHAZQapp();
+		 
+		        }else if(Intent.ACTION_SCREEN_OFF.equals(action)){
+		            Toast.makeText(context,"屏幕关屏",Toast.LENGTH_SHORT).show();
+		        }else if(Intent.ACTION_USER_PRESENT.equals(action)){
+		            Toast.makeText(context,"屏幕解锁",Toast.LENGTH_SHORT).show();
+		            
+		            //runHAZQapp();
+		        }
+
+		  }
+		 }
+	 
+		void openApp(String packageName) throws NameNotFoundException {
+			PackageInfo pi = getPackageManager().getPackageInfo(packageName, 0);
+
+			Intent resolveIntent = new Intent(Intent.ACTION_MAIN, null);
+			resolveIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+			resolveIntent.setPackage(pi.packageName);
+
+			List<ResolveInfo> apps = getPackageManager().queryIntentActivities(resolveIntent, 0);
+
+			ResolveInfo ri = apps.iterator().next();
+			if (ri != null) {
+				String pkgName = ri.activityInfo.packageName;
+				String className = ri.activityInfo.name;
+
+				Intent intent = new Intent(Intent.ACTION_MAIN);
+				intent.addCategory(Intent.CATEGORY_LAUNCHER);
+
+				ComponentName cn = new ComponentName(pkgName, className);
+
+				intent.setComponent(cn);
+				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				startActivity(intent);
+//				if(pkgName.contains("com.tmall.wireless"))
+//		        {
+//					bAutoOpen = true;
+//		        }
+			}
+		}
+
+	
+	  //锁屏、唤醒相关
+		private void wakeAndUnlock(boolean b)
+	    {
+	           if(b)
+	           {
+	                  //获取电源管理器对象
+	                  pm=(PowerManager) getSystemService(Context.POWER_SERVICE);
+	     
+	                  //获取PowerManager.WakeLock对象，后面的参数|表示同时传入两个值，最后的是调试用的Tag
+	                  wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "bright");
+	     
+	                  //点亮屏幕
+	                  wl.acquire();
+	                 
+	                  //得到键盘锁管理器对象
+	                  km= (KeyguardManager)getSystemService(Context.KEYGUARD_SERVICE);
+	                  kl = km.newKeyguardLock("unLock");
+	     
+	                  //解锁
+	                  kl.disableKeyguard();
+	           }
+	           else
+	           {
+	                  //锁屏
+	                  kl.reenableKeyguard();
+	                 
+	                  //释放wakeLock，关灯
+	                  wl.release();
+	           }
+	          
+	    }
 
 	public void runHAZQapp() {
 //		PackageManager packageManager = this.getPackageManager();   

@@ -75,9 +75,9 @@ public class MyAccessibilityService extends AccessibilityService {
 
         MainActivity.updateData2MainUI(sTextLog);
 
-//        Toast toast=Toast.makeText(this,"onServiceConnected()..." + sTextLog, Toast.LENGTH_SHORT);
-//        toast.setGravity(Gravity.CENTER, 0, 0);
-//        toast.show();
+        Toast toast=Toast.makeText(this,"onServiceConnected()..." + sTextLog, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
         
 
@@ -231,7 +231,7 @@ public class MyAccessibilityService extends AccessibilityService {
 					
 					MainActivity.updateData2MainUI(Thread.currentThread().getName() + " ...点击委托确认");
 					//debug 点委托确认按钮
-    	        	//findAndClick(event, "com.gfjgj.dzh:id/confirm"); //委托确认
+    	        	findAndClick(event, "com.gfjgj.dzh:id/confirm"); //委托确认
             		return;
             	}
 
