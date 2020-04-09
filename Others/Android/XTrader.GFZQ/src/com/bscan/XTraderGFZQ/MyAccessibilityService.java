@@ -220,6 +220,9 @@ public class MyAccessibilityService extends AccessibilityService {
             	if(getByTxt(event, "委托请求提交成功。合同号为") || getByTxt(event, "不能超过"))
             	{
     	        	findAndClick(event, "com.gfjgj.dzh:id/confirm"); //确定
+    	        	
+    	        	goHome();
+    	        	
     	        	return;
             	}
             	
@@ -245,6 +248,13 @@ public class MyAccessibilityService extends AccessibilityService {
             }
     	}
     }
+
+	private void goHome() {
+		Intent intent= new Intent(Intent.ACTION_MAIN);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//如果是服务里调用，必须加入new task标识
+		intent.addCategory(Intent.CATEGORY_HOME);
+		startActivity(intent);
+		}
 
 	public boolean getByTxt(AccessibilityEvent event, String sTxttt) {
 		if(null == event)

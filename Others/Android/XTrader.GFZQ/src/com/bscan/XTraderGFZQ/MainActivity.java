@@ -306,7 +306,7 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
     }
 
 		private static void showLog(String rcvstr) {
-			SimpleDateFormat   formatter   =   new   SimpleDateFormat   ("yyyy-MM-dd HH:mm:ss.SSS");
+			SimpleDateFormat   formatter   =   new   SimpleDateFormat   (/*"yyyy-MM-dd "+ */"HH:mm:ss.SSS");
 	        Date curDate =  new Date(System.currentTimeMillis());
 	        //获取当前时间
 	        String   str   =   formatter.format(curDate);

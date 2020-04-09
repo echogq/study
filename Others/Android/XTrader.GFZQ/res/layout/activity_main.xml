@@ -9,38 +9,50 @@
     tools:context="com.bscan.XTraderGFZQ.MainActivity" >
 
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="2"
-        android:orientation="vertical" android:id="@+id/linearLayout1">
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
 
-    <RadioButton
-        android:id="@+id/svrIP"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-            android:layout_gravity="center"
-        android:clickable="false"
-        android:text="服务器IP" />
-
-        <CheckBox
-            android:id="@+id/cbAct"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:checked="true"
-            android:text="行动" />
+            android:orientation="vertical"
+            android:background="#AABBCC" >
+            
+            <TextView
+                android:id="@+id/tvLocalIP"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="本机IP" />
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/tvLocalIP"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="本机IP" />
+            android:orientation="horizontal" >
+
+            <RadioButton
+                android:id="@+id/svrIP"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:clickable="false"
+                android:text="服务器IP" />
+
+            <CheckBox
+                android:id="@+id/cbAct"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:checked="true"
+                android:text="行动" />
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:orientation="horizontal" >
 
             <Button
@@ -96,8 +108,7 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:orientation="horizontal" >
 
             <Button
@@ -136,24 +147,30 @@
                 android:text="-1.00"
                 android:textColor="#ffffff" />
         </LinearLayout>
-        
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="===============================" />
-        
-        <TextView    
-		    android:id="@+id/tvLog"    
-		    android:layout_width="fill_parent"    
-		    android:layout_height="fill_parent"
-        	android:layout_weight="1.0"    
-		    android:scrollbars="vertical" 
-		    android:fadeScrollbars="false"
-		    android:singleLine="false"      
-		             
-		    android:textColor="#882200"  
-		    />   <!-- android:maxLines="15000" -->  
-    </LinearLayout>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#AABBCC"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/tvLog"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:fadeScrollbars="false"
+                android:scrollbars="vertical"
+                android:singleLine="false"
+                android:textColor="#882200" />
+
+            <!-- android:maxLines="15000" -->
+
+        </RelativeLayout>
+    </LinearLayout>
 
 </RelativeLayout>
