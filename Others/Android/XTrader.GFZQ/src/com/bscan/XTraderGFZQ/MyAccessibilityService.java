@@ -254,6 +254,8 @@ public class MyAccessibilityService extends AccessibilityService {
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//如果是服务里调用，必须加入new task标识
 		intent.addCategory(Intent.CATEGORY_HOME);
 		startActivity(intent);
+		
+		MainActivity.wl.release();
 		}
 
 	public boolean getByTxt(AccessibilityEvent event, String sTxttt) {

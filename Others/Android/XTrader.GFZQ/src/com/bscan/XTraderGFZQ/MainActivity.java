@@ -620,7 +620,7 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
 	           else
 	           {
 	                  //À¯∆¡
-	                  kl.reenableKeyguard();
+	                  //kl.reenableKeyguard();
 	                 
 	                  // Õ∑≈wakeLock£¨πÿµ∆
 	                  wl.release();
