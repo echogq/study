@@ -415,75 +415,81 @@ void ThreadProcess_UDP_Listen(LPVOID Port)
 		//	}
 		//}
 
-		// 创建套接字  
-		sockLocal = socket(AF_INET, SOCK_DGRAM, 0);
-		if (sockLocal == INVALID_SOCKET)
-		{
-			printf("socket() failed, Error Code:%d/n", WSAGetLastError());
-			return; ;
-		}
-		// 绑定套接字  
-		nRet = ::bind(sockLocal, (SOCKADDR*)&addrSrv, sizeof(SOCKADDR));
-		if (SOCKET_ERROR == nRet)
-		{
-			printf("bind failed !/n");
-			closesocket(sockLocal);
-			return; ;
-		}
-		ZeroMemory(buf, MAX_BUF_LEN);
-
-		// 从客户端接收数据  
-		int timeout = 0; //3s
-		setsockopt(sockLocal, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout));
-
 		while (1)
 		{
-			nRet = recvfrom(sockLocal, buf, MAX_BUF_LEN, 0, (SOCKADDR*)&addrClient, &len);
-			if (SOCKET_ERROR == nRet)
+			// 创建套接字  
+			sockLocal = socket(AF_INET, SOCK_DGRAM, 0);
+			if (sockLocal == INVALID_SOCKET)
 			{
-				printf("recvfrom failed !\n");
-				closesocket(sockLocal);
+				printf("socket() failed, Error Code:%d/n", WSAGetLastError());
+				Sleep(100);
 				continue;
 			}
-		
-			TraceEx(buf);
-
-			// 打印来自客户端发送来的数据  
-			//printf("Recv From Client:%s\n", buf);
-
-
-			// 向客户端发送数据  
-			//strcpy(buf, "UDP Hello World ! [Server]\r\n");
-			//sendto(sockLocal, buf, strlen(buf), 0, (SOCKADDR*)&addrClient, len);
+			// 绑定套接字  
+			nRet = ::bind(sockLocal, (SOCKADDR*)&addrSrv, sizeof(SOCKADDR));
+			if (SOCKET_ERROR == nRet)
 			{
+				printf("bind failed !/n");
+				closesocket(sockLocal);
+				Sleep(100);
+				continue;
 			}
-			//WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
-			static char str[128];
-			struct sockaddr_in *sin = (struct sockaddr_in *)((SOCKADDR*)&addrClient);
-			if (inet_ntop(AF_INET, &sin->sin_addr, str, sizeof(str)) != NULL)
+			ZeroMemory(buf, MAX_BUF_LEN);
+
+			// 从客户端接收数据  
+			int timeout = 0; //3s
+			setsockopt(sockLocal, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout));
+
+			while (1)
 			{
-				string sZipName = "";
-				string sLocalIP = GetNetCardIP();
-
-				if (sLocalIP.length() > 6)//1.1.1.1
+				nRet = recvfrom(sockLocal, buf, MAX_BUF_LEN, 0, (SOCKADDR*)&addrClient, &len);
+				if (SOCKET_ERROR == nRet)
 				{
-					::sendto(sockLocal, sLocalIP.c_str(), sLocalIP.length(), 0, (SOCKADDR*)&addrClient, len);
+					printf("recvfrom failed !\n");
+					closesocket(sockLocal);
+					Sleep(100);
+					break;
 				}
-				//if (PORT_TERMINAL_ZIP == (int)Port)
-				//{
-				//	sZipName = "Terminal.zip";
-				//}
-				//else if (PORT_COMMON_ZIP == (int)Port)
-				//{
-				//	sZipName = "common.zip";
-				//}
 
-				//if (Common::IsFileExist(".\\" + sZipName))
-				//{
-				//	::sendto(sockLocal, "QMDnc.exe", 9, 0, (SOCKADDR*)&addrClient, len);
-				//	Sleep(100);
-				//	TCP_ConnectAndSendFile(str, (int)Port, sZipName);
-				//}
+				TraceEx(buf);
+
+				// 打印来自客户端发送来的数据  
+				//printf("Recv From Client:%s\n", buf);
+
+
+				// 向客户端发送数据  
+				//strcpy(buf, "UDP Hello World ! [Server]\r\n");
+				//sendto(sockLocal, buf, strlen(buf), 0, (SOCKADDR*)&addrClient, len);
+				{
+				}
+				//WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
+				static char str[128];
+				struct sockaddr_in *sin = (struct sockaddr_in *)((SOCKADDR*)&addrClient);
+				if (inet_ntop(AF_INET, &sin->sin_addr, str, sizeof(str)) != NULL)
+				{
+					string sZipName = "";
+					string sLocalIP = GetNetCardIP();
+
+					if (sLocalIP.length() > 6)//1.1.1.1
+					{
+						::sendto(sockLocal, sLocalIP.c_str(), sLocalIP.length(), 0, (SOCKADDR*)&addrClient, len);
+					}
+					//if (PORT_TERMINAL_ZIP == (int)Port)
+					//{
+					//	sZipName = "Terminal.zip";
+					//}
+					//else if (PORT_COMMON_ZIP == (int)Port)
+					//{
+					//	sZipName = "common.zip";
+					//}
+
+					//if (Common::IsFileExist(".\\" + sZipName))
+					//{
+					//	::sendto(sockLocal, "QMDnc.exe", 9, 0, (SOCKADDR*)&addrClient, len);
+					//	Sleep(100);
+					//	TCP_ConnectAndSendFile(str, (int)Port, sZipName);
+					//}
+				}
 			}
 		}
 
