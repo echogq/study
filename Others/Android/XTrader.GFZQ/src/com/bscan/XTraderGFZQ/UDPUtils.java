@@ -11,6 +11,7 @@ import java.util.Enumeration;
 import org.apache.http.conn.util.InetAddressUtils;
 
 import android.content.Context;
+import android.media.RingtoneManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -200,8 +201,9 @@ public class UDPUtils implements Runnable {
 					configInfo.length, ip, SERVER_PORT);// 创建发送类型的数据报：
 
 			Log.i(TAG, MainActivity.getLocalHostIp() + " ->sendUDPPing: " + message);
-			sendSocket.send(sendPacket); // 通过套接字发送数据：
 			sendSocket.setSoTimeout(200);  
+			sendSocket.send(sendPacket); // 通过套接字发送数据：
+			//sendSocket.
 			//Log.i(TAG, "socket.setSoTimeout(200)");
 			sendSocket.receive(rcvPacket);
 			
@@ -237,13 +239,23 @@ public class UDPUtils implements Runnable {
 	@Override
 	public void run() {
 		//StartListen();
-		
+		int iIntV = 300;
+		int iAlarmIntV = 2000;
 		while(true){
 			if(null == TcpClientConnector.mConnectThread)
 			{
 				MainActivity.updateData2MainUI("UDP广播17077查找中...");
 
 				sendUDPPing("Java...UDP");
+				
+				if(iAlarmIntV <= 0)
+				{
+					MainActivity.soundAlarm(RingtoneManager.TYPE_NOTIFICATION); 
+					iAlarmIntV = 2000;
+				}
+				else
+					iAlarmIntV -= iIntV;
+
 			}
 			else
 			{
@@ -267,7 +279,7 @@ public class UDPUtils implements Runnable {
 //				}
 			}
 		try {
-			Thread.sleep(100);
+			Thread.sleep(iIntV);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

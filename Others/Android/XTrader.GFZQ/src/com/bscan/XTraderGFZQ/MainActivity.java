@@ -85,7 +85,9 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-                
+             
+    	gMainContext = this.getApplicationContext();
+
         this.wakeAndUnlock(true);
         
         ((TextView) findViewById(R.id.tvLocalIP)).setText(Html.fromHtml("本机IP: <font color='#0000FF'>" + getLocalHostIp() + "</font>"));
@@ -120,7 +122,7 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
         // 以上方法以 post开头的允许你处理Runnable对象
         //sendMessage()允许你处理Message对象(Message里可以包含数据,)
 
-        jumpToSettingPage(this.getApplicationContext());
+        jumpToSettingPage(gMainContext);
 
         
         //infomation.append("目的IP： "+SERVER_IP+"\n"+"目的端口： "+SERVER_PORT+"\n");
@@ -254,9 +256,7 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
 
 		        showLog("handleMessage...收到指令=" + rcvstr);
 		        
-		        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);  
-                Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);  
-                r.play(); 
+		        soundAlarm(RingtoneManager.TYPE_NOTIFICATION); 
                 
 				if (((CheckBox) findViewById(R.id.cbAct)).isChecked()) {
 					MainActivity.this.ActionByStrCMD(rcvstr);
@@ -451,7 +451,6 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
 	
     public static void jumpToSettingPage(Context context) {
             try {
-            	gMainContext = context;
 //        		WifiManager manager = (WifiManager) gMainContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 //        		wifiLock  = manager.createMulticastLock("localWifi");
         		
@@ -523,7 +522,7 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        runHAZQapp();
+        runTradeApp();
 		//playAudio(this, 10);
 
 		// 这里监听一下系统广播，判断如果屏幕熄灭就把系统锁屏还原
@@ -628,7 +627,7 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
 	          
 	    }
 
-	public void runHAZQapp() {
+	public void runTradeApp() {
 //		PackageManager packageManager = this.getPackageManager();   
 //        Intent intent = packageManager.getLaunchIntentForPackage("com.gfjgj.dzh");
 //        startActivity(intent);
@@ -743,5 +742,15 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
         }
  
     }
+
+	public static void soundAlarm(int iSound) {
+		Uri notification = RingtoneManager.getDefaultUri(iSound);  
+		if((null != notification) && (null != gMainContext ))
+		{
+			Ringtone r = RingtoneManager.getRingtone(gMainContext, notification);  
+			if(null != r)
+				r.play();
+		}
+	}
 }
 
