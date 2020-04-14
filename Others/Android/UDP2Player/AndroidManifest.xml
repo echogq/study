@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"></uses-permission>
     <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
 	<uses-permission android:name="android.permission.GET_TASKS"/>
+	<uses-permission android:name="android.permission.REORDER_TASKS" />
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 	<uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES"/>
 
@@ -20,7 +21,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme" android:restoreAnyVersion="false">
         android:sharedUserId="android.uid.system"
         <activity
             android:name=".MainActivity"
@@ -47,7 +48,9 @@
 					<data android:mimeType="video/*"/>
                    <!--下面这几行也必须得设置-->
                    <action android:name="android.intent.action.VIEW"/>
+                   <action android:name="android.intent.action.SEND"/>
                    <category android:name="android.intent.category.DEFAULT"/>
+                   
                </intent-filter>
             
         </activity>

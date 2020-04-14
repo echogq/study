@@ -1,6 +1,6 @@
 package com.bscan.udp2player;
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -26,12 +26,13 @@ import java.net.MulticastSocket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class UDP_Push  extends ActionBarActivity {
+public class UDP_Push  extends Activity {
     /*发送广播端的socket*/
     private MulticastSocket ms;
     /*发送广播的按钮*/
     private Button sendUDPBrocast;
-    private String param = "";
+    private String sPrefix = "";
+    private String sUrl = "";
     private TextView TextView00;
     private TextView TextView01;
  
@@ -40,11 +41,14 @@ public class UDP_Push  extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         init();
 
+        Intent intent = getIntent();
+        String message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
+        
         Uri data = getIntent().getData();
         if(data != null)
         {
 	        Log.i("TAG", "host = " + data.getHost() + " path = " + data.getPath() + " query = " + data.getQuery());
-	        param = data.toString();
+	        sUrl = data.toString();
 	        
 	     // Android 4.0 之后不能在主线程中请求网络
             new Thread(new Runnable(){
@@ -76,7 +80,7 @@ public class UDP_Push  extends ActionBarActivity {
                     @Override
                     public void run() {
                     	
-            	        param = TextView00.getText().toString();
+            	        sUrl = TextView00.getText().toString();
 
                         sendUDP();
                     }
@@ -94,7 +98,7 @@ public class UDP_Push  extends ActionBarActivity {
                 Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-            	        param = TextView01.getText().toString();
+            	        sUrl = TextView01.getText().toString();
                         sendUDP();
                     }
                 });
@@ -154,7 +158,9 @@ public class UDP_Push  extends ActionBarActivity {
  
 
 		    //String sendData=ip+formatedDate;
- 		    String sendData=param;
+ 		    String sendData = sPrefix + sUrl;
+        	sPrefix = "";
+
 
 //                        byte[] data = "192.168.1.109".getBytes();
 		    byte[] data = sendData.getBytes();
@@ -174,12 +180,12 @@ public class UDP_Push  extends ActionBarActivity {
 	}
 
 	public void setTxts() {
-		String ArrStr[] = param.split("http");
+		String ArrStr[] = sUrl.split("http");
 		if(ArrStr.length>0)
 		{
 			TextView01.setText("http" + ArrStr[ArrStr.length-1]);
 		}
-		TextView00.setText(param);
+		TextView00.setText(sUrl);
 	}
 
 	/**
@@ -192,7 +198,9 @@ public class UDP_Push  extends ActionBarActivity {
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
+                	sPrefix = "https://www.playm3u8.cn/jiexi.php?url=";
                     sendUDP();
+                	sPrefix = "";
                 }
             });
  

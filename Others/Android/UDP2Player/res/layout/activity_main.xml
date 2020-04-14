@@ -15,7 +15,7 @@
          android:layout_height="wrap_content"
          android:layout_alignParentTop="true"
          android:layout_alignRight="@+id/result"
-         android:text="发送广播" />
+         android:text="发至TV播" />
 
      <TextView
          android:id="@+id/result"

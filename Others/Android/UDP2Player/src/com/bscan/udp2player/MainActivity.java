@@ -1,8 +1,13 @@
 package com.bscan.udp2player;
 
-import android.support.v7.app.ActionBarActivity;
+//import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
+import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.ActivityManager.RunningTaskInfo;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
@@ -23,10 +29,11 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
  
-public class MainActivity extends ActionBarActivity implements Runnable{
+public class MainActivity extends Activity implements Runnable{
  
     private MulticastSocket ds;
     String multicastHost="224.0.0.1";
@@ -34,7 +41,9 @@ public class MainActivity extends ActionBarActivity implements Runnable{
     TextView result;
     String beforeResult="";
     Handler mHandler;
- 
+    public final static String EXTRA_MESSAGE = "com.bscan.udp2player.MESSAGE";
+    
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,7 +106,7 @@ public class MainActivity extends ActionBarActivity implements Runnable{
                     String packageName = "com.mitv.mivideoplayer";
                     //private void killApp(String packageName) {
                        // ActivityManager am = (ActivityManager)getApplicationContext().getSystemService(ACTIVITY_SERVICE);
-                        Log.d("aaa", "Trying to kill app " + packageName);
+                        //Log.d("aaa", "Trying to kill app " + packageName);
                         
                         ActivityManager am=(ActivityManager) getSystemService(ACTIVITY_SERVICE);  
                         am.killBackgroundProcesses(packageName);  
@@ -105,9 +114,55 @@ public class MainActivity extends ActionBarActivity implements Runnable{
                     }
         	        }
         	   }.start();
+        	   
+//注册系统剪切板的监听器事件，当剪切板数据发生变化的时候，就能获取到剪切板的数据
+        	   final ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        	   clipboardManager.addPrimaryClipChangedListener(new ClipboardManager.OnPrimaryClipChangedListener()
+        	   {
+        	       @Override
+        	   	public void onPrimaryClipChanged()
+        	       {
+        	           ClipData.Item itemAt = clipboardManager.getPrimaryClip().getItemAt(0);
+        	           Log.e("监听到剪切板中的内容:",itemAt.getText().toString());
+        	           
+       				Intent intent = new Intent();
+    				intent.setClass(MainActivity.this, UDP_Push.class);  //从IntentActivity跳转到SubActivity
+    				intent.putExtra("name", "xiazdong");  //放入数据
 
+
+//        	           UDP_Push sss;
+//        	           Intent intent = new Intent(getApplicationContext(), UDP_Push.class);
+        	           intent.setAction(Intent.ACTION_SEND);
+        	           intent.setType("http");
+        	           String message = itemAt.getText().toString();
+        	           intent.setData(Uri.parse(message));
+        	           //intent.putExtra(EXTRA_MESSAGE, message);
+       				startActivity(intent);  //开始跳转
+       				moveToFront();
+       				
+        	       }
+        	   });
     }
  
+    //@TargetApi(11)
+    protected void moveToFront() {
+        if (Build.VERSION.SDK_INT >= 11) { // honeycomb
+            final ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+            final List<RunningTaskInfo> recentTasks = activityManager.getRunningTasks(Integer.MAX_VALUE);
+
+            for (int i = 0; i < recentTasks.size(); i++) 
+            {
+                   Log.d("Executed app", "Application executed : " 
+                           +recentTasks.get(i).baseActivity.toShortString()
+                           + "\t\t ID: "+recentTasks.get(i).id+"");  
+                   // bring to front                
+                   if (recentTasks.get(i).baseActivity.toShortString().indexOf("udp2player") > -1) {                     
+                      activityManager.moveTaskToFront(recentTasks.get(i).id, ActivityManager.MOVE_TASK_WITH_HOME);
+                   }
+            }
+        }
+    }
+    
     @Override
     public void run() {
         // TODO Auto-generated method stub
