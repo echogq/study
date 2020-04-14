@@ -130,8 +130,8 @@ public class UDPUtils implements Runnable {
 				// 等待客户机连接
 				packet.setData(data);
 				Log.e(TAG, "receive0");
-				socket.setSoTimeout(200);  
-				Log.e(TAG, "socket.setSoTimeout(200)");
+				socket.setSoTimeout(1000);  
+				Log.e(TAG, "socket.setSoTimeout(1000)");
 					MainActivity.acquireWakeLock();
 			socket.receive(packet);
 				MainActivity.releaseWakeLock();
