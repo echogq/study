@@ -201,7 +201,7 @@ public class UDPUtils implements Runnable {
 					configInfo.length, ip, SERVER_PORT);// 创建发送类型的数据报：
 
 			Log.i(TAG, MainActivity.getLocalHostIp() + " ->sendUDPPing: " + message);
-			sendSocket.setSoTimeout(200);  
+			sendSocket.setSoTimeout(1000);  //200有问题
 			sendSocket.send(sendPacket); // 通过套接字发送数据：
 			//sendSocket.
 			//Log.i(TAG, "socket.setSoTimeout(200)");

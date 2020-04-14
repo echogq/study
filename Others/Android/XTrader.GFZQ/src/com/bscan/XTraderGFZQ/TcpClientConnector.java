@@ -16,7 +16,7 @@ import java.net.Socket;
 
 public class TcpClientConnector {
     private static TcpClientConnector mTcpClientConnector;
-    public static Socket mClient;
+    public static Socket mClient = null;
     private ConnectLinstener mListener;
     public static Thread mConnectThread = null;
     private String mmmSerIP;
@@ -66,10 +66,22 @@ public class TcpClientConnector {
                         connect(mmmSerIP, mmmSerPort);
                     } catch (IOException e) {
                     	mConnectThread = null;
+                    	try {
+							disconnect();
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
                         e.printStackTrace();
                     }
                     
                 	mConnectThread = null;
+                	try {
+						disconnect();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 
                 }
             });
@@ -83,9 +95,10 @@ public class TcpClientConnector {
      * @throws IOException
      */
     private void connect(String mSerIP, int mSerPort) throws IOException {
-        if (mClient == null) {
+        /*if (mClient == null)*/ {
             mClient = new Socket(mmmSerIP, mmmSerPort);
         }
+        mClient.setSoTimeout(7000); //对端是3s一次发送心跳："AutoTrade...TCPPing"
         InputStream inputStream = mClient.getInputStream();
         byte[] buffer = new byte[1024];
         int len = -1;
@@ -115,7 +128,7 @@ public class TcpClientConnector {
 				MainActivity.myHandler.sendMessage(msg); // 向Handler发送消息,更新UI
 
 			}
-            Message message = new Message();
+//            Message message = new Message();
 //            message.what = 100;
 //            Bundle bundle = new Bundle();
 //            bundle.putString("data", data);
