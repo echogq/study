@@ -17,6 +17,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.accessibility.AccessibilityEvent;
@@ -61,7 +62,8 @@ public class MyAccessibilityService extends AccessibilityService {
 //        setServiceInfo(config);
         
         PowerManager pmm = (PowerManager)this.getSystemService(Context.POWER_SERVICE);
-		pmm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyAccessibilityService").acquire();
+		WakeLock sss = pmm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyAccessibilityService");
+		sss.acquire();
 
         //udpUtils = new UDPUtils("192.168.1.255", 17077);
         udpUtils = new UDPUtils("255.255.255.255", 17077);

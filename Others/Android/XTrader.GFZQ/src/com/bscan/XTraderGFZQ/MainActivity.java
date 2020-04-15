@@ -91,12 +91,12 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
     	setWifiDormancy(gMainContext);
         this.wakeAndUnlock(true);
 		// 这里监听一下系统广播，判断如果屏幕熄灭就把系统锁屏还原
- 	   IntentFilter intentFilter = new IntentFilter();
- 	   intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
- 	   intentFilter.addAction(Intent.ACTION_SCREEN_ON);
- 	   intentFilter.addAction(Intent.ACTION_USER_PRESENT);
- 	   screenEventReceiver = new ScreenBroadcastReceiver();
- 	   registerReceiver(screenEventReceiver, intentFilter);
+// 	   IntentFilter intentFilter = new IntentFilter();
+// 	   intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+// 	   intentFilter.addAction(Intent.ACTION_SCREEN_ON);
+// 	   intentFilter.addAction(Intent.ACTION_USER_PRESENT);
+// 	   screenEventReceiver = new ScreenBroadcastReceiver();
+// 	   registerReceiver(screenEventReceiver, intentFilter);
 
         
         ((TextView) findViewById(R.id.tvLocalIP)).setText(Html.fromHtml("本机IP: <font color='#0000FF'>" + getLocalHostIp() + "</font>"));
@@ -624,6 +624,7 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
 	     
 	                  //获取PowerManager.WakeLock对象，后面的参数|表示同时传入两个值，最后的是调试用的Tag
 	                  wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "bright");
+	          		  wl.setReferenceCounted(false); 
 	     
 	                  //点亮屏幕
 	                  wl.acquire();
@@ -680,49 +681,49 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
      */
 
     static public WakeLock wakeLock;
-    static public void acquireWakeLock(){
-
-//    	if (null != wifiLock) wifiLock.acquire();	
-    	if (null == wakeLock) {
-
-    		PowerManager pm = (PowerManager) gMainContext.getSystemService(Context.POWER_SERVICE);
-
-    		wakeLock = pm.newWakeLock(
-    				PowerManager.PARTIAL_WAKE_LOCK 
-    				| PowerManager.ON_AFTER_RELEASE
-    				//| PowerManager.FULL_WAKE_LOCK
-    				, gMainContext.getClass()
-
-    				.getCanonicalName());
-			Log.i("XXOO", "call acquireWakeLock = " + wakeLock);
-
-    		if (null != wakeLock) {
-
-
-    			wakeLock.acquire();
-
-    		}
-
-    	}
-
-    }
-
-    // 释放设备电源锁
-
-    static public void releaseWakeLock() {
-
-//    	if (null != wifiLock) wifiLock.release();//必须调用
-    	if (null != wakeLock && wakeLock.isHeld()) {
-
-    		Log.i(TAG, "call releaseWakeLock");
-
-    		wakeLock.release();
-
-    		wakeLock = null;
-
-    	}
-
-    }
+//    static public void acquireWakeLock(){
+//
+////    	if (null != wifiLock) wifiLock.acquire();	
+//    	if (null == wakeLock) {
+//
+//    		PowerManager pm = (PowerManager) gMainContext.getSystemService(Context.POWER_SERVICE);
+//
+//    		wakeLock = pm.newWakeLock(
+//    				PowerManager.PARTIAL_WAKE_LOCK 
+//    				| PowerManager.ON_AFTER_RELEASE
+//    				//| PowerManager.FULL_WAKE_LOCK
+//    				, gMainContext.getClass()
+//
+//    				.getCanonicalName());
+//			Log.i("XXOO", "call acquireWakeLock = " + wakeLock);
+//
+//    		if (null != wakeLock) {
+//
+//
+//    			wakeLock.acquire();
+//
+//    		}
+//
+//    	}
+//
+//    }
+//
+//    // 释放设备电源锁
+//
+//    static public void releaseWakeLock() {
+//
+////    	if (null != wifiLock) wifiLock.release();//必须调用
+//    	if (null != wakeLock && wakeLock.isHeld()) {
+//
+//    		Log.i(TAG, "call releaseWakeLock");
+//
+//    		wakeLock.release();
+//
+//    		wakeLock = null;
+//
+//    	}
+//
+//    }
 
     //	WakeLock 类型以及说明：
     //
