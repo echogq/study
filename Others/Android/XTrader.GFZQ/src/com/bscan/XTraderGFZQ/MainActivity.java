@@ -23,6 +23,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -87,7 +88,7 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
         setContentView(R.layout.activity_main);
              
     	gMainContext = this.getApplicationContext();
-
+    	setWifiDormancy(gMainContext);
         this.wakeAndUnlock(true);
 		// 这里监听一下系统广播，判断如果屏幕熄灭就把系统锁屏还原
  	   IntentFilter intentFilter = new IntentFilter();
@@ -535,7 +536,20 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
 
 	}
 
-	 class ScreenBroadcastReceiver extends BroadcastReceiver {
+	public void setWifiDormancy(Context context){
+		int value = Settings.System.getInt(context.getContentResolver(), Settings.System.WIFI_SLEEP_POLICY,  Settings.System.WIFI_SLEEP_POLICY_DEFAULT);
+		Log.d(TAG, "setWifiDormancy() returned: " + value);
+		final SharedPreferences prefs = context.getSharedPreferences("wifi_sleep_policy", Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putInt(Settings.System.WIFI_SLEEP_POLICY, value);
+		editor.commit();
+ 
+		if(Settings.System.WIFI_SLEEP_POLICY_NEVER != value){
+			Settings.System.putInt(context.getContentResolver(), Settings.System.WIFI_SLEEP_POLICY, Settings.System.WIFI_SLEEP_POLICY_NEVER);
+		}
+	}
+	
+	class ScreenBroadcastReceiver extends BroadcastReceiver {
 		 private String action=null;
 
 		  @Override
