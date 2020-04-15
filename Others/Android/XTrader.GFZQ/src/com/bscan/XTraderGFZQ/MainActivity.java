@@ -78,7 +78,7 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
     static KeyguardLock kl;
     static PowerManager pm;
     static PowerManager.WakeLock wl;
-	private ScreenBroadcastReceiver screenOffReceiver;
+	private ScreenBroadcastReceiver screenEventReceiver;
     
 	
     @Override
@@ -89,6 +89,14 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
     	gMainContext = this.getApplicationContext();
 
         this.wakeAndUnlock(true);
+		// 这里监听一下系统广播，判断如果屏幕熄灭就把系统锁屏还原
+ 	   IntentFilter intentFilter = new IntentFilter();
+ 	   intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+ 	   intentFilter.addAction(Intent.ACTION_SCREEN_ON);
+ 	   intentFilter.addAction(Intent.ACTION_USER_PRESENT);
+ 	   screenEventReceiver = new ScreenBroadcastReceiver();
+ 	   registerReceiver(screenEventReceiver, intentFilter);
+
         
         ((TextView) findViewById(R.id.tvLocalIP)).setText(Html.fromHtml("本机IP: <font color='#0000FF'>" + getLocalHostIp() + "</font>"));
         
@@ -525,12 +533,6 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
         runTradeApp();
 		//playAudio(this, 10);
 
-		// 这里监听一下系统广播，判断如果屏幕熄灭就把系统锁屏还原
-	   IntentFilter intentFilter = new IntentFilter();
-	   intentFilter.addAction("android.intent.action.SCREEN_OFF");
-	   screenOffReceiver = new ScreenBroadcastReceiver();
-	   registerReceiver(screenOffReceiver, intentFilter);
-
 	}
 
 	 class ScreenBroadcastReceiver extends BroadcastReceiver {
@@ -551,13 +553,16 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
 			   
 		        action=intent.getAction();
 		        if(Intent.ACTION_SCREEN_ON.equals(action)){
-		            Toast.makeText(context,"屏幕开屏",Toast.LENGTH_SHORT).show();
+					Log.e(TAG, "***屏幕*** -----------开屏------");
+		            //Toast.makeText(context,"屏幕开屏",Toast.LENGTH_SHORT).show();
 		            //runHAZQapp();
 		 
 		        }else if(Intent.ACTION_SCREEN_OFF.equals(action)){
-		            Toast.makeText(context,"屏幕关屏",Toast.LENGTH_SHORT).show();
+					Log.e(TAG, "***屏幕*** -----------关------");
+		            //Toast.makeText(context,"屏幕关屏",Toast.LENGTH_SHORT).show();
 		        }else if(Intent.ACTION_USER_PRESENT.equals(action)){
-		            Toast.makeText(context,"屏幕解锁",Toast.LENGTH_SHORT).show();
+					Log.e(TAG, "****** ---------解锁--------");
+		            //Toast.makeText(context,"屏幕解锁",Toast.LENGTH_SHORT).show();
 		            
 		            //runHAZQapp();
 		        }

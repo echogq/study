@@ -167,7 +167,8 @@ public class UDP_Push  extends Activity {
  
 		    //224.0.0.1为广播地址
 		    //InetAddress address = InetAddress.getByName("224.0.0.1");
-		    InetAddress address = InetAddress.getByName("192.168.1.255");
+		    InetAddress address = InetAddress.getByName("255.255.255.255");
+		    //InetAddress address = InetAddress.getByName("192.168.1.255");
 		    //这个地方可以输出判断该地址是不是广播类型的地址
 		    System.out.println(address.isMulticastAddress());
 		    dataPacket = new DatagramPacket(data, data.length, address,

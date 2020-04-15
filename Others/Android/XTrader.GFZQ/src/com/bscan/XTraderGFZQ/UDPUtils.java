@@ -132,9 +132,9 @@ public class UDPUtils implements Runnable {
 				Log.e(TAG, "receive0");
 				socket.setSoTimeout(1000);  
 				Log.e(TAG, "socket.setSoTimeout(1000)");
-					MainActivity.acquireWakeLock();
+					//MainActivity.acquireWakeLock();
 			socket.receive(packet);
-				MainActivity.releaseWakeLock();
+				//MainActivity.releaseWakeLock();
 				
 				Log.i(TAG, "rcv: " + packet.getAddress().getHostAddress());
 				Log.i(TAG, "rcv: " + packet.getSocketAddress());
