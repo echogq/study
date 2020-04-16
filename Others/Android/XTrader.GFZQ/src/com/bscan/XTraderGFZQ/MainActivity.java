@@ -525,12 +525,25 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
 //			e1.printStackTrace();
 //		}
 		
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		PowerManager powerManager = (PowerManager) MainActivity.gMainContext.getSystemService(Context.POWER_SERVICE);
+		
+		boolean ifOpen = false;
+		
+		while(!ifOpen)
+		{
+			try {
+		    	showLog(Thread.currentThread().getName() + "==[sleep(1000)]");
+		        Log.i("XXOO", "Thread.sleep(1000)..[" );
+				Thread.sleep(1000);
+		        Log.i("XXOO", "Thread.sleep(1000)..]" );
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			ifOpen = powerManager.isScreenOn(); 
 		}
+
         runTradeApp();
 		//playAudio(this, 10);
 
@@ -554,16 +567,16 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
 
 		  @Override
 		  public void onReceive(Context context, Intent intent) {
-			   if (kl != null) {
-				    // 还原锁屏
-		               //锁屏
-		               //kl.reenableKeyguard();
-		          }
-			   if (wl != null && wl.isHeld()) {
-				    // 还原锁屏
-		               //释放wakeLock，关灯
-		               wl.release();
-				   }
+//			   if (kl != null) {
+//				    // 还原锁屏
+//		               //锁屏
+//		               //kl.reenableKeyguard();
+//		          }
+//			   if (wl != null && wl.isHeld()) {
+//				    // 还原锁屏
+//		               //释放wakeLock，关灯
+//		               wl.release();
+//				   }
 			   
 		        action=intent.getAction();
 		        if(Intent.ACTION_SCREEN_ON.equals(action)){
@@ -652,6 +665,8 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
 //        Intent intent = packageManager.getLaunchIntentForPackage("com.gfjgj.dzh");
 //        startActivity(intent);
    
+    	showLog("[运行] --> " + "com.gfjgj.dzh");
+
 		Intent intent = getPackageManager().getLaunchIntentForPackage("com.gfjgj.dzh");
 		startActivity(intent);
 		

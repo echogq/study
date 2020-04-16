@@ -240,7 +240,7 @@ public class UDPUtils implements Runnable {
 	public void run() {
 		//StartListen();
 		int iIntV = 300;
-		int iAlarmIntV = 2000;
+		int iAlarmIntV = 1200;
 		while(true){
 			if(null == TcpClientConnector.mConnectThread)
 			{
@@ -250,8 +250,15 @@ public class UDPUtils implements Runnable {
 				
 				if(iAlarmIntV <= 0)
 				{
-					MainActivity.soundAlarm(RingtoneManager.TYPE_NOTIFICATION); 
-					iAlarmIntV = 2000;
+					PowerManager powerManager = (PowerManager) MainActivity.gMainContext.getSystemService(Context.POWER_SERVICE);
+					//true为打开，false为关闭
+					boolean ifOpen = powerManager.isScreenOn();
+					
+					if(!ifOpen)
+					{
+						MainActivity.soundAlarm(RingtoneManager.TYPE_NOTIFICATION); 
+					}
+					iAlarmIntV = 1200;
 				}
 				else
 					iAlarmIntV -= iIntV;
