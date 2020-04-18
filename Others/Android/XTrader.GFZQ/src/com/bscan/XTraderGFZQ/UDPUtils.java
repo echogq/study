@@ -201,7 +201,7 @@ public class UDPUtils implements Runnable {
 					configInfo.length, ip, SERVER_PORT);// 创建发送类型的数据报：
 
 			Log.i(TAG, MainActivity.getLocalHostIp() + " ->sendUDPPing: " + message);
-			sendSocket.setSoTimeout(1000);  //200有问题
+			sendSocket.setSoTimeout(2000);  //200有问题
 			sendSocket.send(sendPacket); // 通过套接字发送数据：
 			//sendSocket.
 			//Log.i(TAG, "socket.setSoTimeout(200)");
@@ -248,8 +248,22 @@ public class UDPUtils implements Runnable {
 
 				sendUDPPing("Java...UDP");
 				
+					WifiManager wifiManager = (WifiManager) MainActivity.gMainContext.getSystemService(Context.WIFI_SERVICE);
 				if(iAlarmIntV <= 0)
 				{
+
+					//开启、关闭wifi
+//					if (wifiManager.isWifiEnabled()) {
+//					} else {
+//					}
+//					wifiManager.setWifiEnabled(false);
+//					try {
+//						Thread.sleep(3000);
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//					wifiManager.setWifiEnabled(true);
 					PowerManager powerManager = (PowerManager) MainActivity.gMainContext.getSystemService(Context.POWER_SERVICE);
 					//true为打开，false为关闭
 					boolean ifOpen = powerManager.isScreenOn();

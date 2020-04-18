@@ -18,28 +18,30 @@
 
 完成后息屏
 完成后回退到主界面
+=================================================================================================
+姓名：***  帐号：151000022835
 
-04-15 22:15:42.678: E/MediaPlayer-JNI(31776): QCMediaPlayer mediaplayer NOT present
-04-15 22:15:43.598: E/MediaPlayer(31776): Should have subtitle controller already set
-04-15 22:15:44.068: E/XXOO(31776): ***屏幕*** -----------开屏------
-04-15 22:15:48.028: E/AndroidRuntime(31776): FATAL EXCEPTION: main
-04-15 22:15:48.028: E/AndroidRuntime(31776): Process: com.bscan.XTraderGFZQ, PID: 31776
-04-15 22:15:48.028: E/AndroidRuntime(31776): java.lang.RuntimeException: WakeLock under-locked bright
-04-15 22:15:48.028: E/AndroidRuntime(31776): 	at android.os.PowerManager$WakeLock.release(PowerManager.java:792)
-04-15 22:15:48.028: E/AndroidRuntime(31776): 	at android.os.PowerManager$WakeLock.release(PowerManager.java:754)
-04-15 22:15:48.028: E/AndroidRuntime(31776): 	at com.bscan.XTraderGFZQ.MyAccessibilityService.goHome(MyAccessibilityService.java:262)
-04-15 22:15:48.028: E/AndroidRuntime(31776): 	at com.bscan.XTraderGFZQ.MyAccessibilityService.onAccessibilityEvent(MyAccessibilityService.java:228)
-04-15 22:15:48.028: E/AndroidRuntime(31776): 	at android.accessibilityservice.AccessibilityService$1.onAccessibilityEvent(AccessibilityService.java:556)
-04-15 22:15:48.028: E/AndroidRuntime(31776): 	at android.accessibilityservice.AccessibilityService$IAccessibilityServiceClientWrapper.executeMessage(AccessibilityService.java:644)
-04-15 22:15:48.028: E/AndroidRuntime(31776): 	at com.android.internal.os.HandlerCaller$MyHandler.handleMessage(HandlerCaller.java:40)
-04-15 22:15:48.028: E/AndroidRuntime(31776): 	at android.os.Handler.dispatchMessage(Handler.java:102)
-04-15 22:15:48.028: E/AndroidRuntime(31776): 	at android.os.Looper.loop(Looper.java:136)
-04-15 22:15:48.028: E/AndroidRuntime(31776): 	at android.app.ActivityThread.main(ActivityThread.java:5137)
-04-15 22:15:48.028: E/AndroidRuntime(31776): 	at java.lang.reflect.Method.invokeNative(Native Method)
-04-15 22:15:48.028: E/AndroidRuntime(31776): 	at java.lang.reflect.Method.invoke(Method.java:515)
-04-15 22:15:48.028: E/AndroidRuntime(31776): 	at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:801)
-04-15 22:15:48.028: E/AndroidRuntime(31776): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:617)
-04-15 22:15:48.028: E/AndroidRuntime(31776): 	at dalvik.system.NativeStart.main(Native Method)
+安全级别：通讯密码   降为验证码认证 升为通讯密码认证 
+
+电脑绑定：未启用 绑定电脑 解除绑定 
+
+上次登录时间：20200416 12:22:29
+
+上次登录版本：
+
+上次登录MAC：; CH:ZH; VER:android 3.16
+
+上次登录站点/电话：
+MIP:36.7.154.161; 
+IMEI:863175020619967; 
+MPN:152******49; 
+OSV:Android OS Version 4.4.2; 
+IMSI:460023569723627; 
+MAC:; CH:ZH; 
+
+VER:android 3.16
+
+上次登录委托方式：手机委托
 
 
 

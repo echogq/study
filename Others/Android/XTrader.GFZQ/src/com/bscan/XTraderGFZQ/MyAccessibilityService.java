@@ -100,7 +100,7 @@ public class MyAccessibilityService extends AccessibilityService {
          */
             String className = event.getClassName().toString();
     	
-    	if(className.contains("Text") && (null != event.getSource()))
+    	if(className.contains("Text") && (null != event.getSource()) && (null != event.getSource().getText()))
     	{
     		String sTxt = (event.getSource()).getText().toString();
         	Log.d("XXOO", className + " -> " + AccessibilityEvent.eventTypeToString(event.getEventType()) + " - " + (event.getSource()));

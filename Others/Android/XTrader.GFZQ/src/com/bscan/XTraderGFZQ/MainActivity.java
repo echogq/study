@@ -16,6 +16,7 @@ import org.apache.http.conn.util.InetAddressUtils;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.KeyguardManager;
 import android.app.KeyguardManager.KeyguardLock;
 import android.content.BroadcastReceiver;
@@ -545,6 +546,11 @@ public class MainActivity extends Activity  implements CompoundButton.OnCheckedC
 		}
 
         runTradeApp();
+        
+        ActivityManager mAm = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+        String activity_name = mAm.getRunningTasks(1).get(0).topActivity.getClassName();
+        Log.i("XXOO", "->"+activity_name );
+
 		//playAudio(this, 10);
 
 	}

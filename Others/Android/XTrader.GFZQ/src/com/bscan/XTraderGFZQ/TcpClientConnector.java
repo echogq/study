@@ -98,7 +98,7 @@ public class TcpClientConnector {
         /*if (mClient == null)*/ {
             mClient = new Socket(mmmSerIP, mmmSerPort);
         }
-        mClient.setSoTimeout(7000); //对端是3s一次发送心跳："AutoTrade...TCPPing"
+        mClient.setSoTimeout(10000); //对端是3s一次发送心跳："AutoTrade...TCPPing"
         InputStream inputStream = mClient.getInputStream();
         byte[] buffer = new byte[1024];
         int len = -1;
@@ -106,7 +106,7 @@ public class TcpClientConnector {
         String lastRcvData = "";
         while ((len = inputStream.read(buffer)) != -1) {
             String data = new String(buffer, 0, len);
-            
+            send(data);
             //if(!lastRcvData.equals(data))
             {
 				Log.v("XXOO", "rcvedTCP......" + data + " 前指令=" + MainActivity.fAction);
