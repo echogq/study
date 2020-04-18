@@ -58,6 +58,38 @@ void LogTrace16380(LPCTSTR pszFormat, ...)
 
 }
 
+//递归遍历所有子窗口的子窗口 , 查找
+HWND Find_ChildWindow(HWND parent, char* sWnd)
+{
+	HWND child = NULL;
+	HWND child000 = NULL;
+	TCHAR buf[MAX_PATH];
+	DWORD pid = 0, tid = 0;
+	do {
+		child = FindWindowEx(parent, child, NULL, NULL);
+		int ret = GetWindowText(child, buf, MAX_PATH);
+		buf[ret] = 0;
+
+		if (strlen(buf) > 0)
+		{
+			LogTrace16380("0x%08X -> 0x%08X %s \n", parent, child, buf);
+			if (strstr(buf, sWnd))
+			{
+				return child;
+			}
+		}
+		if (child)
+			child000 = Find_ChildWindow(child, sWnd);
+		if(child000)
+		{
+			return child000;
+		}
+	} while (child);
+
+	return NULL;
+}
+
+
 //遍历所有子窗口的子窗口 , Z序遍历
 void print_window2(HWND parent, int level)
 {
@@ -71,7 +103,9 @@ void print_window2(HWND parent, int level)
 		tid = GetWindowThreadProcessId(child, &pid);
 		for (int i = 0; i < level; ++i)
 			_tprintf("\t");
-		_tprintf("%s ,  pid:%d, tid:%d\n", buf, pid, tid);
+
+		_tprintf("[[%s ,  pid:%d, tid:%d\n", buf, pid, tid);
+
 		if (child)
 			print_window2(child, level + 1);
 	} while (child);
@@ -118,7 +152,7 @@ CAuto_TDXBuyApp::CAuto_TDXBuyApp()
 
 HWND hMainWnd = NULL;
 /// 回調函数:査找AP主窗口句柄
-BOOL CALLBACK EnumWindowsPrc(HWND hwnd, LPARAM lParam)
+BOOL CALLBACK EnumWindowsPrcHAZQ(HWND hwnd, LPARAM lParam)
 {
 	char szCaption[512];
 	char *szTemp;
@@ -132,6 +166,29 @@ BOOL CALLBACK EnumWindowsPrc(HWND hwnd, LPARAM lParam)
 	{
 		::GetClassName(hwnd, szCaption, sizeof(szCaption));
 		if (strstr(szCaption, "TdxW_MainFrame_Class"))
+		{
+			hMainWnd = hwnd;
+			return FALSE;
+		}
+	}
+
+	return TRUE;
+}
+
+BOOL CALLBACK EnumWindowsPrc(HWND hwnd, LPARAM lParam)
+{
+	char szCaption[512];
+	char *szTemp;
+
+	memset(szCaption, '\0', 512);
+	szTemp = (char *)lParam;
+	::GetWindowTextA(hwnd, szCaption, sizeof(szCaption));
+
+
+	if (strstr(szCaption, szTemp))
+	{
+		::GetClassName(hwnd, szCaption, sizeof(szCaption));
+		//if (strstr(szCaption, "TdxW_MainFrame_Class"))
 		{
 			hMainWnd = hwnd;
 			return FALSE;
@@ -161,7 +218,7 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 	//华安证券V6.36 - [组合图-创业板]
 	//通达信金融终端V7.46 - [分析图表-创业板指]
 	hMainWnd = NULL;
-	::EnumWindows(EnumWindowsPrc, (LPARAM)"华安证券");
+	::EnumWindows(EnumWindowsPrcHAZQ, (LPARAM)"华安证券");
 
 	HWND hTDX_MainWnd = hMainWnd/*::FindWindowA(sMainClass, NULL)*/;
 	if (hTDX_MainWnd)
@@ -419,6 +476,37 @@ CAuto_TDXBuyApp theApp;
 
 BOOL CAuto_TDXBuyApp::InitInstance()
 {
+	//::EnumWindows(EnumWindowsPrc, (LPARAM)"核新网上交易系统");
+
+	HWND hSubWnd = Find_ChildWindow(NULL, "核新网上交易系统");
+	if (hSubWnd)
+	{
+		hSubWnd = Find_ChildWindow(hSubWnd, "同时买卖");//先找到唯一的子窗口，再取其父窗口进行关键按钮的查找
+		if (hSubWnd)
+		{
+			//if (3 < __argc)
+			{
+				HWND hBtn_BS = NULL;
+				if (strstr(__argv[0], "Auto_TDXBuy"))
+				{
+					hBtn_BS = Find_ChildWindow(::GetParent(hSubWnd), "买入[B]");
+				}
+				else if (strstr(__argv[0], "Auto_TDXSell"))
+				{
+					hBtn_BS = Find_ChildWindow(::GetParent(hSubWnd), "卖出[S]");
+				}
+
+				if (hBtn_BS)
+				{
+					LogTrace16380("点了一次按钮。。。\n");
+					PostMessage(hBtn_BS, BM_CLICK, 0, 0L);
+					return TRUE;
+				}
+			}
+		}
+	}
+	return FALSE; //下面的代码是为HAZQ.TDX, 暂时不用了。。。
+
 	if (3 < __argc)
 	{
 		if (strstr(__argv[0], "Auto_TDXBuy"))
