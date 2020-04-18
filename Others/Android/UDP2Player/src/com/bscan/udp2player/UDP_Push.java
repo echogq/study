@@ -159,6 +159,8 @@ public class UDP_Push  extends Activity {
 
 		    //String sendData=ip+formatedDate;
  		    String sendData = sPrefix + sUrl;
+ 		    if(sPrefix.length() > 0)
+ 		    	sendData += "?etag=12345";
         	sPrefix = "";
 
 
