@@ -183,7 +183,7 @@ void ThreadProcess_TCP_Send(LPVOID pSock)
 	{
 		//extern HANDLE g_Event_BS_Action;
 
-		DWORD res = WaitForSingleObject(hhh, 3000);
+		DWORD res = WaitForSingleObject(hhh, 300);
 		string msg = g_sCMD;
 		char sendBuf[100] = { 0 };
 		int xxx = 0;
@@ -1124,7 +1124,7 @@ CAutoTradeDlg::CAutoTradeDlg(CWnd* pParent /*=NULL*/)
 , m_buyCode3(_T(""))
 , m_bAutoSell(TRUE)
 , m_bAutoBuy(TRUE)
-, m_bUDP(TRUE)
+, m_bUDP(FALSE)
 , m_iRateS(1)
 , m_iRateB(2)
 , m_strCopyData(_T(""))
@@ -1248,6 +1248,38 @@ ON_BN_CLICKED(ID_RUNTDX, &CAutoTradeDlg::OnBnClickedRuntdx)
 ON_WM_COPYDATA()
 END_MESSAGE_MAP()
 
+//递归遍历所有子窗口的子窗口 , 查找
+HWND Find_ChildWindow(HWND parent, char* sWnd)
+{
+	HWND child = NULL;
+	HWND child000 = NULL;
+	TCHAR buf[MAX_PATH];
+	DWORD pid = 0, tid = 0;
+	do {
+		child = FindWindowEx(parent, child, NULL, NULL);
+		int ret = GetWindowText(child, buf, MAX_PATH);
+		buf[ret] = 0;
+
+		if (strlen(buf) > 0)
+		{
+			//LogTrace16380("0x%08X -> 0x%08X %s \n", parent, child, buf);
+			if (strstr(buf, sWnd))
+			{
+				return child;
+			}
+		}
+		if (child)
+			child000 = Find_ChildWindow(child, sWnd);
+		if (child000)
+		{
+			return child000;
+		}
+	} while (child);
+
+	return NULL;
+}
+
+
 void Thread_ClosePopups(PVOID param)
 {
 	while (true)
@@ -1256,14 +1288,24 @@ void Thread_ClosePopups(PVOID param)
 		if (hPopWnd = ::FindWindow("#32770", "通达信信息"))
 		{
 			//::MessageBoxA(NULL, "通达信软件", "友好提示", MB_ICONEXCLAMATION);
-			::SendMessage(hPopWnd, WM_CLOSE, 0, 0);
+			::PostMessage(hPopWnd, WM_CLOSE, 0, 0);
 		}
 
 		hPopWnd = NULL;
 		if (hPopWnd = ::FindWindow("#32770", "通达信软件"))
 		{
 			//::MessageBoxA(NULL, "通达信软件", "友好提示", MB_ICONEXCLAMATION);
-			::SendMessage(hPopWnd, WM_CLOSE, 0, 0);
+			::PostMessage(hPopWnd, WM_CLOSE, 0, 0);
+		}
+
+		HWND hSubWnd = Find_ChildWindow(NULL, "核新网上交易系统");
+		if (hSubWnd)
+		{
+			hSubWnd = Find_ChildWindow(hSubWnd, "同时买卖");//先找到唯一的子窗口，再取其父窗口进行关键按钮的查找
+			if (hSubWnd)
+			{
+				::EnableWindow(hSubWnd, FALSE);//这个按钮太危险，屏蔽掉它
+			}
 		}
 		Sleep(50);
 	}
