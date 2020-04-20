@@ -1037,11 +1037,11 @@ void CAutoTradeDlg::GetInHandList()
 }
 BOOL BuyIt(CString stkCode)
 {
-	return RunApp2End("Auto_TDXBuy.exe", stkCode); //直接返回1、0，表示买入成功、失败
+	return RunApp2End("Auto_TDXBuy.exe", stkCode, FALSE); //直接返回1、0，表示买入成功、失败
 }
 BOOL SellIt(CString stkCode)
 {
-	return RunApp2End("Auto_TDXSell.exe", stkCode); //直接返回1、0，表示买入成功、失败
+	return RunApp2End("Auto_TDXSell.exe", stkCode, FALSE); //直接返回1、0，表示买入成功、失败
 }
 
 void SaleStk(CAutoTradeDlg * p)

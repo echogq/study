@@ -9,6 +9,9 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+//HWND g_hMainWnd = NULL;
+HWND g_hMainWnd = NULL;
+HWND hPop_Wnd = NULL;
 
 void LogTrace16380(LPCTSTR pszFormat, ...)
 {
@@ -53,33 +56,58 @@ void LogTrace16380(LPCTSTR pszFormat, ...)
 		cds.lpData = szapipath;
 		cds.cbData = strlen(szapipath) + 1; //字符串请记得把'\0'加上, 不然就错了, 这里是ANSI字符串
 
-		::PostMessage(hTradeWnd, WM_COPYDATA, 0, (LPARAM)&cds);
+		::SendMessage(hTradeWnd, WM_COPYDATA, 0, (LPARAM)&cds);
 	}
 
 }
 
 //递归遍历所有子窗口的子窗口 , 查找
-HWND Find_ChildWindow(HWND parent, char* sWnd)
+HWND Find_ChildWindow(HWND parent, char* sWnd/*, char* sClass = NULL*/)
 {
 	HWND child = NULL;
 	HWND child000 = NULL;
-	TCHAR buf[MAX_PATH];
+	TCHAR buf[1024];
+	TCHAR bufClass[1024];
 	DWORD pid = 0, tid = 0;
 	do {
 		child = FindWindowEx(parent, child, NULL, NULL);
-		int ret = GetWindowText(child, buf, MAX_PATH);
+		int ret = GetWindowTextA(child, buf, 1024);
 		buf[ret] = 0;
 
+		if (strlen(buf) == 0)
+		{
+			::SendMessage(child, WM_GETTEXT, sizeof(buf) / sizeof(char), (LPARAM)buf);//EDIT的句柄，消息，接收缓冲区大小，接收缓冲区指针
+		}
+
+		::GetClassName(child, bufClass, 1024);
+		//BOOL bClassOK = sClass ? FALSE:TRUE;
+
+		//if (sClass && strstr(bufClass, sClass))
+		//{
+		//		if (::IsWindowVisible(child))
+		//		{
+		//			DWORD dwId = 0;
+		//			GetWindowThreadProcessId(child, &dwId);
+
+		//			if (hMain_Wnd == ::GetParent(child))
+		//			{
+		//				bClassOK = TRUE;
+		//				hPop_Wnd = child;
+		//				LogTrace16380("0x%08X -> 0x%08X p=0x%08X pid=%d %d %s \n", parent, child, ::GetParent(child), dwId, ::IsWindowVisible(child), buf);
+		//			}
+		//			
+		//		}
+		//}
 		if (strlen(buf) > 0)
 		{
-			LogTrace16380("0x%08X -> 0x%08X %s \n", parent, child, buf);
-			if (strstr(buf, sWnd))
+			//LogTrace16380("0x%08X -> 0x%08X %d %s \n", parent, child, ::IsWindowVisible(parent), buf);
+			if (strstr(buf, sWnd)/* && bClassOK*/)
 			{
 				return child;
 			}
 		}
 		if (child)
-			child000 = Find_ChildWindow(child, sWnd);
+			child000 = Find_ChildWindow(child, sWnd/*, sClass*/);
 		if(child000)
 		{
 			return child000;
@@ -150,7 +178,6 @@ CAuto_TDXBuyApp::CAuto_TDXBuyApp()
 	// 将所有重要的初始化放置在 InitInstance 中
 }
 
-HWND hMainWnd = NULL;
 /// 回調函数:査找AP主窗口句柄
 BOOL CALLBACK EnumWindowsPrcHAZQ(HWND hwnd, LPARAM lParam)
 {
@@ -167,7 +194,7 @@ BOOL CALLBACK EnumWindowsPrcHAZQ(HWND hwnd, LPARAM lParam)
 		::GetClassName(hwnd, szCaption, sizeof(szCaption));
 		if (strstr(szCaption, "TdxW_MainFrame_Class"))
 		{
-			hMainWnd = hwnd;
+			g_hMainWnd = hwnd;
 			return FALSE;
 		}
 	}
@@ -190,7 +217,7 @@ BOOL CALLBACK EnumWindowsPrc(HWND hwnd, LPARAM lParam)
 		::GetClassName(hwnd, szCaption, sizeof(szCaption));
 		//if (strstr(szCaption, "TdxW_MainFrame_Class"))
 		{
-			hMainWnd = hwnd;
+			g_hMainWnd = hwnd;
 			return FALSE;
 		}
 	}
@@ -217,10 +244,10 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 
 	//华安证券V6.36 - [组合图-创业板]
 	//通达信金融终端V7.46 - [分析图表-创业板指]
-	hMainWnd = NULL;
+	g_hMainWnd = NULL;
 	::EnumWindows(EnumWindowsPrcHAZQ, (LPARAM)"华安证券");
 
-	HWND hTDX_MainWnd = hMainWnd/*::FindWindowA(sMainClass, NULL)*/;
+	HWND hTDX_MainWnd = g_hMainWnd/*::FindWindowA(sMainClass, NULL)*/;
 	if (hTDX_MainWnd)
 	{
 		::SetWindowPos(hTDX_MainWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
@@ -476,12 +503,16 @@ CAuto_TDXBuyApp theApp;
 
 BOOL CAuto_TDXBuyApp::InitInstance()
 {
-	//::EnumWindows(EnumWindowsPrc, (LPARAM)"核新网上交易系统");
-
-	HWND hSubWnd = Find_ChildWindow(NULL, "核新网上交易系统");
-	if (hSubWnd)
+	::EnumWindows(EnumWindowsPrc, (LPARAM)"核新网上交易系统");
+	//WinExec("echo 0>>1.txt", SW_HIDE);
+	//g_hMainWnd = g_hMainWnd;
+	//hMain_Wnd = Find_ChildWindow(NULL, "核新网上交易系统");
+	if (g_hMainWnd)
 	{
-		hSubWnd = Find_ChildWindow(hSubWnd, "同时买卖");//先找到唯一的子窗口，再取其父窗口进行关键按钮的查找
+		ShowWindow(g_hMainWnd, SW_SHOWNORMAL);
+		SetForegroundWindow(g_hMainWnd);
+		SetActiveWindow(g_hMainWnd); //父窗口置为活动窗口
+		HWND hSubWnd = Find_ChildWindow(g_hMainWnd, "同时买卖");//先找到唯一的子窗口，再取其父窗口进行关键按钮的查找
 		if (hSubWnd)
 		{
 			//if (3 < __argc)
@@ -498,9 +529,61 @@ BOOL CAuto_TDXBuyApp::InitInstance()
 
 				if (hBtn_BS)
 				{
+
 					LogTrace16380("点了一次按钮。。。\n");
 					PostMessage(hBtn_BS, BM_CLICK, 0, 0L);
+
+					//HWND hSubWnd0 = ::FindWindowA("#32770", "");//先找到唯一的子窗口，再取其父窗口进行关键按钮的查找
+
+					//等待弹出框3s
+					HWND hPopWnd = NULL;
+					for (int i = 0; i < 60; i++)
+					{
+						hPopWnd = ::GetLastActivePopup(g_hMainWnd);
+						if (g_hMainWnd != hPopWnd)
+						{
+							//得到文字
+							if (hPopWnd)
+							{
+								HWND child = NULL;
+								TCHAR buf[MAX_PATH];
+								DWORD pid = 0, tid = 0;
+
+								do {
+									child = FindWindowEx(hPopWnd, child, NULL, NULL);
+									int dStyle = (int)GetWindowLong(child, GWL_STYLE);
+									if ((0x50020000 == dStyle) || (0x5002000D == dStyle))
+									{
+										//得到结果文字
+										TCHAR buf[1024];
+										::SendMessage(child, WM_GETTEXT, sizeof(buf) / sizeof(char), (LPARAM)buf);//EDIT的句柄，消息，接收缓冲区大小，接收缓冲区指针
+										LogTrace16380(buf);
+										//送出文字。。。
+
+										//关闭(hPopWnd);
+										child = Find_ChildWindow(hPopWnd, "确定");
+										if (child)
+										{
+											SetForegroundWindow(hPopWnd);
+											SetActiveWindow(hPopWnd); //父窗口置为活动窗口
+											SendMessage(child, BM_CLICK, 0, 0);//单击
+
+											ShowWindow(g_hMainWnd, SW_MINIMIZE);
+										}
+										break;
+									}
+
+								} while (child);
+
+								child = NULL;
+							}
+							break;
+						}
+						Sleep(50);
+					}
+
 					return TRUE;
+
 				}
 			}
 		}
