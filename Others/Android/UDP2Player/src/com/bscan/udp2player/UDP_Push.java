@@ -109,6 +109,8 @@ public class UDP_Push  extends Activity {
 
         sendUDPBrocast = (Button) findViewById(R.id.send);
         sendUDPBrocast.setOnClickListener(new SendUDPBrocastListener());
+        Button sendUDPBrocast2 = (Button) findViewById(R.id.senddd);
+        sendUDPBrocast2.setOnClickListener(new SendUDPBrocastListener2());
         try {
             /*创建socket实例*/
             ms = new MulticastSocket();
@@ -202,6 +204,27 @@ public class UDP_Push  extends Activity {
                 @Override
                 public void run() {
                 	sPrefix = "https://www.playm3u8.cn/jiexi.php?url=";
+                    sendUDP();
+                	sPrefix = "";
+                }
+            });
+ 
+            thread.start();
+ 
+        }
+    }
+    
+	/**
+     * 单击按钮时，发送局域网广播
+     * */
+    class SendUDPBrocastListener2 implements View.OnClickListener {
+ 
+        @Override
+        public void onClick(View v) {
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                	sPrefix = "http://vip.vip-dianying.com/8050/?url=";
                     sendUDP();
                 	sPrefix = "";
                 }
