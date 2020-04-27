@@ -4,18 +4,6 @@
 #include "stdafx.h"
 #include "AutoTrade.h"
 #include "AutoTradeDlg.h"
-#include <vector>
-#include <algorithm>
-#include <Windows.h>
-#include <Tlhelp32.h>
-#include <stdio.h>
-#include <sstream>
-#include<set>
-#include <list>
-
-using std::random_shuffle;
-using std::vector;
-const int MAX_BUF_LEN = 4096;
 #define PORT_UDP 17077
 #define PORT_TCP 17078
 
@@ -1473,23 +1461,6 @@ void LoginGFZQ()
 }
 
 
-void FindClickRefresh(HWND hSubWnd)
-{
-	string sVerfy = "";
-	string sClass = "";
-	HWND hwnd = NULL;
-
-	sClass = "Button";
-	hwnd = Find_ChildWindowByClassWH(::GetParent(hSubWnd), sClass.c_str(), 54, 21);
-	if (hwnd)
-	{
-		if (::IsWindowEnabled(hwnd))
-		{
-			::PostMessage(hwnd, BM_CLICK, 0, 0L);
-		}
-	}
-}
-
 void Thread_ClosePopups(PVOID param)
 {
 	while (true)
@@ -1514,7 +1485,7 @@ void Thread_ClosePopups(PVOID param)
 			hSubWnd = Find_ChildWindow(hSubWnd, "同时买卖");//先找到唯一的子窗口，再取其父窗口进行关键按钮的查找
 			if (hSubWnd)
 			{
-				FindClickRefresh(hSubWnd);
+				//FindClickRefresh(hSubWnd);
 				::EnableWindow(hSubWnd, FALSE);//这个按钮太危险，屏蔽掉它
 			}
 		}
@@ -3230,6 +3201,7 @@ LRESULT CAutoTradeDlg::OnTradeMsg( WPARAM wParam, LPARAM lParam )
 	{
 
 		UpdateData(TRUE);
+
 		switch(lParam)
 		{
 		case 0:

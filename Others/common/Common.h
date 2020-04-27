@@ -1,4 +1,17 @@
 #pragma once
+#include <vector>
+#include <algorithm>
+#include <Windows.h>
+#include <Tlhelp32.h>
+#include <stdio.h>
+#include <sstream>
+#include<set>
+#include <list>
+
+using std::random_shuffle;
+using std::vector;
+using namespace std;
+const int MAX_BUF_LEN = 4096;
 
 void TraceEx(const wchar_t *strOutputString, ...)
 {
@@ -110,6 +123,23 @@ HWND Find_ChildWindow(HWND parent, char* sWnd/*, char* sClass = NULL*/)
 	} while (child);
 
 	return NULL;
+}
+
+void FindClickRefresh(HWND hSubWnd)
+{
+	string sVerfy = "";
+	string sClass = "";
+	HWND hwnd = NULL;
+
+	sClass = "Button";
+	hwnd = Find_ChildWindowByClassWH(::GetParent(hSubWnd), sClass.c_str(), 54, 21);
+	if (hwnd)
+	{
+		if (::IsWindowEnabled(hwnd))
+		{
+			::PostMessage(hwnd, BM_CLICK, 0, 0L);
+		}
+	}
 }
 
 

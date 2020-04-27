@@ -460,6 +460,9 @@ BOOL CAuto_TDXBuyApp::InitInstance()
 		HWND hSubWnd = Find_ChildWindow(g_hMainWnd, "同时买卖");//先找到唯一的子窗口，再取其父窗口进行关键按钮的查找
 		if (hSubWnd)
 		{
+			FindClickRefresh(hSubWnd);
+			Sleep(1000);
+
 			//if (3 < __argc)
 			{
 				HWND hBtn_BS = NULL;
