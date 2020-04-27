@@ -2,18 +2,39 @@
 // Microsoft Visual C++ 生成的包含文件。
 // 供 AutoTrade.rc 使用
 //
+#define IDB_BITMAP_0                    0
+#define IDB_BITMAP1                     8000
+#define IDB_BITMAP12                    8001
+#define IDB_BITMAP13                    8002
 #define IDSALEALL                       3
+#define IDB_BITMAP14                    8003
 #define IDBUYALL                        4
 #define IDBUYRANDOM                     4
+#define IDB_BITMAP15                    8004
 #define IDSALEALL2                      5
+#define IDB_BITMAP16                    8005
 #define IDSALEALL3                      6
+#define IDB_BITMAP17                    8006
 #define IDSALEALL4                      7
 #define IDNOTSALELST                    7
+#define IDB_BITMAP18                    8007
 #define IDSALEALL5                      8
+#define IDB_BITMAP10                    8008
 #define IDOK2                           9
 #define ID_RUNTDX                       9
+#define IDB_BITMAP11                    8009
 #define IDOK3                           10
 #define ID_KILLTDX                      10
+#define IDB_BITMAP3                     8011
+#define IDB_BITMAP4                     8012
+#define IDB_BITMAP5                     8013
+#define IDB_BITMAP6                     8014
+#define IDB_BITMAP7                     8015
+#define IDB_BITMAP8                     8016
+#define IDB_BITMAP9                     8017
+#define IDB_BITMAP19                    8018
+#define IDB_BITMAP20                    8019
+#define IDB_BITMAP2                     8010
 #define IDD_AUTOTRADE_DIALOG            102
 #define IDR_MF2                         126
 #define IDR_MF                          127
@@ -79,7 +100,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        132
+#define _APS_NEXT_RESOURCE_VALUE        152
 #define _APS_NEXT_COMMAND_VALUE         32771
 #define _APS_NEXT_CONTROL_VALUE         1045
 #define _APS_NEXT_SYMED_VALUE           101

@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Auto_TDXBuy.h"
 #include "Auto_TDXBuyDlg.h"
+#include "../Common/Common.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -59,62 +60,6 @@ void LogTrace16380(LPCTSTR pszFormat, ...)
 		::SendMessage(hTradeWnd, WM_COPYDATA, 0, (LPARAM)&cds);
 	}
 
-}
-
-//递归遍历所有子窗口的子窗口 , 查找
-HWND Find_ChildWindow(HWND parent, char* sWnd/*, char* sClass = NULL*/)
-{
-	HWND child = NULL;
-	HWND child000 = NULL;
-	TCHAR buf[1024];
-	TCHAR bufClass[1024];
-	DWORD pid = 0, tid = 0;
-	do {
-		child = FindWindowEx(parent, child, NULL, NULL);
-		int ret = GetWindowTextA(child, buf, 1024);
-		buf[ret] = 0;
-
-		if (strlen(buf) == 0)
-		{
-			::SendMessage(child, WM_GETTEXT, sizeof(buf) / sizeof(char), (LPARAM)buf);//EDIT的句柄，消息，接收缓冲区大小，接收缓冲区指针
-		}
-
-		::GetClassName(child, bufClass, 1024);
-		//BOOL bClassOK = sClass ? FALSE:TRUE;
-
-		//if (sClass && strstr(bufClass, sClass))
-		//{
-		//		if (::IsWindowVisible(child))
-		//		{
-		//			DWORD dwId = 0;
-		//			GetWindowThreadProcessId(child, &dwId);
-
-		//			if (hMain_Wnd == ::GetParent(child))
-		//			{
-		//				bClassOK = TRUE;
-		//				hPop_Wnd = child;
-		//				LogTrace16380("0x%08X -> 0x%08X p=0x%08X pid=%d %d %s \n", parent, child, ::GetParent(child), dwId, ::IsWindowVisible(child), buf);
-		//			}
-		//			
-		//		}
-		//}
-		if (strlen(buf) > 0)
-		{
-			//LogTrace16380("0x%08X -> 0x%08X %d %s \n", parent, child, ::IsWindowVisible(parent), buf);
-			if (strstr(buf, sWnd)/* && bClassOK*/)
-			{
-				return child;
-			}
-		}
-		if (child)
-			child000 = Find_ChildWindow(child, sWnd/*, sClass*/);
-		if(child000)
-		{
-			return child000;
-		}
-	} while (child);
-
-	return NULL;
 }
 
 

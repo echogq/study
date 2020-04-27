@@ -30,6 +30,7 @@ static char THIS_FILE[] = __FILE__;
 #include<time.h>
 #include <ws2tcpip.h>
 #include <..\..\..\..\..\VS2013\VC\include\iostream>
+#include "../Common/Common.h"
 
 #define AUTO_OPEN_ALL "..\\Script\\Auto_OpenAll.exe"
 
@@ -40,31 +41,125 @@ CString g_sCMD = "ping";
 using namespace std;
 list<HANDLE> g_Event_BS_Action;
 int g_iTcpClientsCount = 0;
+HBITMAP g_hBitmap20[20];
 
-void TraceEx(const wchar_t *strOutputString, ...)
-{
-	va_list vlArgs = NULL;
-	va_start(vlArgs, strOutputString);
-	size_t nLen = _vscwprintf(strOutputString, vlArgs) + 1;
-	wchar_t *strBuffer = new wchar_t[nLen];
-	_vsnwprintf_s(strBuffer, nLen, nLen, strOutputString, vlArgs);
-	va_end(vlArgs);
-	OutputDebugStringW(strBuffer);
-	delete[] strBuffer;
-}
 
-void TraceEx(const char *strOutputString, ...)
+// 根据窗口句柄后台截图并且比对验证码图片
+string GetBmp4OCR(HWND hwnd, int left, int top, int width, int height, CHAR* path = NULL)
 {
-	char strBuffer[4096] = { 0 };
-	memset(strBuffer, 0, 4096);
-	va_list vlArgs = NULL;
-	va_start(vlArgs, strOutputString);
-	size_t nLen = _vscprintf(strOutputString, vlArgs) + 1 + 8;
-	strcpy(strBuffer, "\r\n[TDX] ");
-	_vsnprintf_s(strBuffer + 8, nLen, nLen, strOutputString, vlArgs);
-	va_end(vlArgs);
-	OutputDebugStringA(strBuffer);
-	//delete[] strBuffer;
+	string sResult = "";
+	HDC pDC;// 源DC
+			//判断是不是窗口句柄如果是的话不能使用GetDC来获取DC 不然截图会是黑屏
+	if (hwnd == ::GetDesktopWindow())
+	{
+		pDC = CreateDCA("DISPLAY", NULL, NULL, NULL);
+	}
+	else
+	{
+		pDC = ::GetDC(hwnd);//获取屏幕DC(0为全屏，句柄则为窗口)
+	}
+	int BitPerPixel = ::GetDeviceCaps(pDC, BITSPIXEL);//获得颜色模式
+	if (width == 0 && height == 0)//默认宽度和高度为全屏
+	{
+		width = ::GetDeviceCaps(pDC, HORZRES); //设置图像宽度全屏
+		height = ::GetDeviceCaps(pDC, VERTRES); //设置图像高度全屏
+	}
+	HDC memDC;//内存DC
+	memDC = ::CreateCompatibleDC(pDC);
+	HBITMAP memBitmap, oldmemBitmap;//建立和屏幕兼容的bitmap
+	memBitmap = ::CreateCompatibleBitmap(pDC, width, height);
+	oldmemBitmap = (HBITMAP)::SelectObject(memDC, memBitmap);//将memBitmap选入内存DC
+	if (hwnd == ::GetDesktopWindow())
+	{
+		BitBlt(memDC, 0, 0, width, height, pDC, left, top, SRCCOPY);//图像宽度高度和截取位置
+	}
+	else
+	{
+		bool bret = ::PrintWindow(hwnd, memDC, PW_CLIENTONLY);
+		if (!bret)
+		{
+			BitBlt(memDC, 0, 0, width, height, pDC, left, top, SRCCOPY);//图像宽度高度和截取位置
+		}
+	}
+	//以下代码保存memDC中的位图到文件
+	BITMAP bmp;
+	::GetObject(memBitmap, sizeof(BITMAP), &bmp);;//获得位图信息
+	FILE *fp = NULL;
+	if (path != NULL)
+	{
+		fopen_s(&fp, path, "w+b");//图片保存路径和方式
+	}
+
+	BITMAPINFOHEADER bih = { 0 };//位图信息头
+	bih.biBitCount = bmp.bmBitsPixel;//每个像素字节大小
+	bih.biCompression = BI_RGB;
+	bih.biHeight = bmp.bmHeight;//高度
+	bih.biPlanes = 1;
+	bih.biSize = sizeof(BITMAPINFOHEADER);
+	bih.biSizeImage = bmp.bmWidthBytes * bmp.bmHeight;//图像数据大小
+	bih.biWidth = bmp.bmWidth;//宽度
+
+	BITMAPFILEHEADER bfh = { 0 };//位图文件头
+	bfh.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);//到位图数据的偏移量
+	bfh.bfSize = bfh.bfOffBits + bmp.bmWidthBytes * bmp.bmHeight;//文件总的大小
+	bfh.bfType = (WORD)0x4d42;
+
+	if (fp != NULL)
+	{
+		fwrite(&bfh, 1, sizeof(BITMAPFILEHEADER), fp);//写入位图文件头
+		fwrite(&bih, 1, sizeof(BITMAPINFOHEADER), fp);//写入位图信息头
+	}
+
+	byte * p = new byte[bmp.bmWidthBytes * bmp.bmHeight];//申请内存保存位图数据
+	memset(p, 0, bmp.bmWidthBytes * bmp.bmHeight);
+	GetDIBits(memDC, (HBITMAP)memBitmap, 0, height, p,
+		(LPBITMAPINFO)&bih, DIB_RGB_COLORS);//获取位图数据
+
+	if (fp != NULL)
+	{
+		fwrite(p, 1, bmp.bmWidthBytes * bmp.bmHeight, fp);//写入位图数据
+		fclose(fp);
+	}
+	for (int i = 0; i < 20; i++)
+	{
+		byte * pppp = new byte[bmp.bmWidthBytes * bmp.bmHeight];//申请内存保存位图数据
+		memset(pppp, 0, bmp.bmWidthBytes * bmp.bmHeight);
+		GetDIBits(memDC, (HBITMAP)g_hBitmap20[i], 0, height, pppp,
+			(LPBITMAPINFO)&bih, DIB_RGB_COLORS);//获取位图数据
+
+		if (0 == memcmp(pppp, p, bmp.bmWidthBytes * bmp.bmHeight))
+		{
+			sResult = std::to_string(i%10);
+			break;
+		}
+	}
+	delete[] p;
+#if 0	
+	HWND sBitHwnd = GetDlgItem(g_Hwnd, IDC_STATIC_IMG);
+	/*返回内存中的位图句柄 还原原来的内存DC位图句柄 不能直接用 memBitmap我测试好像是不行不知道为什么*/
+	HBITMAP oleImage = (HBITMAP)::SelectObject(memDC, oldmemBitmap);
+	oleImage = (HBITMAP)SendMessage(sBitHwnd, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)oleImage);
+
+	/*这种方法也能把位图显示到picture 控件上*/
+	HDC bitDc = NULL;
+	bitDc = ::GetDC(sBitHwnd);
+	BitBlt(bitDc, 0, 0, bmp.bmWidth, bmp.bmHeight, memDC, 0, 0, SRCCOPY); //内存DC映射到屏幕DC
+	ReleaseDC(sBitHwnd, bitDc);
+	/*如果需要把位图转换*/
+	/*
+	CImage image;
+	image.Create(nWidth, nHeight, nBitPerPixel);
+	BitBlt(image.GetDC(), 0, 0, nWidth, nHeight, hdcSrc, 0, 0, SRCCOPY);
+	::ReleaseDC(NULL, hdcSrc);
+	image.ReleaseDC();
+	image.Save(path, Gdiplus::ImageFormatPNG);//ImageFormatJPEG
+	*/
+	DeleteObject(oleImage);
+#endif
+	DeleteObject(memBitmap);
+	DeleteDC(memDC);
+	ReleaseDC(hwnd, pDC);
+	return sResult;
 }
 
 string GetNetCardIP()
@@ -138,6 +233,7 @@ string GetNetCardIP()
 	}
 	return sIP;
 }
+
 
 set<SOCKET> sock_TCP_Connections;
 //set<SOCKET> sock_TCP_Send;
@@ -1248,37 +1344,151 @@ ON_BN_CLICKED(ID_RUNTDX, &CAutoTradeDlg::OnBnClickedRuntdx)
 ON_WM_COPYDATA()
 END_MESSAGE_MAP()
 
-//递归遍历所有子窗口的子窗口 , 查找
-HWND Find_ChildWindow(HWND parent, char* sWnd)
+////递归遍历所有子窗口的子窗口 , 查找
+//HWND Find_ChildWindow(HWND parent, char* sWnd)
+//{
+//	HWND child = NULL;
+//	HWND child000 = NULL;
+//	TCHAR buf[MAX_PATH];
+//	DWORD pid = 0, tid = 0;
+//	do {
+//		child = FindWindowEx(parent, child, NULL, NULL);
+//		int ret = GetWindowText(child, buf, MAX_PATH);
+//		buf[ret] = 0;
+//
+//		if (strlen(buf) > 0)
+//		{
+//			//LogTrace16380("0x%08X -> 0x%08X %s \n", parent, child, buf);
+//			if (strstr(buf, sWnd))
+//			{
+//				return child;
+//			}
+//		}
+//		if (child)
+//			child000 = Find_ChildWindow(child, sWnd);
+//		if (child000)
+//		{
+//			return child000;
+//		}
+//	} while (child);
+//
+//	return NULL;
+//}
+
+void KeyPress(char chr)
 {
-	HWND child = NULL;
-	HWND child000 = NULL;
-	TCHAR buf[MAX_PATH];
-	DWORD pid = 0, tid = 0;
-	do {
-		child = FindWindowEx(parent, child, NULL, NULL);
-		int ret = GetWindowText(child, buf, MAX_PATH);
-		buf[ret] = 0;
-
-		if (strlen(buf) > 0)
-		{
-			//LogTrace16380("0x%08X -> 0x%08X %s \n", parent, child, buf);
-			if (strstr(buf, sWnd))
-			{
-				return child;
-			}
-		}
-		if (child)
-			child000 = Find_ChildWindow(child, sWnd);
-		if (child000)
-		{
-			return child000;
-		}
-	} while (child);
-
-	return NULL;
+	Sleep(50);
+	keybd_event(chr, 0, 0, 0);
+	keybd_event(chr, 0, KEYEVENTF_KEYUP, 0);
 }
 
+
+void LoginGFZQ()
+{
+	for (int i = 0; i < 20; i++)
+	{
+		/*HBITMAP*/ g_hBitmap20[i] = (HBITMAP)::LoadBitmap(AfxGetApp()->m_hInstance, MAKEINTRESOURCE(i + 8000));
+		if (!g_hBitmap20[i])
+		{
+			int iii = GetLastError();
+		}
+	}
+
+	HWND hSubWnd = Find_ChildWindow(NULL, "核新网上交易系统");
+	if (hSubWnd)
+	{
+		hSubWnd = Find_ChildWindow(NULL, "用户登录");//先找到唯一的子窗口，再取其父窗口进行关键按钮的查找
+		if (hSubWnd)
+		{
+			string sVerfy = "";
+			string sClass = "";
+			HWND hwnd = NULL;
+
+			sClass = "Edit";
+			hwnd = Find_ChildWindowByClassWH(hSubWnd, sClass.c_str(), 113, 16);
+			if (hwnd)
+			{
+				//::SendMessage(hwnd, WM_SETTEXT, sizeof(sVerfy.c_str()) / sizeof(char), (LPARAM)sVerfy.c_str());//EDIT的句柄，消息，接收缓冲区大小，接收缓冲区指针
+				::ShowWindow(hwnd, SW_SHOWNORMAL);
+				::SetForegroundWindow(hwnd);
+				::SetActiveWindow(hwnd); //父窗口置为活动窗口
+				::SetFocus(hwnd);
+
+				while (hSubWnd != ::GetForegroundWindow())
+				{
+					Sleep(50);
+				}
+				::SetFocus(hwnd);
+				//hSubWnd = GetFocusEx();
+				//while (GetFocusEx() != hwnd)
+				//{
+				//	Sleep(50);
+				//}
+
+				/*Password.ini
+				[GFZQ]
+				Password=******
+				*/
+				char buf[MAX_PATH] = { 0 };
+				GetPrivateProfileStringA("GFZQ", "Password", "", buf, sizeof(buf), ".\\Password.ini");
+
+				for (int i=0;i<strlen(buf);i++)
+				{
+					KeyPress(buf[i]);
+				}
+			}
+
+			sClass = "Static";
+			hwnd = Find_ChildWindowByClassWH(hSubWnd, sClass.c_str(), 86, 21);
+			if (hwnd)
+			{
+				RECT rect;
+				::GetClientRect(hwnd, &rect); //86 * 21
+				char pN[256] = "111.bmp";
+				for (int i = 0; i < 5; i++)
+				{
+					pN[0] = 48 + i;
+					sVerfy += (GetBmp4OCR(hwnd, i * 16, 3, 13, 15/*, pN*/));
+				}
+				TRACE(sVerfy.c_str());
+			}
+
+			sClass = "Edit";
+			hwnd = Find_ChildWindowByClassWH(hSubWnd, sClass.c_str(), 47, 16);
+			if (hwnd)
+			{
+				TRACE(sVerfy.c_str());
+				::SendMessage(hwnd, WM_SETTEXT, sizeof(sVerfy.c_str()) / sizeof(char), (LPARAM)sVerfy.c_str());//EDIT的句柄，消息，接收缓冲区大小，接收缓冲区指针
+																											   //::SetWindowTextA(hwnd, sVerfy.c_str());
+			}
+
+			hwnd = Find_ChildWindow(hSubWnd, "确定(&Y)");//先找到唯一的子窗口，再取其父窗口进行关键按钮的查找
+			if (hwnd)
+			{
+				::PostMessage(hwnd, BM_CLICK, 0, 0L);
+
+			}
+		}
+	}
+}
+
+
+void FindClickRefresh(HWND hSubWnd)
+{
+	string sVerfy = "";
+	string sClass = "";
+	HWND hwnd = NULL;
+
+	sClass = "Button";
+	hwnd = Find_ChildWindowByClassWH(::GetParent(hSubWnd), sClass.c_str(), 54, 21);
+	if (hwnd)
+	{
+		if (::IsWindowEnabled(hwnd))
+		{
+			::PostMessage(hwnd, BM_CLICK, 0, 0L);
+		}
+	}
+}
 
 void Thread_ClosePopups(PVOID param)
 {
@@ -1304,9 +1514,13 @@ void Thread_ClosePopups(PVOID param)
 			hSubWnd = Find_ChildWindow(hSubWnd, "同时买卖");//先找到唯一的子窗口，再取其父窗口进行关键按钮的查找
 			if (hSubWnd)
 			{
+				FindClickRefresh(hSubWnd);
 				::EnableWindow(hSubWnd, FALSE);//这个按钮太危险，屏蔽掉它
 			}
 		}
+
+		LoginGFZQ();
+
 		Sleep(50);
 	}
 
@@ -1766,10 +1980,53 @@ void WriteDailyLog(CString sLog)
 	}
 }
 
+
+
+static WNDPROC g_pOldWndProc = NULL;
+static UINT g_uGetFocusMessage = RegisterWindowMessage(_T("SpecialGetFocusMessage"));
+static LRESULT WINAPI GetFocusWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	if (uMsg == g_uGetFocusMessage)
+	{
+		return (LRESULT)GetFocus();
+	}
+	else
+	{
+		return CallWindowProc(g_pOldWndProc, hWnd, uMsg, wParam, lParam);
+	}
+}
+HWND GetFocusEx()
+{
+	HWND hWnd = GetForegroundWindow();
+	if (!IsWindow(hWnd))
+		return NULL;
+	g_pOldWndProc = (WNDPROC)GetWindowLong(hWnd, GWL_WNDPROC);
+	SetWindowLong(hWnd, GWL_WNDPROC, (LONG)GetFocusWindowProc);
+	HWND hResult = (HWND)SendMessage(hWnd, g_uGetFocusMessage, 0, 0);
+	SetWindowLong(hWnd, GWL_WNDPROC, (LONG)g_pOldWndProc);
+	g_pOldWndProc = NULL;
+	return hResult;
+}
+
+
 BOOL CAutoTradeDlg::OnInitDialog()
 {
 	::OutputDebugString(" CAutoTradeDlg::OnInitDialog() ");
 	CDialog::OnInitDialog();
+
+	//HWND hwnd = (HWND)0x002D2FEC;
+	//RECT rect;
+	////hdc = BeginPaint(hwnd, &ps);
+	//::GetClientRect(hwnd, &rect); //86 * 21
+	//char pN[256] = "111.bmp";
+	//string sVerfy = "";
+	//for (int i=0;i<5; i++)
+	//{
+	//	pN[0] = 48+i;
+	//	sVerfy += (GetScreenBmp(hwnd, i*16, 3, 13, 15/*, pN*/));
+	//}
+	//TRACE(sVerfy.c_str());
+	int pp = 0;
 
 	//if (NULL == g_Event_BS_Action)
 	//{
