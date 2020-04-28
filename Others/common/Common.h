@@ -138,6 +138,10 @@ void FindClickRefresh(HWND hSubWnd)
 		if (::IsWindowEnabled(hwnd))
 		{
 			::PostMessage(hwnd, BM_CLICK, 0, 0L);
+			do
+			{
+				Sleep(500);
+			} while (!::IsWindowEnabled(hSubWnd));
 		}
 	}
 }

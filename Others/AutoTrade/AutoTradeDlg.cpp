@@ -1424,37 +1424,45 @@ void LoginGFZQ()
 				{
 					KeyPress(buf[i]);
 				}
-			}
 
-			sClass = "Static";
-			hwnd = Find_ChildWindowByClassWH(hSubWnd, sClass.c_str(), 86, 21);
-			if (hwnd)
-			{
-				RECT rect;
-				::GetClientRect(hwnd, &rect); //86 * 21
-				char pN[256] = "111.bmp";
-				for (int i = 0; i < 5; i++)
+				if (strlen(buf)>0)//有读取到Password
 				{
-					pN[0] = 48 + i;
-					sVerfy += (GetBmp4OCR(hwnd, i * 16, 3, 13, 15/*, pN*/));
+					sClass = "Static";
+					hwnd = Find_ChildWindowByClassWH(hSubWnd, sClass.c_str(), 86, 21);
+					if (hwnd)
+					{
+						RECT rect;
+						::GetClientRect(hwnd, &rect); //86 * 21
+						char pN[256] = "00000.bmp";
+						for (int i = 0; i < 5; i++)
+						{
+							pN[0] = 48 + i;
+							sVerfy += (GetBmp4OCR(hwnd, i * 16, 3, 13, 15/*, pN*/));
+							if (sVerfy.length() == 0)//not 读取到Verfy
+							{
+								GetBmp4OCR(hwnd, i * 16, 3, 13, 15, pN);
+							}
+						}
+						TRACE(sVerfy.c_str());
+						if (sVerfy.length() > 0)//有读取到Verfy
+						{
+							sClass = "Edit";
+							hwnd = Find_ChildWindowByClassWH(hSubWnd, sClass.c_str(), 47, 16);
+							if (hwnd)
+							{
+								TRACE(sVerfy.c_str());
+								::SendMessage(hwnd, WM_SETTEXT, sizeof(sVerfy.c_str()) / sizeof(char), (LPARAM)sVerfy.c_str());//EDIT的句柄，消息，接收缓冲区大小，接收缓冲区指针
+									
+								//点击确定按钮登录
+								hwnd = Find_ChildWindow(hSubWnd, "确定(&Y)");//先找到唯一的子窗口，再取其父窗口进行关键按钮的查找
+								if (hwnd)
+								{
+									::PostMessage(hwnd, BM_CLICK, 0, 0L);
+								}
+							}
+						}
+					}
 				}
-				TRACE(sVerfy.c_str());
-			}
-
-			sClass = "Edit";
-			hwnd = Find_ChildWindowByClassWH(hSubWnd, sClass.c_str(), 47, 16);
-			if (hwnd)
-			{
-				TRACE(sVerfy.c_str());
-				::SendMessage(hwnd, WM_SETTEXT, sizeof(sVerfy.c_str()) / sizeof(char), (LPARAM)sVerfy.c_str());//EDIT的句柄，消息，接收缓冲区大小，接收缓冲区指针
-																											   //::SetWindowTextA(hwnd, sVerfy.c_str());
-			}
-
-			hwnd = Find_ChildWindow(hSubWnd, "确定(&Y)");//先找到唯一的子窗口，再取其父窗口进行关键按钮的查找
-			if (hwnd)
-			{
-				::PostMessage(hwnd, BM_CLICK, 0, 0L);
-
 			}
 		}
 	}

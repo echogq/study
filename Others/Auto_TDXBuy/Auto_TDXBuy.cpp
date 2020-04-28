@@ -461,7 +461,10 @@ BOOL CAuto_TDXBuyApp::InitInstance()
 		if (hSubWnd)
 		{
 			FindClickRefresh(hSubWnd);
-			Sleep(1000);
+			do 
+			{
+				Sleep(500);
+			} while (!::IsWindowEnabled(hSubWnd));
 
 			//if (3 < __argc)
 			{
