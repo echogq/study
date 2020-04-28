@@ -52,10 +52,24 @@ string GetBmp4OCR(HWND hwnd, int left, int top, int width, int height, CHAR* pat
 		width = ::GetDeviceCaps(pDC, HORZRES); //设置图像宽度全屏
 		height = ::GetDeviceCaps(pDC, VERTRES); //设置图像高度全屏
 	}
-	HDC memDC;//内存DC
-	memDC = ::CreateCompatibleDC(pDC);
+	HDC memDC = NULL;//内存DC
+
+	do 
+	{
+		pDC = ::GetDC(hwnd);//获取屏幕DC(0为全屏，句柄则为窗口)
+		memDC = ::CreateCompatibleDC(pDC);
+		Sleep(10);
+	} while (!memDC);
+	int pppxx = ::GetLastError();
 	HBITMAP memBitmap, oldmemBitmap;//建立和屏幕兼容的bitmap
-	memBitmap = ::CreateCompatibleBitmap(pDC, width, height);
+	memBitmap = NULL;
+	//while (!memBitmap)
+	{
+ 		memBitmap = ::CreateCompatibleBitmap(pDC, width, height);
+		//Null memBitmap sometimes......
+		int pppx = ::GetLastError();
+		Sleep(10);
+	}
 	oldmemBitmap = (HBITMAP)::SelectObject(memDC, memBitmap);//将memBitmap选入内存DC
 	if (hwnd == ::GetDesktopWindow())
 	{
@@ -72,56 +86,59 @@ string GetBmp4OCR(HWND hwnd, int left, int top, int width, int height, CHAR* pat
 	//以下代码保存memDC中的位图到文件
 	BITMAP bmp;
 	::GetObject(memBitmap, sizeof(BITMAP), &bmp);;//获得位图信息
-	FILE *fp = NULL;
-	if (path != NULL)
+
+	if (bmp.bmWidth * bmp.bmHeight == width* height)
 	{
-		fopen_s(&fp, path, "w+b");//图片保存路径和方式
-	}
+		BITMAPINFOHEADER bih = { 0 };//位图信息头
+		bih.biBitCount = bmp.bmBitsPixel;//每个像素字节大小
+		bih.biCompression = BI_RGB;
+		bih.biHeight = bmp.bmHeight;//高度
+		bih.biPlanes = 1;
+		bih.biSize = sizeof(BITMAPINFOHEADER);
+		bih.biSizeImage = bmp.bmWidthBytes * bmp.bmHeight;//图像数据大小
+		bih.biWidth = bmp.bmWidth;//宽度
 
-	BITMAPINFOHEADER bih = { 0 };//位图信息头
-	bih.biBitCount = bmp.bmBitsPixel;//每个像素字节大小
-	bih.biCompression = BI_RGB;
-	bih.biHeight = bmp.bmHeight;//高度
-	bih.biPlanes = 1;
-	bih.biSize = sizeof(BITMAPINFOHEADER);
-	bih.biSizeImage = bmp.bmWidthBytes * bmp.bmHeight;//图像数据大小
-	bih.biWidth = bmp.bmWidth;//宽度
+		BITMAPFILEHEADER bfh = { 0 };//位图文件头
+		bfh.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);//到位图数据的偏移量
+		bfh.bfSize = bfh.bfOffBits + bmp.bmWidthBytes * bmp.bmHeight;//文件总的大小
+		bfh.bfType = (WORD)0x4d42;
 
-	BITMAPFILEHEADER bfh = { 0 };//位图文件头
-	bfh.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);//到位图数据的偏移量
-	bfh.bfSize = bfh.bfOffBits + bmp.bmWidthBytes * bmp.bmHeight;//文件总的大小
-	bfh.bfType = (WORD)0x4d42;
+		FILE *fp = NULL;
+		if (path != NULL)
+		{
+			fopen_s(&fp, path, "w+b");//图片保存路径和方式
+		}
+		if (fp != NULL)
+		{
+			fwrite(&bfh, 1, sizeof(BITMAPFILEHEADER), fp);//写入位图文件头
+			fwrite(&bih, 1, sizeof(BITMAPINFOHEADER), fp);//写入位图信息头
+		}
 
-	if (fp != NULL)
-	{
-		fwrite(&bfh, 1, sizeof(BITMAPFILEHEADER), fp);//写入位图文件头
-		fwrite(&bih, 1, sizeof(BITMAPINFOHEADER), fp);//写入位图信息头
-	}
-
-	byte * p = new byte[bmp.bmWidthBytes * bmp.bmHeight];//申请内存保存位图数据
-	memset(p, 0, bmp.bmWidthBytes * bmp.bmHeight);
-	GetDIBits(memDC, (HBITMAP)memBitmap, 0, height, p,
-		(LPBITMAPINFO)&bih, DIB_RGB_COLORS);//获取位图数据
-
-	if (fp != NULL)
-	{
-		fwrite(p, 1, bmp.bmWidthBytes * bmp.bmHeight, fp);//写入位图数据
-		fclose(fp);
-	}
-	for (int i = 0; i < 20; i++)
-	{
-		byte * pppp = new byte[bmp.bmWidthBytes * bmp.bmHeight];//申请内存保存位图数据
-		memset(pppp, 0, bmp.bmWidthBytes * bmp.bmHeight);
-		GetDIBits(memDC, (HBITMAP)g_hBitmap20[i], 0, height, pppp,
+		byte * p = new byte[bmp.bmWidthBytes * bmp.bmHeight];//申请内存保存位图数据
+		memset(p, 0, bmp.bmWidthBytes * bmp.bmHeight);
+		GetDIBits(memDC, (HBITMAP)memBitmap, 0, height, p,
 			(LPBITMAPINFO)&bih, DIB_RGB_COLORS);//获取位图数据
 
-		if (0 == memcmp(pppp, p, bmp.bmWidthBytes * bmp.bmHeight))
+		if (fp != NULL)
 		{
-			sResult = std::to_string(i%10);
-			break;
+			fwrite(p, 1, bmp.bmWidthBytes * bmp.bmHeight, fp);//写入位图数据
+			fclose(fp);
 		}
+		for (int i = 0; i < 20; i++)
+		{
+			byte * pppp = new byte[bmp.bmWidthBytes * bmp.bmHeight];//申请内存保存位图数据
+			memset(pppp, 0, bmp.bmWidthBytes * bmp.bmHeight);
+			GetDIBits(memDC, (HBITMAP)g_hBitmap20[i], 0, height, pppp,
+				(LPBITMAPINFO)&bih, DIB_RGB_COLORS);//获取位图数据
+
+			if (0 == memcmp(pppp, p, bmp.bmWidthBytes * bmp.bmHeight))
+			{
+				sResult = std::to_string(i % 10);
+				break;
+			}
+		}
+		delete[] p;
 	}
-	delete[] p;
 #if 0	
 	HWND sBitHwnd = GetDlgItem(g_Hwnd, IDC_STATIC_IMG);
 	/*返回内存中的位图句柄 还原原来的内存DC位图句柄 不能直接用 memBitmap我测试好像是不行不知道为什么*/
@@ -1386,7 +1403,7 @@ void LoginGFZQ()
 	if (hSubWnd)
 	{
 		hSubWnd = Find_ChildWindow(NULL, "用户登录");//先找到唯一的子窗口，再取其父窗口进行关键按钮的查找
-		if (hSubWnd)
+		if (hSubWnd && ::IsWindowVisible(hSubWnd))
 		{
 			string sVerfy = "";
 			string sClass = "";
@@ -1396,7 +1413,7 @@ void LoginGFZQ()
 			hwnd = Find_ChildWindowByClassWH(hSubWnd, sClass.c_str(), 113, 16);
 			if (hwnd)
 			{
-				//::SendMessage(hwnd, WM_SETTEXT, sizeof(sVerfy.c_str()) / sizeof(char), (LPARAM)sVerfy.c_str());//EDIT的句柄，消息，接收缓冲区大小，接收缓冲区指针
+				::SendMessage(hwnd, WM_SETTEXT, sizeof(sVerfy.c_str()) / sizeof(char), (LPARAM)sVerfy.c_str());//EDIT的句柄，消息，接收缓冲区大小，接收缓冲区指针
 				::ShowWindow(hwnd, SW_SHOWNORMAL);
 				::SetForegroundWindow(hwnd);
 				::SetActiveWindow(hwnd); //父窗口置为活动窗口
@@ -1458,6 +1475,8 @@ void LoginGFZQ()
 								if (hwnd)
 								{
 									::PostMessage(hwnd, BM_CLICK, 0, 0L);
+									::ShowWindow(hSubWnd, SW_HIDE);
+									Sleep(9000);//防止重入破坏输入内容
 								}
 							}
 						}
