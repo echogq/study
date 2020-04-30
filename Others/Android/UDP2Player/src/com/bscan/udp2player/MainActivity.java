@@ -74,10 +74,17 @@ public class MainActivity extends Activity implements Runnable{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
         new Thread() {
         	@Override
         	public void run() {
                 m3u8Server = new TcpServer(null);
+        	}
+        }.start();
+        
+        new Thread() {
+        	@Override
+        	public void run() {
         	     //这里写入子线程需要做的工作
                 try {
                 	String filepath = Environment.getExternalStorageDirectory() + "/xxx";

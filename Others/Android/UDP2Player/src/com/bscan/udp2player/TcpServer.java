@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Map;
 
 import android.util.Log;
 public class TcpServer extends Thread{
@@ -23,7 +24,7 @@ public class TcpServer extends Thread{
 			
 			tcpServer=new ServerSocket();
 			tcpServer.setReuseAddress(true); //设置 ServerSocket 的选项
-			tcpServer.bind(new InetSocketAddress(59099)); //与 8080 端口绑定
+			tcpServer.bind(new InetSocketAddress(9999)); //与 8080 端口绑定
 
 	        //接受连接,传图片给连接的客户端,每个TCP连接都是一个java线程
 	        while(true){
@@ -57,10 +58,22 @@ public class TcpServer extends Thread{
             while((length = inn.read(data)) != -1){
     			Log.i("TAG", new String(data).substring(0, length));
     			
-    			if()
-
-                //out.write(data, 0, length);
+    			if(length<4096) {
                 //写出数据
+    				//String sResp="HTTP/1.1 200 OK\r\nConnection: keep-alive\r\nContent Type: video/mp2t\r\n\r\n";
+    				String sResp="HTTP/1.1 200 OK\r\nServer: NWS_VCLOUD_BIGSTORAGE\r\nConnection: close\r\nDate: Thu, 30 Apr 2020 16:23:30 GMT\r\nCache-Control: max-age=600\r\nExpires: Thu, 30 Apr 2020 16:33:30 GMT\r\nLast-Modified: Thu, 03 Oct 2019 01:44:15 GMT\r\nContent-Type: video/mp2t\r\nContent-Length: 638824\r\nX-NWS-LOG-UUID: 04e9a9df-57df-4e96-aea9-9c93bd712ad5 11cc68d8ac416839db7813d322bd9066\r\nX-Cache-Lookup: Hit From Disktank3\r\nX-Cache-Lookup: Hit From Upstream\r\nX-Daa-Tunnel: hop_count=1\r\nAccess-Control-Allow-Origin: *\r\n\r\n";
+                    out.write(sResp.getBytes(), 0, sResp.length());
+
+                  for (Map.Entry<String ,byte[]> entry : StaticBufs.vFileMap.entrySet()) {
+          			//Log.i("TAG", "Key = " + entry.getKey() + ", Value = " + entry.getValue());
+          			//conn.setRequestProperty(entry.getKey(), entry.getValue());
+                    out.write(entry.getValue(), 0, entry.getValue().length);
+                    out.flush();
+        			Log.i("TAGo", "write len="+entry.getValue().length);
+          		}
+
+    			}
+
             }
             long endTime = System.currentTimeMillis();
             //提示信息
