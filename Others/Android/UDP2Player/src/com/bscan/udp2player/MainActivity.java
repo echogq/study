@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
@@ -23,15 +24,22 @@ import android.webkit.MimeTypeMap;
 import android.widget.TextView;
  
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
  
 public class MainActivity extends Activity implements Runnable{
  
@@ -41,14 +49,97 @@ public class MainActivity extends Activity implements Runnable{
     TextView result;
     String beforeResult="";
     Handler mHandler;
+	TcpServer m3u8Server;
     public final static String EXTRA_MESSAGE = "com.bscan.udp2player.MESSAGE";
+    static byte[] b = null;
     
+  //子字符串modelStr在字符串str中第count次出现时的下标
+    private int getFromIndex(String str, String modelStr, Integer count) {
+    	//对子字符串进行匹配
+            Matcher slashMatcher = Pattern.compile(modelStr).matcher(str);
+    	int index = 0;
+            //matcher.find();尝试查找与该模式匹配的输入序列的下一个子序列
+    		while(slashMatcher.find()) {
+    	    index++;
+    	    //当modelStr字符第count次出现的位置
+    	    if(index == count){
+    	       break;
+    	    }
+    	}
+            //matcher.start();返回以前匹配的初始索引。
+    	return slashMatcher.start();
+    }
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+        new Thread() {
+        	@Override
+        	public void run() {
+                m3u8Server = new TcpServer(null);
+        	     //这里写入子线程需要做的工作
+                try {
+                	String filepath = Environment.getExternalStorageDirectory() + "/xxx";
+                	
+                	File file2 = new File(filepath);
+                	if (!file2.exists())
+                	file2.mkdirs();
+
+                	String sUrl = "https://cn4.5311444.com/hls/20190426/97ed0bf400fc7efb547d3f91ea31d7b1/1556253639/index.m3u8";
+                    DownUtil downUtil = new DownUtil(
+                    		sUrl,
+                    		//filepath + "/filename2",
+                    		"",
+                    		2);
+                    
+                    b = null;
+
+                    b = downUtil.downLoad();
+                          
+                    //解析M3U8
+                    ByteArrayInputStream byteArray = new ByteArrayInputStream(b);
+                    BufferedReader bInput = new BufferedReader(new InputStreamReader(byteArray));
+                    //String[] subUrl = sUrl.split("/");
+                    String input;  
+                    while ((input= bInput.readLine()) != null) {  
+                    	Log.i("TAG", input);  
+                    	
+                        String sPrefix = "";
+                    	if((input.indexOf("/") ==0))
+                    		sPrefix = sUrl.substring(0, getFromIndex(sUrl, ("/"), 3));
+                    	else
+                    		sPrefix = sUrl.substring(0, sUrl.lastIndexOf("/"))+"/";
+                            
+                    	if((input.indexOf(".ts") >=0) 
+                    			|| (input.indexOf(".mp4") >=0))
+                    	{
+							DownUtil downOne = new DownUtil(
+                            		sPrefix + input,
+                            		//filepath + "/filename2",
+                            		"",
+                            		5);
+                            
+                    		StaticBufs.vFileMap.put(input, downOne.downLoad());
+                    		
+                    		Log.i("TAG", "len=" + StaticBufs.vFileMap.get(input).length);
+                    	}
+//                        for (Map.Entry<String ,byte[]> entry : StaticBufs.vFileMap.entrySet()) {
+//                			Log.i("TAG", "Key = " + entry.getKey() + ", Value = " + entry.getValue());
+//                			conn.setRequestProperty(entry.getKey(), entry.getValue());
+//                		}
+
+                    }  
+                    //5线程下载，存入数组
+                    //数组总数》5*2时暂停
+                    //tcp监听，请求完成的，删除其-5位置前的
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+        	        }
+        	   }.start();
+
         mHandler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(Message msg) {
