@@ -13,23 +13,36 @@ import java.util.Map;
 import android.util.Log;
 public class TcpServer extends Thread{
 	Socket clientSocket;
+    static ServerSocket tcpServer = null;
     public TcpServer(Socket clientSocket) {
         super();
         this.clientSocket = clientSocket;
         
         //建立TCP连接服务,绑定端口
-        ServerSocket tcpServer;
 		try {
 			//tcpServer = new ServerSocket(9099);
-			
-			tcpServer=new ServerSocket();
-			tcpServer.setReuseAddress(true); //设置 ServerSocket 的选项
-			tcpServer.bind(new InetSocketAddress(9999)); //与 8080 端口绑定
-
 	        //接受连接,传图片给连接的客户端,每个TCP连接都是一个java线程
 	        while(true){
-	            clientSocket = tcpServer.accept();
-	            new TcpServer(clientSocket).start();
+				if(tcpServer == null)
+				{
+					tcpServer=new ServerSocket();
+					tcpServer.setReuseAddress(true); //设置 ServerSocket 的选项
+					tcpServer.bind(new InetSocketAddress(9999)); //与 8080 端口绑定
+				}
+		         clientSocket = tcpServer.accept();
+		         new Thread() {
+		        	 Socket clientSocket0;
+		        	 public void start0(Socket clientSocket) {
+		        		 clientSocket0 = clientSocket;
+		        		 this.start();
+		         	}
+		         	@Override
+		         	public void run() {
+		         		gogogo(clientSocket0);
+		         	}
+		         }.start0(clientSocket);
+
+	            //new TcpServer(clientSocket).start();
 	        }
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -39,7 +52,11 @@ public class TcpServer extends Thread{
 
     @Override
       public void run() {
-        try {
+        gogogo(clientSocket);
+    }
+
+	public void gogogo(Socket clientSocket) {
+		try {
             //获得客户端的ip地址和主机名
             String clientAddress = clientSocket.getInetAddress().getHostAddress();
             String clientHostName = clientSocket.getInetAddress().getHostName();
@@ -118,8 +135,15 @@ public class TcpServer extends Thread{
     					//    						Log.i("TAGo", "write len="+entry.getValue().length);
     					//    					}
     				}
-    				else if(MainActivity.bytesM3u8 != null)
+    				else 
     				{
+    					while(MainActivity.bytesM3u8 == null)
+							try {
+								Thread.sleep(100);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
     					String sResp="HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Type: application/x-mpeg\r\n"
     							+"Content-Length: " + MainActivity.bytesM3u8.length
     							+"\r\n\r\n";
@@ -142,5 +166,5 @@ public class TcpServer extends Thread{
         catch (IOException e) {
             e.printStackTrace();
         }
-    }
+	}
 }

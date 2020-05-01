@@ -124,7 +124,8 @@ public class MainActivity extends Activity implements Runnable{
                 @Override
                 public void run() {
                 	openIntent("https://cn4.5311444.com/hls/20190426/97ed0bf400fc7efb547d3f91ea31d7b1/1556253639/index.m3u8");
-                }
+                 	//openIntent("https://leshi.cdn-zuyida.com/20180421/23526_27748718/index.m3u8");
+               }
             }).start();
          }
     }
@@ -310,109 +311,120 @@ public class MainActivity extends Activity implements Runnable{
 
         	@Override
         	public void run() {
-        	     //这里写入子线程需要做的工作
-                try {
-//                	String filepath = Environment.getExternalStorageDirectory() + "/xxx";
-//                	
-//                	File file2 = new File(filepath);
-//                	if (!file2.exists())
-//                	file2.mkdirs();
+        		//这里写入子线程需要做的工作
+        		try {
+        			//                	String filepath = Environment.getExternalStorageDirectory() + "/xxx";
+        			//                	
+        			//                	File file2 = new File(filepath);
+        			//                	if (!file2.exists())
+        			//                	file2.mkdirs();
 
-                	Log.i("TAGo", "开始下载" + this.sUrl);
-                	String sUrl = this.sUrl;
-                    DownUtil downUtil = new DownUtil(
-                    		sUrl,
-                    		//filepath + "/filename2",
-                    		"",
-                    		1);
-                    
-                    bytesM3u8 = null;
+        			while(true){
+        				Log.i("TAGo", "开始下载" + this.sUrl);
+        				String sUrl = this.sUrl;
+        				DownUtil downUtil = new DownUtil(
+        						sUrl,
+        						//filepath + "/filename2",
+        						"",
+        						1);
 
-                    StaticBufs.vFileMap.clear();
-                    StaticBufs.lstNames.clear();
-                    StaticBufs.iCntThreads[0] = 0;
-                    StaticBufs.sCurPlayingPart[0] = "";
-                    bytesM3u8 = downUtil.downLoad();
-                        
-                    Log.i("TAGo",  "M3u8 下载完成，长度 :" + bytesM3u8.length);
-                    //解析M3U8
-                    ByteArrayInputStream byteArray = new ByteArrayInputStream(bytesM3u8);
-                    BufferedReader bInput = new BufferedReader(new InputStreamReader(byteArray));
-                    //String[] subUrl = sUrl.split("/");
-                    String input;  
-                    while ((input= bInput.readLine()) != null) {  
-                    	Log.i("TAG", input);  
-                    	
-                        String sPrefix = "";
-                    	if((input.indexOf("/") ==0))
-                    		sPrefix = sUrl.substring(0, getFromIndex(sUrl, ("/"), 3));
-                    	else
-                    		sPrefix = sUrl.substring(0, sUrl.lastIndexOf("/"))+"/";
-                            
-                    	if((input.indexOf(".ts") >=0) 
-                    			|| (input.indexOf(".mp4") >=0))
-                    	{
-                    		if(!StaticBufs.vFileMap.containsKey(StaticBufs.sCurPlayingPart[0])){
-                    			bInput = new BufferedReader(new InputStreamReader(byteArray));
-                    			while ((input= bInput.readLine()) != null) {
-                    				if(input.equals(StaticBufs.sCurPlayingPart[0]))
-                    					break;
-                    			}
-                    		}
-                    			
-                    		while((StaticBufs.iCntThreads[0] >= MAX_THREADS)||(StaticBufs.vFileMap.size() >= MainActivity.MAX_BLOCKs))
-                    			Thread.sleep(50);
-                    		
-	                        new Thread() {
-	                        	String sPrefix;
-	                        	String input;
-	                        	public void start0(String sPrefix, String input) {
-	                        		this.sPrefix = sPrefix;
-	                        		this.input = input;
-	                        		StaticBufs.iCntThreads[0]++;
-	                        		this.start();
-	                        	}
-	                        	@Override
-	                        	public void run() {
-	                        	     //这里写入子线程需要做的工作
-									DownUtil downOne = new DownUtil(
-		                            		sPrefix + input,
-		                            		//filepath + "/filename2",
-		                            		"",
-		                            		1);//暂时只能单线程下载，直到改正了里面的skip
-		                            byte[] pppm;
-									try {
-										pppm = downOne.downLoad();
-			                    		StaticBufs.vFileMap.put(input, pppm);
-			                    		//getFileByBytes(pppm, filepath, "file00000000.ts");
-			                    		Log.i("TAG", "len=" + StaticBufs.vFileMap.get(input).length);
-									} catch (Exception e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									} finally {
-										StaticBufs.iCntThreads[0]--;
-									}
-	                        	}
-	                        }.start0(sPrefix , input);
-	                        
+        				bytesM3u8 = null;
 
-                    		//break;
-                    	}
-//                        for (Map.Entry<String ,byte[]> entry : StaticBufs.vFileMap.entrySet()) {
-//                			Log.i("TAG", "Key = " + entry.getKey() + ", Value = " + entry.getValue());
-//                			conn.setRequestProperty(entry.getKey(), entry.getValue());
-//                		}
+        				StaticBufs.vFileMap.clear();
+        				StaticBufs.lstNames.clear();
+        				StaticBufs.iCntThreads[0] = 0;
+        				StaticBufs.sCurPlayingPart[0] = "";
+        				bytesM3u8 = downUtil.downLoad();
 
-                    }  
-                    //5线程下载，存入数组
-                    //数组总数》5*2时暂停
-                    //tcp监听，请求完成的，删除其-5位置前的
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        				Log.i("TAGo",  "M3u8 下载完成，长度 :" + bytesM3u8.length);
+        				//解析M3U8
+        				ByteArrayInputStream byteArray = new ByteArrayInputStream(bytesM3u8);
+        				BufferedReader bInput = new BufferedReader(new InputStreamReader(byteArray));
+        				//String[] subUrl = sUrl.split("/");
+        				String input;  
+        				while ((input= bInput.readLine()) != null) {  
+        					Log.i("TAG", input);  
 
-        	        }
-        	   }.start0(url);
+        					String sPrefix = "";
+        					if((input.indexOf("/") ==0))
+        						sPrefix = sUrl.substring(0, getFromIndex(sUrl, ("/"), 3));
+        					else
+        						sPrefix = sUrl.substring(0, sUrl.lastIndexOf("/"))+"/";
+        					if(input.indexOf(".m3u8") >0) {
+        						bytesM3u8 = null;
+        						this.sUrl = sPrefix + input;
+        						break;
+        					}
+        					if((input.indexOf(".ts") >=0) 
+        							|| (input.indexOf(".mp4") >=0))
+        					{
+        						if((StaticBufs.sCurPlayingPart[0].length() > 0) && !StaticBufs.vFileMap.containsKey(StaticBufs.sCurPlayingPart[0])){
+        							bInput = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(bytesM3u8)));
+        							while ((input= bInput.readLine()) != null) {
+        								if(input.equals(StaticBufs.sCurPlayingPart[0]))
+        									break;
+        							}
+        						}
+
+        						while((StaticBufs.iCntThreads[0] >= MAX_THREADS)||(StaticBufs.vFileMap.size() >= MainActivity.MAX_BLOCKs))
+        							Thread.sleep(50);
+
+        						new Thread() {
+        							String sPrefix;
+        							String input;
+        							public void start0(String sPrefix, String input) {
+        								this.sPrefix = sPrefix;
+        								this.input = input;
+        								StaticBufs.iCntThreads[0]++;
+        								this.start();
+        							}
+        							@Override
+        							public void run() {
+        								//这里写入子线程需要做的工作
+        								DownUtil downOne = new DownUtil(
+        										sPrefix + input,
+        										//filepath + "/filename2",
+        										"",
+        										1);//暂时只能单线程下载，直到改正了里面的skip
+        								byte[] pppm;
+        								try {
+        									pppm = downOne.downLoad();
+        									StaticBufs.vFileMap.put(input, pppm);
+        									//getFileByBytes(pppm, filepath, "file00000000.ts");
+        									Log.i("TAG", "len=" + StaticBufs.vFileMap.get(input).length);
+        								} catch (Exception e) {
+        									// TODO Auto-generated catch block
+        									e.printStackTrace();
+        								} finally {
+        									StaticBufs.iCntThreads[0]--;
+        								}
+        							}
+        						}.start0(sPrefix , input);
+
+
+        						//break;
+        					}
+        					//                        for (Map.Entry<String ,byte[]> entry : StaticBufs.vFileMap.entrySet()) {
+        					//                			Log.i("TAG", "Key = " + entry.getKey() + ", Value = " + entry.getValue());
+        					//                			conn.setRequestProperty(entry.getKey(), entry.getValue());
+        					//                		}
+
+        				}  
+
+        				if(!sUrl.equals(this.sUrl))
+        					continue;
+        				else
+        					break;
+        			}	
+        			//5线程下载，存入数组
+        			//数组总数》5*2时暂停
+        			//tcp监听，请求完成的，删除其-5位置前的
+        		} catch (Exception e) {
+        			e.printStackTrace();
+        		}
+
+        	}
+		}.start0(url);
 	}
 
     @Override
