@@ -1,8 +1,12 @@
 package com.bscan.udp2player;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class StaticBufs {
+    public static final ArrayList<String> lstNames = new ArrayList();
+    public static final int[] iCntThreads = new int[1];
     public static final HashMap<String ,byte[]> vFileMap = new HashMap<>();
     public static final HashMap<String ,String> header = new HashMap<>();
     private StaticBufs() {

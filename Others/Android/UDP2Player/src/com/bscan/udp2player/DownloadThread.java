@@ -86,6 +86,9 @@ public class DownloadThread implements Runnable {
             	if(currentPart != null)
             		currentPart.write(buffer, 0, hasRead);
             	else
+//            		for(int index  = 0 ; index  < hasRead ; index ++){
+//            			bArray[this.startPos+length+index] = buffer[index];
+//                    }
             		System.arraycopy(buffer,0, bArray, this.startPos+length, hasRead);
             		//bArray.write(buffer, 0, hasRead);
                 length += hasRead;

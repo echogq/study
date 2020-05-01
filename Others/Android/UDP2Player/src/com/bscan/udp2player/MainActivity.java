@@ -23,9 +23,11 @@ import android.os.Bundle;
 import android.webkit.MimeTypeMap;
 import android.widget.TextView;
  
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -51,7 +53,10 @@ public class MainActivity extends Activity implements Runnable{
     Handler mHandler;
 	TcpServer m3u8Server;
     public final static String EXTRA_MESSAGE = "com.bscan.udp2player.MESSAGE";
-    static byte[] b = null;
+	protected static final int MAX_THREADS = 5;
+    public static final int MAX_BLOCKs = 50;
+
+    static byte[] bytesM3u8 = null;
     
   //子字符串modelStr在字符串str中第count次出现时的下标
     private int getFromIndex(String str, String modelStr, Integer count) {
@@ -68,6 +73,40 @@ public class MainActivity extends Activity implements Runnable{
     	}
             //matcher.start();返回以前匹配的初始索引。
     	return slashMatcher.start();
+    }
+    
+	//将Byte数组转换成文件
+    public static void getFileByBytes(byte[] bytes, String filePath, String fileName) {
+        BufferedOutputStream bos = null;
+        FileOutputStream fos = null;
+        File file = null;
+        try {
+//            File dir = new File(filePath);
+//            if (!dir.exists() && dir.isDirectory()) {// 判断文件目录是否存在
+//                dir.mkdirs();
+//            }
+            file = new File(filePath + "/" + fileName);
+            fos = new FileOutputStream(file);
+            bos = new BufferedOutputStream(fos);
+            bos.write(bytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (bos != null) {
+                try {
+                    bos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
     
     @Override
@@ -98,14 +137,14 @@ public class MainActivity extends Activity implements Runnable{
                     		sUrl,
                     		//filepath + "/filename2",
                     		"",
-                    		2);
+                    		1);
                     
-                    b = null;
+                    bytesM3u8 = null;
 
-                    b = downUtil.downLoad();
+                    bytesM3u8 = downUtil.downLoad();
                           
                     //解析M3U8
-                    ByteArrayInputStream byteArray = new ByteArrayInputStream(b);
+                    ByteArrayInputStream byteArray = new ByteArrayInputStream(bytesM3u8);
                     BufferedReader bInput = new BufferedReader(new InputStreamReader(byteArray));
                     //String[] subUrl = sUrl.split("/");
                     String input;  
@@ -121,15 +160,43 @@ public class MainActivity extends Activity implements Runnable{
                     	if((input.indexOf(".ts") >=0) 
                     			|| (input.indexOf(".mp4") >=0))
                     	{
-							DownUtil downOne = new DownUtil(
-                            		sPrefix + input,
-                            		//filepath + "/filename2",
-                            		"",
-                            		5);
-                            
-                    		StaticBufs.vFileMap.put(input, downOne.downLoad());
+                    		while((StaticBufs.iCntThreads[0] >= MAX_THREADS)||(StaticBufs.vFileMap.size() >= MainActivity.MAX_BLOCKs))
+                    			Thread.sleep(50);
                     		
-                    		Log.i("TAG", "len=" + StaticBufs.vFileMap.get(input).length);
+	                        new Thread() {
+	                        	String sPrefix;
+	                        	String input;
+	                        	public void start0(String sPrefix, String input) {
+	                        		this.sPrefix = sPrefix;
+	                        		this.input = input;
+	                        		StaticBufs.iCntThreads[0]++;
+	                        		this.start();
+	                        	}
+	                        	@Override
+	                        	public void run() {
+	                        	     //这里写入子线程需要做的工作
+									DownUtil downOne = new DownUtil(
+		                            		sPrefix + input,
+		                            		//filepath + "/filename2",
+		                            		"",
+		                            		1);//暂时只能单线程下载，直到改正了里面的skip
+		                            byte[] pppm;
+									try {
+										pppm = downOne.downLoad();
+			                    		StaticBufs.vFileMap.put(input, pppm);
+			                    		//getFileByBytes(pppm, filepath, "file00000000.ts");
+			                    		Log.i("TAG", "len=" + StaticBufs.vFileMap.get(input).length);
+									} catch (Exception e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									} finally {
+										StaticBufs.iCntThreads[0]--;
+									}
+	                        	}
+	                        }.start0(sPrefix , input);
+	                        
+
+                    		//break;
                     	}
 //                        for (Map.Entry<String ,byte[]> entry : StaticBufs.vFileMap.entrySet()) {
 //                			Log.i("TAG", "Key = " + entry.getKey() + ", Value = " + entry.getValue());
