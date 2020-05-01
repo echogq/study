@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
  
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -317,6 +318,7 @@ public class MainActivity extends Activity implements Runnable{
 //                	if (!file2.exists())
 //                	file2.mkdirs();
 
+                	Log.i("TAGo", "开始下载" + this.sUrl);
                 	String sUrl = this.sUrl;
                     DownUtil downUtil = new DownUtil(
                     		sUrl,
@@ -329,8 +331,10 @@ public class MainActivity extends Activity implements Runnable{
                     StaticBufs.vFileMap.clear();
                     StaticBufs.lstNames.clear();
                     StaticBufs.iCntThreads[0] = 0;
+                    StaticBufs.sCurPlayingPart[0] = "";
                     bytesM3u8 = downUtil.downLoad();
-                          
+                        
+                    Log.i("TAGo",  "M3u8 下载完成，长度 :" + bytesM3u8.length);
                     //解析M3U8
                     ByteArrayInputStream byteArray = new ByteArrayInputStream(bytesM3u8);
                     BufferedReader bInput = new BufferedReader(new InputStreamReader(byteArray));
@@ -348,6 +352,14 @@ public class MainActivity extends Activity implements Runnable{
                     	if((input.indexOf(".ts") >=0) 
                     			|| (input.indexOf(".mp4") >=0))
                     	{
+                    		if(!StaticBufs.vFileMap.containsKey(StaticBufs.sCurPlayingPart[0])){
+                    			bInput = new BufferedReader(new InputStreamReader(byteArray));
+                    			while ((input= bInput.readLine()) != null) {
+                    				if(input.equals(StaticBufs.sCurPlayingPart[0]))
+                    					break;
+                    			}
+                    		}
+                    			
                     		while((StaticBufs.iCntThreads[0] >= MAX_THREADS)||(StaticBufs.vFileMap.size() >= MainActivity.MAX_BLOCKs))
                     			Thread.sleep(50);
                     		

@@ -49,6 +49,14 @@ public class TcpServer extends Thread{
             //获取客户端的OutputStream
             OutputStream out = clientSocket.getOutputStream();
             InputStream inn = clientSocket.getInputStream();
+            
+            while(MainActivity.bytesM3u8 == null)
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
             //传出http数据
             //out.write(data, 0, length);
 
@@ -75,6 +83,7 @@ public class TcpServer extends Thread{
     					
     					while(StaticBufs.vFileMap.get(sKey) == null)
 							try {
+								StaticBufs.sCurPlayingPart[0] = sKey;
 								Thread.sleep(100);
 							} catch (InterruptedException e) {
 								// TODO Auto-generated catch block
@@ -109,7 +118,7 @@ public class TcpServer extends Thread{
     					//    						Log.i("TAGo", "write len="+entry.getValue().length);
     					//    					}
     				}
-    				else
+    				else if(MainActivity.bytesM3u8 != null)
     				{
     					String sResp="HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Type: application/x-mpeg\r\n"
     							+"Content-Length: " + MainActivity.bytesM3u8.length

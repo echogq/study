@@ -6,6 +6,7 @@ import java.util.List;
 
 public class StaticBufs {
     public static final ArrayList<String> lstNames = new ArrayList();
+    public static final String[] sCurPlayingPart = new String[1];
     public static final int[] iCntThreads = new int[1];
     public static final HashMap<String ,byte[]> vFileMap = new HashMap<>();
     public static final HashMap<String ,String> header = new HashMap<>();
