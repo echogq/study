@@ -261,7 +261,9 @@ public class MainActivity extends Activity implements Runnable{
 
 	public void openIntent(String url) {
 		String sUrl2Player = "http://127.0.0.1:9999";
-		if(url.indexOf(".m3u") >=0)
+		if(url.indexOf(".ts.m3u8") >=0)
+			sUrl2Player = url;
+		else if(url.indexOf(".m3u") >=0)
 			buffM3U8(url);
 		else
 			sUrl2Player = url;
@@ -355,8 +357,8 @@ public class MainActivity extends Activity implements Runnable{
         						this.sUrl = sPrefix + input;
         						break;
         					}
-        					if((input.indexOf(".ts") >=0) 
-        							|| (input.indexOf(".mp4") >=0))
+        					if(((input.indexOf(".ts") >=0) 
+        							|| (input.indexOf(".mp4") >=0)) && (input.indexOf(".m3u8") <0))
         					{
         						if((StaticBufs.sCurPlayingPart[0].length() > 0) && !StaticBufs.vFileMap.containsKey(StaticBufs.sCurPlayingPart[0])){
         							bInput = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(bytesM3u8)));

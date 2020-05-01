@@ -85,13 +85,13 @@ public class TcpServer extends Thread{
     			Log.i("TAGo", sRequest);
     			
     			if(length<4096) {
-    				if((sRequest.indexOf(".ts") >=0) 
-    						|| (sRequest.indexOf(".mp4") >=0))
+    				if(((sRequest.indexOf(".ts") >=0) 
+    						|| (sRequest.indexOf(".mp4") >=0)) && (sRequest.indexOf(".m3u8") <0))
     				{
     					String sKey = "";
     					for (String string : sRequest.split(" ")) {
-    						if((string.indexOf(".ts") >=0) 
-    								|| (string.indexOf(".mp4") >=0))
+    						if(((string.indexOf(".ts") >=0) 
+    								|| (string.indexOf(".mp4") >=0)) && (sRequest.indexOf(".m3u8") <0))
     						{
     							sKey = string;
     							break;
