@@ -7,6 +7,7 @@ import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -14,6 +15,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import android.os.Build;
 import android.os.Environment;
@@ -21,6 +23,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
 import android.webkit.MimeTypeMap;
+import android.widget.Button;
 import android.widget.TextView;
  
 import java.io.BufferedOutputStream;
@@ -109,6 +112,22 @@ public class MainActivity extends Activity implements Runnable{
         }
     }
     
+	/**
+     * 单击按钮时，
+     * */
+    class SendUDPBrocastListener1 implements View.OnClickListener {
+ 
+        @Override
+        public void onClick(View v) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                	openIntent("https://cn4.5311444.com/hls/20190426/97ed0bf400fc7efb547d3f91ea31d7b1/1556253639/index.m3u8");
+                }
+            }).start();
+         }
+    }
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,99 +140,9 @@ public class MainActivity extends Activity implements Runnable{
         	}
         }.start();
         
-        new Thread() {
-        	@Override
-        	public void run() {
-        	     //这里写入子线程需要做的工作
-                try {
-                	String filepath = Environment.getExternalStorageDirectory() + "/xxx";
-                	
-                	File file2 = new File(filepath);
-                	if (!file2.exists())
-                	file2.mkdirs();
-
-                	String sUrl = "https://cn4.5311444.com/hls/20190426/97ed0bf400fc7efb547d3f91ea31d7b1/1556253639/index.m3u8";
-                    DownUtil downUtil = new DownUtil(
-                    		sUrl,
-                    		//filepath + "/filename2",
-                    		"",
-                    		1);
-                    
-                    bytesM3u8 = null;
-
-                    bytesM3u8 = downUtil.downLoad();
-                          
-                    //解析M3U8
-                    ByteArrayInputStream byteArray = new ByteArrayInputStream(bytesM3u8);
-                    BufferedReader bInput = new BufferedReader(new InputStreamReader(byteArray));
-                    //String[] subUrl = sUrl.split("/");
-                    String input;  
-                    while ((input= bInput.readLine()) != null) {  
-                    	Log.i("TAG", input);  
-                    	
-                        String sPrefix = "";
-                    	if((input.indexOf("/") ==0))
-                    		sPrefix = sUrl.substring(0, getFromIndex(sUrl, ("/"), 3));
-                    	else
-                    		sPrefix = sUrl.substring(0, sUrl.lastIndexOf("/"))+"/";
-                            
-                    	if((input.indexOf(".ts") >=0) 
-                    			|| (input.indexOf(".mp4") >=0))
-                    	{
-                    		while((StaticBufs.iCntThreads[0] >= MAX_THREADS)||(StaticBufs.vFileMap.size() >= MainActivity.MAX_BLOCKs))
-                    			Thread.sleep(50);
-                    		
-	                        new Thread() {
-	                        	String sPrefix;
-	                        	String input;
-	                        	public void start0(String sPrefix, String input) {
-	                        		this.sPrefix = sPrefix;
-	                        		this.input = input;
-	                        		StaticBufs.iCntThreads[0]++;
-	                        		this.start();
-	                        	}
-	                        	@Override
-	                        	public void run() {
-	                        	     //这里写入子线程需要做的工作
-									DownUtil downOne = new DownUtil(
-		                            		sPrefix + input,
-		                            		//filepath + "/filename2",
-		                            		"",
-		                            		1);//暂时只能单线程下载，直到改正了里面的skip
-		                            byte[] pppm;
-									try {
-										pppm = downOne.downLoad();
-			                    		StaticBufs.vFileMap.put(input, pppm);
-			                    		//getFileByBytes(pppm, filepath, "file00000000.ts");
-			                    		Log.i("TAG", "len=" + StaticBufs.vFileMap.get(input).length);
-									} catch (Exception e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									} finally {
-										StaticBufs.iCntThreads[0]--;
-									}
-	                        	}
-	                        }.start0(sPrefix , input);
-	                        
-
-                    		//break;
-                    	}
-//                        for (Map.Entry<String ,byte[]> entry : StaticBufs.vFileMap.entrySet()) {
-//                			Log.i("TAG", "Key = " + entry.getKey() + ", Value = " + entry.getValue());
-//                			conn.setRequestProperty(entry.getKey(), entry.getValue());
-//                		}
-
-                    }  
-                    //5线程下载，存入数组
-                    //数组总数》5*2时暂停
-                    //tcp监听，请求完成的，删除其-5位置前的
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-        	        }
-        	   }.start();
-
+        Button sendUDPBrocast1 = (Button) findViewById(R.id.sendd);
+        sendUDPBrocast1.setOnClickListener(new SendUDPBrocastListener1());
+ 
         mHandler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(Message msg) {
@@ -327,7 +256,153 @@ public class MainActivity extends Activity implements Runnable{
             }
         }
     }
-    
+
+	public void openIntent(String url) {
+		String sUrl2Player = "http://127.0.0.1:9999";
+		if(url.indexOf(".m3u") >=0)
+			buffM3U8(url);
+		else
+			sUrl2Player = url;
+
+
+		
+		String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        if(mimeType == null)
+        	mimeType = "video/*";
+        
+        Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+//        mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+//        startActivity(mediaIntent);
+        ///*****************************************************************************************
+        
+        //要调用另一个APP的activity所在的包名
+        //String packageName = "com.mxtech.videoplayer.pro";
+        //要调用另一个APP的activity名字
+        //String activity = "com.mxtech.videoplayer.pro/.ActivityMediaList";
+        //ComponentName component = new ComponentName(packageName, activity);
+        //Intent mediaIntent = new Intent();
+        //mediaIntent.setComponent(component);
+        mediaIntent.setDataAndType(Uri.parse(sUrl2Player), mimeType);
+        //mediaIntent.setFlags(0x10200000);
+        //intent.putExtra("data", setData());
+        mediaIntent.setPackage("com.mxtech.videoplayer.pro");
+        startActivity(mediaIntent);
+        
+//        String[] headers = {
+//        		"User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.99 Safari/537.36",
+//        		"Referer", "https://vidcloud.icu"};
+//        		Intent intent = new Intent(Intent.ACTION_VIEW);
+//        		intent.setDataAndType(Uri.parse(finalUrl), "video/*");
+//        		intent.putExtra("headers", headers);
+//        		intent.setPackage("com.mxtech.videoplayer.pro");
+//        		startActivity(intent);
+	}
+
+	public void buffM3U8(String url) {
+		new Thread() {
+        	String sUrl;
+        	public void start0(String url) {
+        		this.sUrl = url;
+        		this.start();
+        	}
+
+        	@Override
+        	public void run() {
+        	     //这里写入子线程需要做的工作
+                try {
+//                	String filepath = Environment.getExternalStorageDirectory() + "/xxx";
+//                	
+//                	File file2 = new File(filepath);
+//                	if (!file2.exists())
+//                	file2.mkdirs();
+
+                	String sUrl = this.sUrl;
+                    DownUtil downUtil = new DownUtil(
+                    		sUrl,
+                    		//filepath + "/filename2",
+                    		"",
+                    		1);
+                    
+                    bytesM3u8 = null;
+
+                    StaticBufs.vFileMap.clear();
+                    StaticBufs.lstNames.clear();
+                    StaticBufs.iCntThreads[0] = 0;
+                    bytesM3u8 = downUtil.downLoad();
+                          
+                    //解析M3U8
+                    ByteArrayInputStream byteArray = new ByteArrayInputStream(bytesM3u8);
+                    BufferedReader bInput = new BufferedReader(new InputStreamReader(byteArray));
+                    //String[] subUrl = sUrl.split("/");
+                    String input;  
+                    while ((input= bInput.readLine()) != null) {  
+                    	Log.i("TAG", input);  
+                    	
+                        String sPrefix = "";
+                    	if((input.indexOf("/") ==0))
+                    		sPrefix = sUrl.substring(0, getFromIndex(sUrl, ("/"), 3));
+                    	else
+                    		sPrefix = sUrl.substring(0, sUrl.lastIndexOf("/"))+"/";
+                            
+                    	if((input.indexOf(".ts") >=0) 
+                    			|| (input.indexOf(".mp4") >=0))
+                    	{
+                    		while((StaticBufs.iCntThreads[0] >= MAX_THREADS)||(StaticBufs.vFileMap.size() >= MainActivity.MAX_BLOCKs))
+                    			Thread.sleep(50);
+                    		
+	                        new Thread() {
+	                        	String sPrefix;
+	                        	String input;
+	                        	public void start0(String sPrefix, String input) {
+	                        		this.sPrefix = sPrefix;
+	                        		this.input = input;
+	                        		StaticBufs.iCntThreads[0]++;
+	                        		this.start();
+	                        	}
+	                        	@Override
+	                        	public void run() {
+	                        	     //这里写入子线程需要做的工作
+									DownUtil downOne = new DownUtil(
+		                            		sPrefix + input,
+		                            		//filepath + "/filename2",
+		                            		"",
+		                            		1);//暂时只能单线程下载，直到改正了里面的skip
+		                            byte[] pppm;
+									try {
+										pppm = downOne.downLoad();
+			                    		StaticBufs.vFileMap.put(input, pppm);
+			                    		//getFileByBytes(pppm, filepath, "file00000000.ts");
+			                    		Log.i("TAG", "len=" + StaticBufs.vFileMap.get(input).length);
+									} catch (Exception e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									} finally {
+										StaticBufs.iCntThreads[0]--;
+									}
+	                        	}
+	                        }.start0(sPrefix , input);
+	                        
+
+                    		//break;
+                    	}
+//                        for (Map.Entry<String ,byte[]> entry : StaticBufs.vFileMap.entrySet()) {
+//                			Log.i("TAG", "Key = " + entry.getKey() + ", Value = " + entry.getValue());
+//                			conn.setRequestProperty(entry.getKey(), entry.getValue());
+//                		}
+
+                    }  
+                    //5线程下载，存入数组
+                    //数组总数》5*2时暂停
+                    //tcp监听，请求完成的，删除其-5位置前的
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+        	        }
+        	   }.start0(url);
+	}
+
     @Override
     public void run() {
         // TODO Auto-generated method stub
@@ -347,14 +422,11 @@ public class MainActivity extends Activity implements Runnable{
                         
                         //String url = "https://www.baidu.com/1.m3u8?plplp=899";//示例，实际填你的网络视频链接
                         String url = beforeResult;//"http://www.baidu.com/1.m3u8";//示例，实际填你的网络视频链接
-                        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
-                        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-                        if(mimeType == null)
-                        	mimeType = "video/*";
-                        Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-                        mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-                        startActivity(mediaIntent);
+                        
+                        openIntent(url);
+
                     }
+
                 });
             } catch (Exception e) {
                 e.printStackTrace();

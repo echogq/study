@@ -16,6 +16,15 @@
          android:layout_alignParentTop="true"
          android:layout_alignRight="@+id/result"
          android:text="发至TV播" />
+
+     <Button
+         android:id="@+id/sendd"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignParentTop="true"
+         android:layout_centerHorizontal="true"
+         android:text="测试" />
+
      <Button
          android:id="@+id/senddd"
          android:layout_width="wrap_content"

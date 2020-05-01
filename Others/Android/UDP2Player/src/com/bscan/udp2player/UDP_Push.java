@@ -111,7 +111,7 @@ public class UDP_Push  extends Activity {
         sendUDPBrocast.setOnClickListener(new SendUDPBrocastListener());
         Button sendUDPBrocast2 = (Button) findViewById(R.id.senddd);
         sendUDPBrocast2.setOnClickListener(new SendUDPBrocastListener2());
-        try {
+       try {
             /*´´½¨socketÊµÀý*/
             ms = new MulticastSocket();
         } catch (Exception e) {

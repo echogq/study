@@ -95,9 +95,7 @@ public class TcpServer extends Thread{
     						if(StaticBufs.lstNames.indexOf(sKey) == -1)
     							StaticBufs.lstNames.add(sKey);
     						
-							for (int i = 0; i < StaticBufs.lstNames.size(); i++) {
-								if(StaticBufs.vFileMap.size() < MainActivity.MAX_BLOCKs)
-									break;
+							for (int i = 0; i < StaticBufs.lstNames.size()-(MainActivity.MAX_BLOCKs/2); i++) {
 								StaticBufs.vFileMap.remove(StaticBufs.lstNames.get(i));
 							}
     						//StaticBufs.lstNames.RemoveRange(1,3);
