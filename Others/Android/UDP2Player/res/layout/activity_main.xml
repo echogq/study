@@ -23,7 +23,7 @@
          android:layout_height="wrap_content"
          android:layout_alignParentTop="true"
          android:layout_centerHorizontal="true"
-         android:text="测试" />
+         android:text="=======================测试=======================" />
 
      <Button
          android:id="@+id/senddd"

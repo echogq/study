@@ -57,8 +57,8 @@ public class MainActivity extends Activity implements Runnable{
     Handler mHandler;
 	TcpServer m3u8Server;
     public final static String EXTRA_MESSAGE = "com.bscan.udp2player.MESSAGE";
-	protected static final int MAX_THREADS = 5;
-    public static final int MAX_BLOCKs = 50;
+	protected static final int MAX_THREADS = 10;
+    public static final int MAX_BLOCKs = 80;
 
     static byte[] bytesM3u8 = null;
     
@@ -126,6 +126,7 @@ public class MainActivity extends Activity implements Runnable{
 //                	openIntent("https://tv1.youkutv.cc/2020/03/28/h0fA8TSZSijKdCi4/playlist.m3u8");
 //                	openIntent("https://cn4.5311444.com/hls/20190426/97ed0bf400fc7efb547d3f91ea31d7b1/1556253639/index.m3u8");
                 	openIntent("https://leshi.cdn-zuyida.com/20180421/23526_27748718/index.m3u8");
+//                	openIntent("http://videohy.tc.qq.com/vwecam.tc.qq.com/1006_7f00e3e804394aefbccd579689afacc8.f0.mp4?vkey=50A1AED2B5A08D6F7AB1C53C71207F5CD95376F186A3E02319626CF3D722451D4E914DE0502D5EF6E7F7B87F9FA206ED1B27ACE3A07CE18E&rf=mobile.qzone.qq.com");
                }
             }).start();
          }
@@ -260,8 +261,18 @@ public class MainActivity extends Activity implements Runnable{
         }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+// 这是前提——你的app至少运行了一个service。这里表示当进程不在前台时，马上开启一个service
+        Intent intent = new Intent(this, MyService.class);
+        startService(intent);
+    }
+    
 	public void openIntent(String url) {
-		String sUrl2Player = "http://127.0.0.1:9999";
+		setBtnText(url);
+
+		String sUrl2Player = "http://127.0.0.1:9999/?go="+url;
 		if(url.indexOf(".ts.m3u8") >=0)
 			sUrl2Player = url;
 		else if(url.indexOf(".m3u") >=0)
@@ -293,13 +304,14 @@ public class MainActivity extends Activity implements Runnable{
         //intent.putExtra("data", setData());
         mediaIntent.setPackage("com.mxtech.videoplayer.pro");
         
-        while(StaticBufs.vFileMap.size() == 0)
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+        if(!sUrl2Player.equals(url))
+	        while(StaticBufs.vFileMap.size() < 2)
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
         startActivity(mediaIntent);
         
 //        String[] headers = {
@@ -310,6 +322,18 @@ public class MainActivity extends Activity implements Runnable{
 //        		intent.putExtra("headers", headers);
 //        		intent.setPackage("com.mxtech.videoplayer.pro");
 //        		startActivity(intent);
+	}
+
+	public void setBtnText(final String url) {
+		this.runOnUiThread(new Runnable()
+		{
+		@Override
+		public void run()
+		{
+			((Button) findViewById(R.id.sendd)).setText(url);
+			((Button) findViewById(R.id.sendd)).setWidth(((Button) findViewById(R.id.sendd)).getMeasuredWidth());
+		}
+		});
 	}
 
 	public void buffM3U8(String url) {
@@ -331,6 +355,7 @@ public class MainActivity extends Activity implements Runnable{
         			//                	file2.mkdirs();
 
         			while(true){
+        				setBtnText("开始下载 " + this.sUrl);
         				Log.i("TAGo", "开始下载 " + this.sUrl);
         				String sUrl = this.sUrl;
         				DownUtil downUtil = new DownUtil(
@@ -348,6 +373,7 @@ public class MainActivity extends Activity implements Runnable{
         				bytesM3u8 = downUtil.downLoad();
 
         				Log.i("TAGo",  "M3u8 下载完成，长度 :" + bytesM3u8.length);
+        				setBtnText("M3u8 下载完成，长度 :" + bytesM3u8.length);
         				
         				String strTmp = new String(bytesM3u8);
         				if(strTmp.indexOf(".m3u8") <0)
@@ -426,8 +452,10 @@ public class MainActivity extends Activity implements Runnable{
         										1);//暂时只能单线程下载，直到改正了里面的skip
         								byte[] pppm;
         								try {
-        									pppm = downOne.downLoad();
-        									StaticBufs.vFileMap.put(input, pppm);
+        									setBtnText("开始下载: " + input);
+        			        				pppm = downOne.downLoad();
+        									setBtnText(input + "下载完成，长度 :" + pppm.length);
+        			        				StaticBufs.vFileMap.put(input, pppm);
         									//getFileByBytes(pppm, filepath, "file00000000.ts");
         									Log.i("TAG", "len=" + StaticBufs.vFileMap.get(input).length);
         								} catch (Exception e) {
@@ -485,7 +513,18 @@ public class MainActivity extends Activity implements Runnable{
                         //String url = "https://www.baidu.com/1.m3u8?plplp=899";//示例，实际填你的网络视频链接
                         String url = beforeResult;//"http://www.baidu.com/1.m3u8";//示例，实际填你的网络视频链接
                         
-                        openIntent(url);
+                		new Thread() {
+                        	String sUrl;
+                        	public void start0(String url) {
+                        		this.sUrl = url;
+                        		this.start();
+                        	}
+
+                        	@Override
+                        	public void run() {
+                                openIntent(this.sUrl);
+                        	}
+                		}.start0(url);
 
                     }
 

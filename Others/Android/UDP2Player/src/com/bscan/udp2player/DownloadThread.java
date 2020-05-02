@@ -68,8 +68,9 @@ public class DownloadThread implements Runnable {
         try{
             URL url = new URL(path);
             HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-            conn.setConnectTimeout(9 * 1000);
+            conn.setConnectTimeout(2 * 1000);
             conn.setReadTimeout(9 * 1000);
+            
             //设置请求方法
             conn.setRequestMethod("GET");
             //设置请求属性
@@ -108,7 +109,8 @@ public class DownloadThread implements Runnable {
             try {
             	if(currentPart != null)
             		currentPart.close();
-                inputStream.close();
+            	if(inputStream != null)
+            		inputStream.close();
             }catch (Exception e){
                 e.printStackTrace();
             }
