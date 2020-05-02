@@ -137,6 +137,7 @@ public class TcpServer extends Thread{
     				}
     				else 
     				{
+    					String srt2=new String(MainActivity.bytesM3u8);
     					while(MainActivity.bytesM3u8 == null)
 							try {
 								Thread.sleep(100);

@@ -54,8 +54,11 @@ public class DownUtil {
 		}
         //Header.header.forEach((key, value) -> conn.setRequestProperty(key,value));
 
+        conn.setRequestProperty("Accept-Encoding", "identity");
         //得到文件大小
         fileSize = conn.getContentLength();
+        
+        //fileSize = 15000;
         conn.disconnect();
         
         int currentPartSize = fileSize / threadNum + 1;

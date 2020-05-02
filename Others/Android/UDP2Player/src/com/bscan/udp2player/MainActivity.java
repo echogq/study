@@ -123,8 +123,9 @@ public class MainActivity extends Activity implements Runnable{
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                	openIntent("https://cn4.5311444.com/hls/20190426/97ed0bf400fc7efb547d3f91ea31d7b1/1556253639/index.m3u8");
-                 	//openIntent("https://leshi.cdn-zuyida.com/20180421/23526_27748718/index.m3u8");
+//                	openIntent("https://tv1.youkutv.cc/2020/03/28/h0fA8TSZSijKdCi4/playlist.m3u8");
+//                	openIntent("https://cn4.5311444.com/hls/20190426/97ed0bf400fc7efb547d3f91ea31d7b1/1556253639/index.m3u8");
+                	openIntent("https://leshi.cdn-zuyida.com/20180421/23526_27748718/index.m3u8");
                }
             }).start();
          }
@@ -291,6 +292,14 @@ public class MainActivity extends Activity implements Runnable{
         //mediaIntent.setFlags(0x10200000);
         //intent.putExtra("data", setData());
         mediaIntent.setPackage("com.mxtech.videoplayer.pro");
+        
+        while(StaticBufs.vFileMap.size() == 0)
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         startActivity(mediaIntent);
         
 //        String[] headers = {
@@ -322,7 +331,7 @@ public class MainActivity extends Activity implements Runnable{
         			//                	file2.mkdirs();
 
         			while(true){
-        				Log.i("TAGo", "开始下载" + this.sUrl);
+        				Log.i("TAGo", "开始下载 " + this.sUrl);
         				String sUrl = this.sUrl;
         				DownUtil downUtil = new DownUtil(
         						sUrl,
@@ -339,31 +348,58 @@ public class MainActivity extends Activity implements Runnable{
         				bytesM3u8 = downUtil.downLoad();
 
         				Log.i("TAGo",  "M3u8 下载完成，长度 :" + bytesM3u8.length);
+        				
+        				String strTmp = new String(bytesM3u8);
+        				if(strTmp.indexOf(".m3u8") <0)
+        				{//修改M3U8, 避开MXPLAYER PRO的bug
+        					String strTmp2 = "";
+            				ByteArrayInputStream byteArray = new ByteArrayInputStream(bytesM3u8);
+            				BufferedReader bInput = new BufferedReader(new InputStreamReader(byteArray));
+            				//String[] subUrl = sUrl.split("/");
+            				String sOneLine;  
+            				while ((sOneLine= bInput.readLine()) != null) {
+            					if(sOneLine.indexOf(".ts") >0) {
+	            					if((sOneLine.indexOf("/") ==0))
+	            						break;
+            						
+	            					String sPrefix = "";
+            						sPrefix = sUrl.substring(0, sUrl.lastIndexOf("/"))+"/";
+            						sOneLine = sPrefix + sOneLine;
+
+            						sOneLine = sOneLine.substring(getFromIndex(sUrl, ("/"), 3));
+            					}
+            					strTmp2 += sOneLine;
+                				strTmp2 += "\n";
+            				}
+            				if(sOneLine== null)
+            					bytesM3u8 = strTmp2.getBytes();
+        				}
+        					Log.i("TAp", new String(bytesM3u8));  
         				//解析M3U8
         				ByteArrayInputStream byteArray = new ByteArrayInputStream(bytesM3u8);
         				BufferedReader bInput = new BufferedReader(new InputStreamReader(byteArray));
         				//String[] subUrl = sUrl.split("/");
-        				String input;  
-        				while ((input= bInput.readLine()) != null) {  
-        					Log.i("TAG", input);  
+        				String sOneLine;  
+        				while ((sOneLine= bInput.readLine()) != null) {  
+        					Log.i("TAG", sOneLine);  
 
         					String sPrefix = "";
-        					if((input.indexOf("/") ==0))
+        					if((sOneLine.indexOf("/") ==0))
         						sPrefix = sUrl.substring(0, getFromIndex(sUrl, ("/"), 3));
         					else
         						sPrefix = sUrl.substring(0, sUrl.lastIndexOf("/"))+"/";
-        					if(input.indexOf(".m3u8") >0) {
+        					if(sOneLine.indexOf(".m3u8") >0) {
         						bytesM3u8 = null;
-        						this.sUrl = sPrefix + input;
+        						this.sUrl = sPrefix + sOneLine;
         						break;
         					}
-        					if(((input.indexOf(".ts") >=0) 
-        							|| (input.indexOf(".mp4") >=0)) && (input.indexOf(".m3u8") <0))
+        					if(((sOneLine.indexOf(".ts") >=0) 
+        							|| (sOneLine.indexOf(".mp4") >=0)) && (sOneLine.indexOf(".m3u8") <0))
         					{
         						if((StaticBufs.sCurPlayingPart[0].length() > 0) && !StaticBufs.vFileMap.containsKey(StaticBufs.sCurPlayingPart[0])){
         							bInput = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(bytesM3u8)));
-        							while ((input= bInput.readLine()) != null) {
-        								if(input.equals(StaticBufs.sCurPlayingPart[0]))
+        							while ((sOneLine= bInput.readLine()) != null) {
+        								if(sOneLine.equals(StaticBufs.sCurPlayingPart[0]))
         									break;
         							}
         						}
@@ -401,7 +437,7 @@ public class MainActivity extends Activity implements Runnable{
         									StaticBufs.iCntThreads[0]--;
         								}
         							}
-        						}.start0(sPrefix , input);
+        						}.start0(sPrefix , sOneLine);
 
 
         						//break;

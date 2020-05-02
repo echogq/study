@@ -56,7 +56,11 @@ public class DownloadThread implements Runnable {
         Log.i("TAG", "即将下载 "+Thread.currentThread().getName()+ " size: "  + currentPartSize);
         
     	while(!downHTTP())
-    		;
+    	{
+            this.currentPart = null;
+            this.length = 0;
+    	}	
+        Log.i("TAG", "Done下载 "+Thread.currentThread().getName()+ " size: "  + currentPartSize);
     }
     
 	public boolean downHTTP() {
@@ -64,8 +68,8 @@ public class DownloadThread implements Runnable {
         try{
             URL url = new URL(path);
             HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-            conn.setConnectTimeout(5 * 1000);
-            conn.setReadTimeout(2 * 1000);
+            conn.setConnectTimeout(9 * 1000);
+            conn.setReadTimeout(9 * 1000);
             //设置请求方法
             conn.setRequestMethod("GET");
             //设置请求属性
@@ -77,9 +81,9 @@ public class DownloadThread implements Runnable {
             inputStream = conn.getInputStream();
             //inputStream.skip(n);跳过和丢弃此输入流中数据的 n 个字节
             inputStream.skip(this.startPos);
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[StaticBufs.iBufBlockSize];
             int hasRead = 0;
-            int needRead = (currentPartSize<1024)?currentPartSize:1024;
+            int needRead = (currentPartSize<StaticBufs.iBufBlockSize)?currentPartSize:StaticBufs.iBufBlockSize;
             //读取网络数据写入本地
             Log.i("TAG", Thread.currentThread().getName()+ " :::::: " + currentPartSize + " == " +  startPos );
             while(length < currentPartSize && (hasRead = inputStream.read(buffer, 0, needRead)) != -1){
@@ -110,7 +114,11 @@ public class DownloadThread implements Runnable {
             }
             latch.countDown();
         }
-		return true;
+        
+        if(length < currentPartSize)
+    		return false;
+        else
+        	return true;
 	}
 
     public int getLength() {
