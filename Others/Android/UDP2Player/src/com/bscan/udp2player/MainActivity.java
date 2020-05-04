@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
+import java.math.BigDecimal;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
@@ -44,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
  
@@ -63,7 +65,7 @@ public class MainActivity extends Activity implements Runnable{
     static byte[] bytesM3u8 = null;
     
   //子字符串modelStr在字符串str中第count次出现时的下标
-    private int getFromIndex(String str, String modelStr, Integer count) {
+    public static int getFromIndex(String str, String modelStr, Integer count) {
     	//对子字符串进行匹配
             Matcher slashMatcher = Pattern.compile(modelStr).matcher(str);
     	int index = 0;
@@ -125,8 +127,9 @@ public class MainActivity extends Activity implements Runnable{
                 public void run() {
 //                	openIntent("https://tv1.youkutv.cc/2020/03/28/h0fA8TSZSijKdCi4/playlist.m3u8");
 //                	openIntent("https://cn4.5311444.com/hls/20190426/97ed0bf400fc7efb547d3f91ea31d7b1/1556253639/index.m3u8");
-                	openIntent("https://leshi.cdn-zuyida.com/20180421/23526_27748718/index.m3u8");
+//                	openIntent("https://leshi.cdn-zuyida.com/20180421/23526_27748718/index.m3u8");
 //                	openIntent("http://videohy.tc.qq.com/vwecam.tc.qq.com/1006_7f00e3e804394aefbccd579689afacc8.f0.mp4?vkey=50A1AED2B5A08D6F7AB1C53C71207F5CD95376F186A3E02319626CF3D722451D4E914DE0502D5EF6E7F7B87F9FA206ED1B27ACE3A07CE18E&rf=mobile.qzone.qq.com");
+                	openIntent("");
                }
             }).start();
          }
@@ -270,17 +273,24 @@ public class MainActivity extends Activity implements Runnable{
     }
     
 	public void openIntent(String url) {
-		setBtnText(url);
-
-		String sUrl2Player = "http://127.0.0.1:9999/?go="+url;
-		if(url.indexOf(".ts.m3u8") >=0)
-			sUrl2Player = url;
-		else if(url.indexOf(".m3u") >=0)
+		
+		String sUrl2Player = url;
+		if(url.length() == 0) {
+			url = beforeResult;
+			setBtnText(url);
+			sUrl2Player = "http://127.0.0.1:9999/?go="+url;
 			buffM3U8(url);
+		}
 		else
-			sUrl2Player = url;
+			setBtnText(url);
 
-
+//		String sUrl2Player = "http://127.0.0.1:9999/?go="+url;
+//		if(url.indexOf(".ts.m3u8") >=0)
+//			sUrl2Player = url;
+//		else if(url.indexOf(".m3u") >=0)
+//			buffM3U8(url);
+//		else
+//			sUrl2Player = url;
 		
 		String extension = MimeTypeMap.getFileExtensionFromUrl(url);
         String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
@@ -305,7 +315,7 @@ public class MainActivity extends Activity implements Runnable{
         mediaIntent.setPackage("com.mxtech.videoplayer.pro");
         
         if(!sUrl2Player.equals(url))
-	        while(StaticBufs.vFileMap.size() < 2)
+	        while(StaticBufs.vFileMap.size() < 1)
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
@@ -335,6 +345,7 @@ public class MainActivity extends Activity implements Runnable{
 		}
 		});
 	}
+
 
 	public void buffM3U8(String url) {
 		new Thread() {
@@ -378,27 +389,7 @@ public class MainActivity extends Activity implements Runnable{
         				String strTmp = new String(bytesM3u8);
         				if(strTmp.indexOf(".m3u8") <0)
         				{//修改M3U8, 避开MXPLAYER PRO的bug
-        					String strTmp2 = "";
-            				ByteArrayInputStream byteArray = new ByteArrayInputStream(bytesM3u8);
-            				BufferedReader bInput = new BufferedReader(new InputStreamReader(byteArray));
-            				//String[] subUrl = sUrl.split("/");
-            				String sOneLine;  
-            				while ((sOneLine= bInput.readLine()) != null) {
-            					if(sOneLine.indexOf(".ts") >0) {
-	            					if((sOneLine.indexOf("/") ==0))
-	            						break;
-            						
-	            					String sPrefix = "";
-            						sPrefix = sUrl.substring(0, sUrl.lastIndexOf("/"))+"/";
-            						sOneLine = sPrefix + sOneLine;
-
-            						sOneLine = sOneLine.substring(getFromIndex(sUrl, ("/"), 3));
-            					}
-            					strTmp2 += sOneLine;
-                				strTmp2 += "\n";
-            				}
-            				if(sOneLine== null)
-            					bytesM3u8 = strTmp2.getBytes();
+        					modM3u8ForMXPlayer(sUrl);
         				}
         					Log.i("TAp", new String(bytesM3u8));  
         				//解析M3U8
@@ -422,51 +413,70 @@ public class MainActivity extends Activity implements Runnable{
         					if(((sOneLine.indexOf(".ts") >=0) 
         							|| (sOneLine.indexOf(".mp4") >=0)) && (sOneLine.indexOf(".m3u8") <0))
         					{
-        						if((StaticBufs.sCurPlayingPart[0].length() > 0) && !StaticBufs.vFileMap.containsKey(StaticBufs.sCurPlayingPart[0])){
+        						if((StaticBufs.sCurPlayingPart[0].length() > 0) && !StaticBufs.conKey(StaticBufs.sCurPlayingPart[0])){
         							bInput = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(bytesM3u8)));
         							while ((sOneLine= bInput.readLine()) != null) {
         								if(sOneLine.equals(StaticBufs.sCurPlayingPart[0]))
+        								{
+        									StaticBufs.sCurPlayingPart[0] = "";
+
         									break;
+        								}
         							}
         						}
+
+        						if(StaticBufs.lstNames.indexOf(sOneLine) == -1)
+        							StaticBufs.lstNames.add(sOneLine);
+        						
+    							for (int i = 0; i < StaticBufs.lstNames.size()-(MainActivity.MAX_BLOCKs/2); i++) {
+    								StaticBufs.vecIngAndDone.remove(StaticBufs.lstNames.get(i));
+    								StaticBufs.mapRemove(StaticBufs.lstNames.get(i));
+        						//StaticBufs.lstNames.RemoveRange(1,3);
+    							}
 
         						while((StaticBufs.iCntThreads[0] >= MAX_THREADS)||(StaticBufs.vFileMap.size() >= MainActivity.MAX_BLOCKs))
         							Thread.sleep(50);
 
-        						new Thread() {
-        							String sPrefix;
-        							String input;
-        							public void start0(String sPrefix, String input) {
-        								this.sPrefix = sPrefix;
-        								this.input = input;
-        								StaticBufs.iCntThreads[0]++;
-        								this.start();
-        							}
-        							@Override
-        							public void run() {
-        								//这里写入子线程需要做的工作
-        								DownUtil downOne = new DownUtil(
-        										sPrefix + input,
-        										//filepath + "/filename2",
-        										"",
-        										1);//暂时只能单线程下载，直到改正了里面的skip
-        								byte[] pppm;
-        								try {
-        									setBtnText("开始下载: " + input);
-        			        				pppm = downOne.downLoad();
-        									setBtnText(input + "下载完成，长度 :" + pppm.length);
-        			        				StaticBufs.vFileMap.put(input, pppm);
-        									//getFileByBytes(pppm, filepath, "file00000000.ts");
-        									Log.i("TAG", "len=" + StaticBufs.vFileMap.get(input).length);
-        								} catch (Exception e) {
-        									// TODO Auto-generated catch block
-        									e.printStackTrace();
-        								} finally {
-        									StaticBufs.iCntThreads[0]--;
-        								}
-        							}
-        						}.start0(sPrefix , sOneLine);
-
+        						//if(!StaticBufs.conKey(sOneLine) && !DownUtil.isDowning(sOneLine))
+        						//if(!StaticBufs.conKey(sOneLine) && !DownUtil.isDowning(sOneLine))
+        						if(!StaticBufs.vecIngAndDone.contains(sOneLine))
+        						{
+        							StaticBufs.vecIngAndDone.addElement(sOneLine);
+	        			            UDP_Push.pushLog(sPrefix +sOneLine + " " +(!StaticBufs.conKey(sOneLine)) + "_" +!DownUtil.isDowning(sOneLine));
+	
+	        						new Thread() {
+	        							String sPrefix;
+	        							String input;
+	        							public void start0(String sPrefix, String input) {
+	        								this.sPrefix = sPrefix;
+	        								this.input = input;
+	        								StaticBufs.iCntThreads[0]++;
+	        								this.start();
+	        							}
+	        							@Override
+	        							public void run() {
+	        								//这里写入子线程需要做的工作
+	        								DownUtil downOne = new DownUtil(
+	        										sPrefix + input,
+	        										//filepath + "/filename2",
+	        										"",
+	        										1);//暂时只能单线程下载，直到改正了里面的skip
+	        								byte[] pppm;
+	        								try {
+	        									setBtnText("开始下载: " + input);
+	        			        				pppm = downOne.downLoad();
+	        									setBtnText(input + "下载完成，长度 :" + pppm.length);
+	        									//getFileByBytes(pppm, filepath, "file00000000.ts");
+	        									Log.i("TAG", "len=" + StaticBufs.vFileMap.get(input).length);
+	        								} catch (Exception e) {
+	        									// TODO Auto-generated catch block
+	        									e.printStackTrace();
+	        								} finally {
+	        									StaticBufs.iCntThreads[0]--;
+	        								}
+	        							}
+	        						}.start0(sPrefix , sOneLine);
+        						}
 
         						//break;
         					}
@@ -477,6 +487,7 @@ public class MainActivity extends Activity implements Runnable{
 
         				}  
 
+			            UDP_Push.pushLog("M3u8: "+ new String(bytesM3u8));
         				if(!sUrl.equals(this.sUrl))
         					continue;
         				else
@@ -536,6 +547,30 @@ public class MainActivity extends Activity implements Runnable{
     }
     
 
+
+	public void modM3u8ForMXPlayer(String sUrl) throws IOException {
+		String strTmp2 = "";
+		ByteArrayInputStream byteArray = new ByteArrayInputStream(bytesM3u8);
+		BufferedReader bInput = new BufferedReader(new InputStreamReader(byteArray));
+		//String[] subUrl = sUrl.split("/");
+		String sOneLine;  
+		while ((sOneLine= bInput.readLine()) != null) {
+			if(sOneLine.indexOf(".ts") >0) {
+				if((sOneLine.indexOf("/") ==0))
+					break;
+				
+				String sPrefix = "";
+				sPrefix = sUrl.substring(0, sUrl.lastIndexOf("/"))+"/";
+				sOneLine = sPrefix + sOneLine;
+
+				sOneLine = sOneLine.substring(getFromIndex(sUrl, ("/"), 3));
+			}
+			strTmp2 += sOneLine;
+			strTmp2 += "\n";
+		}
+		if(sOneLine== null)
+			bytesM3u8 = strTmp2.getBytes();
+	}
 
 	private static  String getRunningApk(String sPackageName) {
 	    long startTime = System.currentTimeMillis();

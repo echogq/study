@@ -2,15 +2,32 @@ package com.bscan.udp2player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class StaticBufs {
     public static final ArrayList<String> lstNames = new ArrayList();
     public static final String[] sCurPlayingPart = new String[1];
     public static final int[] iCntThreads = new int[1];
     public static final int iBufBlockSize = 32*1024;
-    public static final HashMap<String ,byte[]> vFileMap = new HashMap<>();
+	public static Vector<String> vecIngAndDone=new Vector<String>();
+
+    public static final HashMap<String ,byte[]> vFileMap = new HashMap<>(); //map，hashmap不是线程安全的
+  //Hashtable
+//    public static final Map<String, byte[]> vFileMap = new Hashtable<>();
     public static final HashMap<String ,String> header = new HashMap<>();
+    public static Lock lock = new ReentrantLock();;
+    public static boolean conKey(String sKey) {
+    	boolean ret = false;
+		lock.lock(); 
+		ret = vFileMap.containsKey(sKey);
+		lock.unlock();  
+		return ret;
+    }
     private StaticBufs() {
     }
     static {
@@ -26,5 +43,22 @@ public class StaticBufs {
 //                        + "application/x-ms-application,application/vnd.ms-excel"
 //                        + "application/vnd.ms-powerpoint, application/msword,*/*");
     }
+	public static void put(String input, byte[] pppm) {
+		lock.lock();  
+		vFileMap.put(input, pppm);
+		lock.unlock();  
+		UDP_Push.pushLog("vFileMap.put("+input);
+	}
+	public static byte[] get(String sKey) {
+		lock.lock();  
+		byte[] tmp = vFileMap.get(sKey);
+		lock.unlock();  
+		return tmp;
+	}
+	public static void mapRemove(String string) {
+		lock.lock();  
+		vFileMap.remove(string);
+		lock.unlock();  
+	}
 
 }
