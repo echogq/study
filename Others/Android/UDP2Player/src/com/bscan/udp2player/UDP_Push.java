@@ -35,6 +35,69 @@ public class UDP_Push  extends Activity {
     private String sUrl = "";
     private TextView TextView00;
     private TextView TextView01;
+    
+    public static void pushLog(final String sLog)
+    {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+            	//sendUDP(sLog, 8009);
+        		//发送的数据包，局网内的所有地址都可以收到该数据包
+        		DatagramPacket dataPacket = null;
+        		MulticastSocket ms;
+        		/*创建socket实例*/
+        		try {
+        		    ms = new MulticastSocket();
+
+        		    ms.setTimeToLive(4);
+        		    //将本机的IP（这里可以写动态获取的IP）地址放到数据包里，其实server端接收到数据包后也能获取到发包方的IP的
+        		    Date date = new Date();
+        		    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd  HH:mm:ss.SSS");
+        		    String formatedDate = format.format(date);
+         
+         
+//                                InetAddress localhost = InetAddress.getByName("localhost");
+//                                String hostAddress = localhost.getHostAddress();
+//                                String sendData = hostAddress +formatedDate;
+         
+         
+        		    //获取wifi服务
+//        		    WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+//        		    //判断wifi是否开启
+//        		    if (!wifiManager.isWifiEnabled()) {
+//        		        wifiManager.setWifiEnabled(true);
+//        		    }
+//        		    WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+//        		    int ipAddress = wifiInfo.getIpAddress();
+//        		    String ip = intToIp(ipAddress);
+//         
+
+        		    //String sendData=ip+formatedDate;
+//         		    String sendData = sPrefix + sUrl;
+//         		    if(sPrefix.length() > 0)
+//         		    	sendData += "?etag=12345";
+//                	sPrefix = "";
+
+
+//                                byte[] data = "192.168.1.109".getBytes();
+        		    byte[] data = ("\r\n"+sLog).getBytes();
+         
+        		    //224.0.0.1为广播地址
+        		    //InetAddress address = InetAddress.getByName("224.0.0.1");
+        		    InetAddress address = InetAddress.getByName("255.255.255.255");
+        		    //InetAddress address = InetAddress.getByName("192.168.1.255");
+        		    //这个地方可以输出判断该地址是不是广播类型的地址
+        		    System.out.println(address.isMulticastAddress());
+        		    dataPacket = new DatagramPacket(data, data.length, address,
+        		    		8009);
+        		    ms.send(dataPacket);
+        		    ms.close();
+        		} catch (Exception e) {
+        		    e.printStackTrace();
+        		}
+            }
+        }).start();
+    }
  
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,7 +118,12 @@ public class UDP_Push  extends Activity {
                 @Override
                 public void run() {
         	        setTxts();
-                	sendUDP();
+        	        
+         		    String sendData = sPrefix + sUrl;
+         		    if(sPrefix.length() > 0)
+         		    	sendData += "?etag=12345";
+                	sPrefix = "";
+                	sendUDP(sendData, 8003);
                 }
             }).start();
 
@@ -82,7 +150,11 @@ public class UDP_Push  extends Activity {
                     	
             	        sUrl = TextView00.getText().toString();
 
-                        sendUDP();
+             		    String sendData = sPrefix + sUrl;
+             		    if(sPrefix.length() > 0)
+             		    	sendData += "?etag=12345";
+                    	sPrefix = "";
+                    	sendUDP(sendData, 8003);
                     }
                 });
      
@@ -99,7 +171,11 @@ public class UDP_Push  extends Activity {
                     @Override
                     public void run() {
             	        sUrl = TextView01.getText().toString();
-                        sendUDP();
+             		    String sendData = sPrefix + sUrl;
+             		    if(sPrefix.length() > 0)
+             		    	sendData += "?etag=12345";
+                    	sPrefix = "";
+                    	sendUDP(sendData, 8003);
                     }
                 });
      
@@ -126,7 +202,7 @@ public class UDP_Push  extends Activity {
                 ( i >> 24 & 0xFF) ;
     }
  
-    public void sendUDP() {
+    public void sendUDP(String sendData, int iPort) {
 		//发送的数据包，局网内的所有地址都可以收到该数据包
 		DatagramPacket dataPacket = null;
 		/*创建socket实例*/
@@ -160,10 +236,10 @@ public class UDP_Push  extends Activity {
  
 
 		    //String sendData=ip+formatedDate;
- 		    String sendData = sPrefix + sUrl;
- 		    if(sPrefix.length() > 0)
- 		    	sendData += "?etag=12345";
-        	sPrefix = "";
+// 		    String sendData = sPrefix + sUrl;
+// 		    if(sPrefix.length() > 0)
+// 		    	sendData += "?etag=12345";
+//        	sPrefix = "";
 
 
 //                        byte[] data = "192.168.1.109".getBytes();
@@ -176,7 +252,7 @@ public class UDP_Push  extends Activity {
 		    //这个地方可以输出判断该地址是不是广播类型的地址
 		    System.out.println(address.isMulticastAddress());
 		    dataPacket = new DatagramPacket(data, data.length, address,
-		            8003);
+		    		iPort);
 		    ms.send(dataPacket);
 		    ms.close();
 		} catch (Exception e) {
@@ -204,8 +280,11 @@ public class UDP_Push  extends Activity {
                 @Override
                 public void run() {
                 	sPrefix = "https://www.playm3u8.cn/jiexi.php?url=";
-                    sendUDP();
+         		    String sendData = sPrefix + sUrl;
+         		    if(sPrefix.length() > 0)
+         		    	sendData += "?etag=12345";
                 	sPrefix = "";
+                	sendUDP(sendData, 8003);
                 }
             });
  
@@ -225,8 +304,11 @@ public class UDP_Push  extends Activity {
                 @Override
                 public void run() {
                 	sPrefix = "http://vip.vip-dianying.com/8050/?url=";
-                    sendUDP();
+         		    String sendData = sPrefix + sUrl;
+         		    if(sPrefix.length() > 0)
+         		    	sendData += "?etag=12345";
                 	sPrefix = "";
+                	sendUDP(sendData, 8003);
                 }
             });
  
