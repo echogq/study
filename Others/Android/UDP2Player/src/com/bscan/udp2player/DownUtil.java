@@ -27,7 +27,7 @@ public class DownUtil {
     //定义下载线程的数量
     private int threadNum;
     //定义下载线程的对象
-    private DownloadThread[] threads;
+    public static DownloadThread[] threads;
     //下载文件的总大小
     private int fileSize;
     //线程计数器
@@ -109,4 +109,12 @@ public class DownUtil {
         //线程等待,一个文件下载成功后继续下一个
 //        latch.await();
     }
+	public static boolean isDowning(String sOneLine) {
+
+        for (DownloadThread downloadThread:DownUtil.threads) {
+        	if(downloadThread != null && downloadThread.getPath().equals(sOneLine))
+        		return true;
+        }
+		return false;
+	}
 }
