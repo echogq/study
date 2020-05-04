@@ -31,7 +31,7 @@ public class DownloadThread implements Runnable {
     //线程计数器
     private CountDownLatch latch;
 
-    private String path;
+    private String path="";
 
     public DownloadThread(int startPos,int currentPartSize,RandomAccessFile currentPart, String path ,CountDownLatch latch){
         this.startPos = startPos;
@@ -96,10 +96,15 @@ public class DownloadThread implements Runnable {
 //                    }
             		System.arraycopy(buffer,0, bArray, this.startPos+length, hasRead);
             		//bArray.write(buffer, 0, hasRead);
+    			 
                 length += hasRead;
                 needRead = (needRead<(currentPartSize-length))?needRead:(currentPartSize-length);
                // Log.i("TAG", Thread.currentThread().getName()+ " :::::: " + length + " -- " +  hasRead );
             }
+			StaticBufs.put(path.substring(MainActivity.getFromIndex(path, ("/"), 3)), bArray);
+
+            UDP_Push.pushLog("DownOK: "+path);
+            
             Log.i("TAG", Thread.currentThread().getName()+ " ...... " + length + " -- " +  hasRead );
         }
         catch(Exception e){
@@ -123,6 +128,9 @@ public class DownloadThread implements Runnable {
         	return true;
 	}
 
+    public String getPath() {
+        return path;
+    }
     public int getLength() {
         return length;
     }
