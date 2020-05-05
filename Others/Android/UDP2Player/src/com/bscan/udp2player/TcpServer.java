@@ -99,7 +99,8 @@ public class TcpServer extends Thread{
     					}
     					
     					UDP_Push.pushLog("MX Player ask: "+sHttpGetPath);
-    					
+    			    	Log.i("TAGmx", "MX Player ask: "+sHttpGetPath);
+
     					//if(StaticBufs.conKey(sHttpGetPath) == false)
     					if(!StaticBufs.vecIngAndDone.contains(sHttpGetPath))
 								StaticBufs.sCurPlayingPart[0] = sHttpGetPath;
@@ -125,6 +126,7 @@ public class TcpServer extends Thread{
     						out.flush();
  
         					UDP_Push.pushLog("MX Player got: "+sHttpGetPath + " Len=" + StaticBufs.get(sHttpGetPath).length);
+        			    	Log.i("TAGmx", "MX Player got: "+sHttpGetPath + " Len=" + StaticBufs.get(sHttpGetPath).length);
 
     						
     					}

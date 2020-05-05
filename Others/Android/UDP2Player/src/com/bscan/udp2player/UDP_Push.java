@@ -38,6 +38,7 @@ public class UDP_Push  extends Activity {
     
     public static void pushLog(final String sLog)
     {
+    	Log.i("TAGG", sLog);
         new Thread(new Runnable() {
             @Override
             public void run() {

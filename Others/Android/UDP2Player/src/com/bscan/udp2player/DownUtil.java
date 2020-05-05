@@ -29,7 +29,7 @@ public class DownUtil {
     //定义下载线程的对象
     public static DownloadThread[] threads;
     //下载文件的总大小
-    private int fileSize;
+    private long fileSize;
     //线程计数器
     private CountDownLatch latch;
 
@@ -43,30 +43,35 @@ public class DownUtil {
     public byte[] downLoad() throws Exception{
         long t1 = System.currentTimeMillis();
         URL url = new URL(path);
-        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-        conn.setConnectTimeout(5 * 1000);
-        //设置请求方法
-        conn.setRequestMethod("GET");
-        //设置请求属性
-        for (Map.Entry<String ,String> entry : StaticBufs.header.entrySet()) {
-			Log.i("TAG", "Key = " + entry.getKey() + ", Value = " + entry.getValue());
-			conn.setRequestProperty(entry.getKey(), entry.getValue());
-		}
-        //Header.header.forEach((key, value) -> conn.setRequestProperty(key,value));
-
-        conn.setRequestProperty("Accept-Encoding", "identity");
-        //得到文件大小
-        fileSize = conn.getContentLength();
         
-        //fileSize = 15000;
-        conn.disconnect();
-        
-        int currentPartSize = fileSize / threadNum + 1;
+        fileSize = -1;
+        while(fileSize == -1)
+        {
+	        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+	        conn.setConnectTimeout(2 * 1000);
+	        conn.setReadTimeout(9 * 1000);
+	        //设置请求方法
+	        conn.setRequestMethod("GET");
+	        //设置请求属性
+	        for (Map.Entry<String ,String> entry : StaticBufs.header.entrySet()) {
+				Log.i("TAG", "Key = " + entry.getKey() + ", Value = " + entry.getValue());
+				conn.setRequestProperty(entry.getKey(), entry.getValue());
+			}
+	        //Header.header.forEach((key, value) -> conn.setRequestProperty(key,value));
+	
+	        conn.setRequestProperty("Accept-Encoding", "identity");
+	        //得到文件大小
+	        fileSize = conn.getContentLength();
+	        
+	        //fileSize = 15000;
+	        conn.disconnect();
+        }
+        long currentPartSize = fileSize / threadNum + 1;
         byte[]b = null;
         
         for(int i = 0;i < threadNum;i++){
             //计算每个线程的下载位置
-            int startPos = i * currentPartSize;
+            long startPos = i * currentPartSize;
             
             if(fileSize - startPos < currentPartSize)
             	currentPartSize = fileSize - startPos;
@@ -76,13 +81,13 @@ public class DownUtil {
 	            //定位该线程的下载位置
 	            currentPart.seek(startPos);
 	            //创建下载线程
-	            threads[i] = new DownloadThread(startPos, currentPartSize, currentPart , path , latch);
+	            threads[i] = new DownloadThread((int)startPos, (int)currentPartSize, currentPart , path , latch);
             }
             else{
             	if(b == null)
-            		b = new byte[fileSize];
+            		b = new byte[(int)fileSize];
             	//ByteArrayOutputStream bArray = new ByteArrayOutputStream(currentPartSize);
-	            threads[i] = new DownloadThread(startPos, currentPartSize, b , path , latch);
+	            threads[i] = new DownloadThread((int)startPos, (int)currentPartSize, b , path , latch);
             }
             Thread t = new Thread(threads[i]);
             t.start();

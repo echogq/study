@@ -130,6 +130,7 @@ public class MainActivity extends Activity implements Runnable{
 //                	openIntent("https://leshi.cdn-zuyida.com/20180421/23526_27748718/index.m3u8");
 //                	openIntent("http://videohy.tc.qq.com/vwecam.tc.qq.com/1006_7f00e3e804394aefbccd579689afacc8.f0.mp4?vkey=50A1AED2B5A08D6F7AB1C53C71207F5CD95376F186A3E02319626CF3D722451D4E914DE0502D5EF6E7F7B87F9FA206ED1B27ACE3A07CE18E&rf=mobile.qzone.qq.com");
                 	openIntent("");
+                	//openIntent("http://127.0.0.1:9999/?go=https://56.com-t-56.com/20190222/6275_993e32bb/index.m3u8");
                }
             }).start();
          }
@@ -277,6 +278,7 @@ public class MainActivity extends Activity implements Runnable{
 		String sUrl2Player = url;
 		if(url.length() == 0) {
 			url = beforeResult;
+			//url = "https://56.com-t-56.com/20190222/6275_993e32bb/index.m3u8";
 			setBtnText(url);
 			sUrl2Player = "http://127.0.0.1:9999/?go="+url;
 			buffM3U8(url);
@@ -428,7 +430,7 @@ public class MainActivity extends Activity implements Runnable{
         						if(StaticBufs.lstNames.indexOf(sOneLine) == -1)
         							StaticBufs.lstNames.add(sOneLine);
         						
-    							for (int i = 0; i < StaticBufs.lstNames.size()-(MainActivity.MAX_BLOCKs/2); i++) {
+    							for (int i = 0; i < StaticBufs.lstNames.size()-(MainActivity.MAX_BLOCKs/3); i++) {
     								StaticBufs.vecIngAndDone.remove(StaticBufs.lstNames.get(i));
     								StaticBufs.mapRemove(StaticBufs.lstNames.get(i));
         						//StaticBufs.lstNames.RemoveRange(1,3);
@@ -442,7 +444,7 @@ public class MainActivity extends Activity implements Runnable{
         						if(!StaticBufs.vecIngAndDone.contains(sOneLine))
         						{
         							StaticBufs.vecIngAndDone.addElement(sOneLine);
-	        			            UDP_Push.pushLog(sPrefix +sOneLine + " " +(!StaticBufs.conKey(sOneLine)) + "_" +!DownUtil.isDowning(sOneLine));
+	        			            //UDP_Push.pushLog(sPrefix +sOneLine + " " +(!StaticBufs.conKey(sOneLine)) + "_" +!DownUtil.isDowning(sOneLine));
 	
 	        						new Thread() {
 	        							String sPrefix;
@@ -487,7 +489,7 @@ public class MainActivity extends Activity implements Runnable{
 
         				}  
 
-			            UDP_Push.pushLog("M3u8: "+ new String(bytesM3u8));
+			            if(bytesM3u8 != null) UDP_Push.pushLog("M3u8: "+ new String(bytesM3u8).substring(0, 500));
         				if(!sUrl.equals(this.sUrl))
         					continue;
         				else

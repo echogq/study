@@ -101,7 +101,8 @@ public class DownloadThread implements Runnable {
                 needRead = (needRead<(currentPartSize-length))?needRead:(currentPartSize-length);
                // Log.i("TAG", Thread.currentThread().getName()+ " :::::: " + length + " -- " +  hasRead );
             }
-			StaticBufs.put(path.substring(MainActivity.getFromIndex(path, ("/"), 3)), bArray);
+            if(path.indexOf(".m3u8") <0)
+            	StaticBufs.put(path.substring(MainActivity.getFromIndex(path, ("/"), 3)), bArray);
 
             UDP_Push.pushLog("DownOK: "+path);
             
