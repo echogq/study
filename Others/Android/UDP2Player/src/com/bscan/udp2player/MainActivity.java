@@ -59,7 +59,7 @@ public class MainActivity extends Activity implements Runnable{
     Handler mHandler;
 	TcpServer m3u8Server;
     public final static String EXTRA_MESSAGE = "com.bscan.udp2player.MESSAGE";
-	protected static final int MAX_THREADS = 10;
+	protected static final int MAX_THREADS = 3;
     public static final int MAX_BLOCKs = 80;
 
     static byte[] bytesM3u8 = null;
@@ -279,6 +279,7 @@ public class MainActivity extends Activity implements Runnable{
 		if(url.length() == 0) {
 			url = beforeResult;
 			//url = "https://56.com-t-56.com/20190222/6275_993e32bb/index.m3u8";
+			//url = "https://leshi.cdn-zuyida.com/20180421/23526_27748718/index.m3u8";
 			setBtnText(url);
 			sUrl2Player = "http://127.0.0.1:9999/?go="+url;
 			buffM3U8(url);
@@ -420,7 +421,7 @@ public class MainActivity extends Activity implements Runnable{
         							while ((sOneLine= bInput.readLine()) != null) {
         								if(sOneLine.equals(StaticBufs.sCurPlayingPart[0]))
         								{
-        									StaticBufs.sCurPlayingPart[0] = "";
+        									//StaticBufs.sCurPlayingPart[0] = "";
 
         									break;
         								}
@@ -436,9 +437,6 @@ public class MainActivity extends Activity implements Runnable{
         						//StaticBufs.lstNames.RemoveRange(1,3);
     							}
 
-        						while((StaticBufs.iCntThreads[0] >= MAX_THREADS)||(StaticBufs.vFileMap.size() >= MainActivity.MAX_BLOCKs))
-        							Thread.sleep(50);
-
         						//if(!StaticBufs.conKey(sOneLine) && !DownUtil.isDowning(sOneLine))
         						//if(!StaticBufs.conKey(sOneLine) && !DownUtil.isDowning(sOneLine))
         						if(!StaticBufs.vecIngAndDone.contains(sOneLine))
@@ -446,38 +444,53 @@ public class MainActivity extends Activity implements Runnable{
         							StaticBufs.vecIngAndDone.addElement(sOneLine);
 	        			            //UDP_Push.pushLog(sPrefix +sOneLine + " " +(!StaticBufs.conKey(sOneLine)) + "_" +!DownUtil.isDowning(sOneLine));
 	
-	        						new Thread() {
-	        							String sPrefix;
-	        							String input;
-	        							public void start0(String sPrefix, String input) {
-	        								this.sPrefix = sPrefix;
-	        								this.input = input;
-	        								StaticBufs.iCntThreads[0]++;
-	        								this.start();
-	        							}
-	        							@Override
-	        							public void run() {
-	        								//这里写入子线程需要做的工作
-	        								DownUtil downOne = new DownUtil(
-	        										sPrefix + input,
-	        										//filepath + "/filename2",
-	        										"",
-	        										1);//暂时只能单线程下载，直到改正了里面的skip
-	        								byte[] pppm;
-	        								try {
-	        									setBtnText("开始下载: " + input);
-	        			        				pppm = downOne.downLoad();
-	        									setBtnText(input + "下载完成，长度 :" + pppm.length);
-	        									//getFileByBytes(pppm, filepath, "file00000000.ts");
-	        									Log.i("TAG", "len=" + StaticBufs.vFileMap.get(input).length);
-	        								} catch (Exception e) {
-	        									// TODO Auto-generated catch block
-	        									e.printStackTrace();
-	        								} finally {
-	        									StaticBufs.iCntThreads[0]--;
-	        								}
-	        							}
-	        						}.start0(sPrefix , sOneLine);
+        							int i=1;
+    								if(sOneLine.equals(StaticBufs.sCurPlayingPart[0]))
+    								{
+    									StaticBufs.sCurPlayingPart[0] = "";
+
+    									i=5;
+    								}
+    								else
+    	        						while((StaticBufs.iCntThreads[0] >= MAX_THREADS)||(StaticBufs.vFileMap.size() >= MainActivity.MAX_BLOCKs))
+    	        							Thread.sleep(50);
+    									
+    								for(;i>0;i--){
+
+		        						new Thread() {
+		        							String sPrefix;
+		        							String input;
+		        							public void start0(String sPrefix, String input) {
+		        								this.sPrefix = sPrefix;
+		        								this.input = input;
+		        								StaticBufs.iCntThreads[0]++;
+		        								this.start();
+		        							}
+		        							@Override
+		        							public void run() {
+		        								//这里写入子线程需要做的工作
+		        								DownUtil downOne = new DownUtil(
+		        										sPrefix + input,
+		        										//filepath + "/filename2",
+		        										"",
+		        										1);//暂时只能单线程下载，直到改正了里面的skip
+		        								byte[] pppm;
+		        								try {
+		        									setBtnText("开始下载: " + input);
+		        						            UDP_Push.pushLog("Down: "+sPrefix + input + "->");
+		        			        				pppm = downOne.downLoad(); //小心：由于多线程下载同一文件，一个完成后，其余线程会中途退出，导致这个返回的数据其实不完整
+		        									setBtnText(input + "下载完成，长度 :" + pppm.length);
+		        									//getFileByBytes(pppm, filepath, "file00000000.ts");
+		        									Log.i("TAG", "len=" + StaticBufs.vFileMap.get(input).length);
+		        								} catch (Exception e) {
+		        									// TODO Auto-generated catch block
+		        									e.printStackTrace();
+		        								} finally {
+		        									StaticBufs.iCntThreads[0]--;
+		        								}
+		        							}
+		        						}.start0(sPrefix , sOneLine);							
+    								}
         						}
 
         						//break;

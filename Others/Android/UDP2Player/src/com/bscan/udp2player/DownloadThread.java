@@ -78,16 +78,24 @@ public class DownloadThread implements Runnable {
     			System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
     			conn.setRequestProperty(entry.getKey(), entry.getValue());
     		}
+	        conn.setRequestProperty("Accept-Encoding", "identity");
+	        
             //Header.header.forEach((key, value) -> conn.setRequestProperty(key,value));
             inputStream = conn.getInputStream();
             //inputStream.skip(n);跳过和丢弃此输入流中数据的 n 个字节
             inputStream.skip(this.startPos);
-            byte[] buffer = new byte[StaticBufs.iBufBlockSize];
+            //byte[] buffer = new byte[StaticBufs.iBufBlockSize];
+            byte[] buffer = new byte[1024];
             int hasRead = 0;
             int needRead = (currentPartSize<StaticBufs.iBufBlockSize)?currentPartSize:StaticBufs.iBufBlockSize;
             //读取网络数据写入本地
             Log.i("TAG", Thread.currentThread().getName()+ " :::::: " + currentPartSize + " == " +  startPos );
-            while(length < currentPartSize && (hasRead = inputStream.read(buffer, 0, needRead)) != -1){
+            while(length < currentPartSize && (hasRead = inputStream.read(buffer, 0, 1024)) != -1){
+            	if(StaticBufs.get(path.substring(MainActivity.getFromIndex(path, ("/"), 3))) != null)
+            	{
+            		length = currentPartSize;
+            		break;
+            	}
             	if(currentPart != null)
             		currentPart.write(buffer, 0, hasRead);
             	else
@@ -102,9 +110,10 @@ public class DownloadThread implements Runnable {
                // Log.i("TAG", Thread.currentThread().getName()+ " :::::: " + length + " -- " +  hasRead );
             }
             if(path.indexOf(".m3u8") <0)
-            	StaticBufs.put(path.substring(MainActivity.getFromIndex(path, ("/"), 3)), bArray);
+            	if(StaticBufs.get(path.substring(MainActivity.getFromIndex(path, ("/"), 3))) == null)
+            		StaticBufs.put(path.substring(MainActivity.getFromIndex(path, ("/"), 3)), bArray);
 
-            UDP_Push.pushLog("DownOK: "+path);
+            UDP_Push.pushLog("Down: "+path+" [OK]");
             
             Log.i("TAG", Thread.currentThread().getName()+ " ...... " + length + " -- " +  hasRead );
         }

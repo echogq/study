@@ -89,8 +89,7 @@ public class DownUtil {
             	//ByteArrayOutputStream bArray = new ByteArrayOutputStream(currentPartSize);
 	            threads[i] = new DownloadThread((int)startPos, (int)currentPartSize, b , path , latch);
             }
-            Thread t = new Thread(threads[i]);
-            t.start();
+            new Thread(threads[i]).start();
         }
         BigDecimal n = BigDecimal.ZERO;
         while (true){
