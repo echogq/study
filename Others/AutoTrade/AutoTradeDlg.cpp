@@ -1514,10 +1514,11 @@ void Thread_ClosePopups(PVOID param)
 			{
 				//FindClickRefresh(hSubWnd);
 				::EnableWindow(hSubWnd, FALSE);//这个按钮太危险，屏蔽掉它
+				::ShowWindow(hSubWnd, SW_HIDE);
 			}
 		}
 
-		LoginGFZQ();
+		//LoginGFZQ();
 
 		Sleep(50);
 	}

@@ -141,7 +141,7 @@ void FindClickRefresh(HWND hSubWnd)
 			do
 			{
 				Sleep(500);
-			} while (!::IsWindowEnabled(hSubWnd));
+			} while (!::IsWindowEnabled(hwnd));
 		}
 	}
 }

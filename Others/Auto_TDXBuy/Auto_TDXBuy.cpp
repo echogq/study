@@ -448,6 +448,8 @@ CAuto_TDXBuyApp theApp;
 
 BOOL CAuto_TDXBuyApp::InitInstance()
 {
+	LogTrace16380("  \n");
+	LogTrace16380("======查找主窗口 <<<<<=======\n");
 	::EnumWindows(EnumWindowsPrc, (LPARAM)"核新网上交易系统");
 	//WinExec("echo 0>>1.txt", SW_HIDE);
 	//g_hMainWnd = g_hMainWnd;
@@ -457,18 +459,21 @@ BOOL CAuto_TDXBuyApp::InitInstance()
 		ShowWindow(g_hMainWnd, SW_SHOWNORMAL);
 		SetForegroundWindow(g_hMainWnd);
 		SetActiveWindow(g_hMainWnd); //父窗口置为活动窗口
+		LogTrace16380("置为活动窗口\n");
 		HWND hSubWnd = Find_ChildWindow(g_hMainWnd, "同时买卖");//先找到唯一的子窗口，再取其父窗口进行关键按钮的查找
 		if (hSubWnd)
 		{
+			LogTrace16380("点击 刷新按钮\n");
 			FindClickRefresh(hSubWnd);
-			do 
-			{
+// 			do 
+// 			{
 				Sleep(500);
-			} while (!::IsWindowEnabled(hSubWnd));
+			//} while (!::IsWindowEnabled(hSubWnd));
 
 			//if (3 < __argc)
 			{
 				HWND hBtn_BS = NULL;
+				LogTrace16380("查找买卖按钮\n");
 				if (strstr(__argv[0], "Auto_TDXBuy"))
 				{
 					hBtn_BS = Find_ChildWindow(::GetParent(hSubWnd), "买入[B]");
@@ -481,11 +486,12 @@ BOOL CAuto_TDXBuyApp::InitInstance()
 				if (hBtn_BS)
 				{
 
-					LogTrace16380("点了一次按钮。。。\n");
+					LogTrace16380("点了一次买/卖按钮。。。\n");
 					PostMessage(hBtn_BS, BM_CLICK, 0, 0L);
 
 					//HWND hSubWnd0 = ::FindWindowA("#32770", "");//先找到唯一的子窗口，再取其父窗口进行关键按钮的查找
 
+					LogTrace16380("等待弹出框3s\n");
 					//等待弹出框3s
 					HWND hPopWnd = NULL;
 					for (int i = 0; i < 60; i++)
@@ -511,12 +517,14 @@ BOOL CAuto_TDXBuyApp::InitInstance()
 										LogTrace16380(buf);
 										//送出文字。。。
 
+										LogTrace16380("查找确定按钮\n");
 										//关闭(hPopWnd);
 										child = Find_ChildWindow(hPopWnd, "确定");
 										if (child)
 										{
 											SetForegroundWindow(hPopWnd);
 											SetActiveWindow(hPopWnd); //父窗口置为活动窗口
+											LogTrace16380("点击 确定按钮\n");
 											SendMessage(child, BM_CLICK, 0, 0);//单击
 
 											ShowWindow(g_hMainWnd, SW_MINIMIZE);
@@ -533,12 +541,14 @@ BOOL CAuto_TDXBuyApp::InitInstance()
 						Sleep(50);
 					}
 
+					LogTrace16380("======本次行动结束。 >>>>>=======\n");
 					return TRUE;
 
 				}
 			}
 		}
 	}
+	LogTrace16380("======本次行动。。。？？？？？？\n");
 	return FALSE; //下面的代码是为HAZQ.TDX, 暂时不用了。。。
 
 	if (3 < __argc)
