@@ -92,7 +92,7 @@ void print_window()
 	DWORD pid = 0, tid = 0;
 
 	do {
-		//查找 Explore 下的一个窗口,如果能找到则根据 Explore 下的child 继续找
+		//“查找” Explore 下的一个窗口,如果能找到则根据 Explore 下的child 继续找
 		child = FindWindowEx(NULL, child, NULL, NULL);
 		int ret = GetWindowText(child, buf, MAX_PATH);
 		buf[ret] = 0;
@@ -330,7 +330,7 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 					}
 					else
 					{
-						LogTrace16380("点击数量比例按钮。。。%08x %08x\n", pCurRateBtnWnd, pCurRateBtnWnd->m_hWnd);
+						LogTrace16380("【点击】数量比例 按钮。。。%08x %08x\n", pCurRateBtnWnd, pCurRateBtnWnd->m_hWnd);
 						char temp2[256] = { 0 };
 						while ((strcmp(temp2, "0") == 0) || (strlen(temp2) == 0))
 						{
@@ -341,7 +341,7 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 							Sleep(10);
 							::SendMessageA(pWnd->m_hWnd, WM_GETTEXT, 256, (LPARAM)temp2);//EDIT的句柄，消息，接收缓冲区大小，接收缓冲区指针
 						}
-						LogTrace16380("点击数量比例按钮结束\n");
+						LogTrace16380("【点击】数量比例 按钮结束\n");
 
 					}
 				}
@@ -367,7 +367,7 @@ void DoTrade(char* sRate, char * sDlgCaption, int iActionID, float fPriceOffset,
 		}
 
 		{
-			LogTrace16380("点击买卖按钮\n");
+			LogTrace16380("【点击】买卖 按钮\n");
 			Sleep(200);
 			HWND hWnd0 = NULL;
 			while (NULL == hWnd0)
@@ -449,7 +449,7 @@ CAuto_TDXBuyApp theApp;
 BOOL CAuto_TDXBuyApp::InitInstance()
 {
 	LogTrace16380("  \n");
-	LogTrace16380("======查找主窗口 <<<<<=======\n");
+	LogTrace16380("======“查找”主窗口 <<<<<=======\n");
 	::EnumWindows(EnumWindowsPrc, (LPARAM)"核新网上交易系统");
 	//WinExec("echo 0>>1.txt", SW_HIDE);
 	//g_hMainWnd = g_hMainWnd;
@@ -460,10 +460,10 @@ BOOL CAuto_TDXBuyApp::InitInstance()
 		SetForegroundWindow(g_hMainWnd);
 		SetActiveWindow(g_hMainWnd); //父窗口置为活动窗口
 		LogTrace16380("置为活动窗口\n");
-		HWND hSubWnd = Find_ChildWindow(g_hMainWnd, "同时买卖");//先找到唯一的子窗口，再取其父窗口进行关键按钮的查找
+		HWND hSubWnd = Find_ChildWindow(g_hMainWnd, "同时买卖");//先找到唯一的子窗口，再取其父窗口进行关键 按钮的“查找”
 		if (hSubWnd)
 		{
-			LogTrace16380("点击 刷新按钮\n");
+			LogTrace16380("【点击】 刷新 按钮\n");
 			FindClickRefresh(hSubWnd);
 // 			do 
 // 			{
@@ -473,7 +473,7 @@ BOOL CAuto_TDXBuyApp::InitInstance()
 			//if (3 < __argc)
 			{
 				HWND hBtn_BS = NULL;
-				LogTrace16380("查找买卖按钮\n");
+				LogTrace16380("“查找”买卖 按钮\n");
 				if (strstr(__argv[0], "Auto_TDXBuy"))
 				{
 					hBtn_BS = Find_ChildWindow(::GetParent(hSubWnd), "买入[B]");
@@ -486,12 +486,12 @@ BOOL CAuto_TDXBuyApp::InitInstance()
 				if (hBtn_BS)
 				{
 
-					LogTrace16380("点了一次买/卖按钮。。。\n");
+					LogTrace16380("【点击】 买/卖 按钮。。。\n");
 					PostMessage(hBtn_BS, BM_CLICK, 0, 0L);
 
-					//HWND hSubWnd0 = ::FindWindowA("#32770", "");//先找到唯一的子窗口，再取其父窗口进行关键按钮的查找
+					//HWND hSubWnd0 = ::FindWindowA("#32770", "");//先找到唯一的子窗口，再取其父窗口进行关键 按钮的“查找”
 
-					LogTrace16380("等待弹出框3s\n");
+					LogTrace16380("。。。等待弹出框3s\n");
 					//等待弹出框3s
 					HWND hPopWnd = NULL;
 					for (int i = 0; i < 60; i++)
@@ -517,14 +517,14 @@ BOOL CAuto_TDXBuyApp::InitInstance()
 										LogTrace16380(buf);
 										//送出文字。。。
 
-										LogTrace16380("查找确定按钮\n");
+										LogTrace16380("“查找”确定 按钮\n");
 										//关闭(hPopWnd);
 										child = Find_ChildWindow(hPopWnd, "确定");
 										if (child)
 										{
 											SetForegroundWindow(hPopWnd);
 											SetActiveWindow(hPopWnd); //父窗口置为活动窗口
-											LogTrace16380("点击 确定按钮\n");
+											LogTrace16380("【点击】 确定 按钮\n");
 											SendMessage(child, BM_CLICK, 0, 0);//单击
 
 											ShowWindow(g_hMainWnd, SW_MINIMIZE);
