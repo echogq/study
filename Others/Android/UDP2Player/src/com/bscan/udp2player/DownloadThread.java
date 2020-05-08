@@ -67,21 +67,22 @@ public class DownloadThread implements Runnable {
 		InputStream inputStream = null;
         try{
             URL url = new URL(path);
-            HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-            conn.setConnectTimeout(2 * 1000);
-            conn.setReadTimeout(9 * 1000);
-            
+        	if(DownUtil.conn == null) {
+	            DownUtil.conn = (HttpURLConnection)url.openConnection();
+	            DownUtil.conn.setConnectTimeout(2 * 1000);
+	            DownUtil.conn.setReadTimeout(9 * 1000);
+        	}
             //设置请求方法
-            conn.setRequestMethod("GET");
+        	DownUtil.conn.setRequestMethod("GET");
             //设置请求属性
             for (Map.Entry<String ,String> entry : StaticBufs.header.entrySet()) {
     			System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
-    			conn.setRequestProperty(entry.getKey(), entry.getValue());
+    			DownUtil.conn.setRequestProperty(entry.getKey(), entry.getValue());
     		}
-	        conn.setRequestProperty("Accept-Encoding", "identity");
+            DownUtil.conn.setRequestProperty("Accept-Encoding", "identity");
 	        
             //Header.header.forEach((key, value) -> conn.setRequestProperty(key,value));
-            inputStream = conn.getInputStream();
+            inputStream = DownUtil.conn.getInputStream();
             //inputStream.skip(n);跳过和丢弃此输入流中数据的 n 个字节
             inputStream.skip(this.startPos);
             //byte[] buffer = new byte[StaticBufs.iBufBlockSize];

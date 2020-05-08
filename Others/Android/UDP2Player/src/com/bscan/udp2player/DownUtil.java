@@ -9,6 +9,7 @@ import java.io.RandomAccessFile;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
@@ -20,6 +21,7 @@ import android.util.Log;
  * @date 2018-09-17
  */
 public class DownUtil {
+	public static HttpURLConnection conn = null;
     //定义下载路径
     private String path;
     //指定所下载的文件的保存位置
@@ -47,11 +49,15 @@ public class DownUtil {
         fileSize = -1;
         while(fileSize == -1)
         {
-	        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-	        conn.setConnectTimeout(2 * 1000);
-	        conn.setReadTimeout(9 * 1000);
+        	if(conn == null) {
+		        conn = (HttpURLConnection)url.openConnection();
+		        conn.setConnectTimeout(2 * 1000);
+		        conn.setReadTimeout(9 * 1000);
+        	}
 	        //设置请求方法
 	        conn.setRequestMethod("GET");
+	        Map<String, List<String>> aaa;
+	        aaa=conn.getRequestProperties();
 	        //设置请求属性
 	        for (Map.Entry<String ,String> entry : StaticBufs.header.entrySet()) {
 				Log.i("TAG", "Key = " + entry.getKey() + ", Value = " + entry.getValue());
@@ -64,7 +70,7 @@ public class DownUtil {
 	        fileSize = conn.getContentLength();
 	        
 	        //fileSize = 15000;
-	        conn.disconnect();
+	        //conn.disconnect();
         }
         long currentPartSize = fileSize / threadNum + 1;
         byte[]b = null;

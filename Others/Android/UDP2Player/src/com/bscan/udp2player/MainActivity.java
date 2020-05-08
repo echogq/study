@@ -59,7 +59,7 @@ public class MainActivity extends Activity implements Runnable{
     Handler mHandler;
 	TcpServer m3u8Server;
     public final static String EXTRA_MESSAGE = "com.bscan.udp2player.MESSAGE";
-	protected static final int MAX_THREADS = 3;
+	protected static final int MAX_THREADS = 1;
     public static final int MAX_BLOCKs = 80;
 
     static byte[] bytesM3u8 = null;
@@ -277,8 +277,8 @@ public class MainActivity extends Activity implements Runnable{
 		
 		String sUrl2Player = url;
 		if(url.length() == 0) {
-			url = beforeResult;
-			//url = "https://56.com-t-56.com/20190222/6275_993e32bb/index.m3u8";
+			//url = beforeResult;
+			url = "https://56.com-t-56.com/20190222/6275_993e32bb/index.m3u8";
 			//url = "https://leshi.cdn-zuyida.com/20180421/23526_27748718/index.m3u8";
 			setBtnText(url);
 			sUrl2Player = "http://127.0.0.1:9999/?go="+url;
