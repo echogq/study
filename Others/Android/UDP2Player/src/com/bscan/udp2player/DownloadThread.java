@@ -4,12 +4,18 @@ package com.bscan.udp2player;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+
+import okhttp3.Call;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import android.util.Log;
 
@@ -71,16 +77,23 @@ public class DownloadThread implements Runnable {
 	            DownUtil.conn = (HttpURLConnection)url.openConnection();
 	            DownUtil.conn.setConnectTimeout(2 * 1000);
 	            DownUtil.conn.setReadTimeout(9 * 1000);
+	            //设置请求方法
+	        	DownUtil.conn.setRequestMethod("GET");
+	            //设置请求属性
+	            for (Map.Entry<String ,String> entry : StaticBufs.header.entrySet()) {
+	    			System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+	    			DownUtil.conn.setRequestProperty(entry.getKey(), entry.getValue());
+	    		}
+	            DownUtil.conn.setRequestProperty("Accept-Encoding", "identity");
         	}
-            //设置请求方法
-        	DownUtil.conn.setRequestMethod("GET");
-            //设置请求属性
-            for (Map.Entry<String ,String> entry : StaticBufs.header.entrySet()) {
-    			System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
-    			DownUtil.conn.setRequestProperty(entry.getKey(), entry.getValue());
-    		}
-            DownUtil.conn.setRequestProperty("Accept-Encoding", "identity");
+        	else
+        	{
+//        		DownUtil.conn.getOutputStream().write(("GET " + "/123.ts"+ " HTTP/1.1\r\n").getBytes());
+        	}
 	        
+        	String url2 = "https://leshi.cdn-zuyida.com/20180421/23526_27748718/index.m3u8";
+        	okGetUrl(url2);
+        	okGetUrl("https://leshi.cdn-zuyida.com/20180421/23526_27748718/800k/hls/index.m3u8");
             //Header.header.forEach((key, value) -> conn.setRequestProperty(key,value));
             inputStream = DownUtil.conn.getInputStream();
             //inputStream.skip(n);跳过和丢弃此输入流中数据的 n 个字节
@@ -92,7 +105,7 @@ public class DownloadThread implements Runnable {
             //读取网络数据写入本地
             Log.i("TAG", Thread.currentThread().getName()+ " :::::: " + currentPartSize + " == " +  startPos );
             while(length < currentPartSize && (hasRead = inputStream.read(buffer, 0, 1024)) != -1){
-            	if(StaticBufs.get(path.substring(MainActivity.getFromIndex(path, ("/"), 3))) != null)
+            	if(StaticBufs.mapGet(path.substring(MainActivity.getFromIndex(path, ("/"), 3))) != null)
             	{
             		length = currentPartSize;
             		break;
@@ -111,11 +124,11 @@ public class DownloadThread implements Runnable {
                // Log.i("TAG", Thread.currentThread().getName()+ " :::::: " + length + " -- " +  hasRead );
             }
             if(path.indexOf(".m3u8") <0)
-            	if(StaticBufs.get(path.substring(MainActivity.getFromIndex(path, ("/"), 3))) == null)
-            		StaticBufs.put(path.substring(MainActivity.getFromIndex(path, ("/"), 3)), bArray);
+            	if(StaticBufs.mapGet(path.substring(MainActivity.getFromIndex(path, ("/"), 3))) == null)
+            		StaticBufs.mapPut(path.substring(MainActivity.getFromIndex(path, ("/"), 3)), bArray);
 
             UDP_Push.pushLog("Down: "+path+" [OK]");
-            
+             
             Log.i("TAG", Thread.currentThread().getName()+ " ...... " + length + " -- " +  hasRead );
         }
         catch(Exception e){
@@ -137,6 +150,25 @@ public class DownloadThread implements Runnable {
     		return false;
         else
         	return true;
+	}
+	public void okGetUrl(String url2) {
+		OkHttpClient okHttpClient = new OkHttpClient();
+		final Request request = new Request.Builder()
+		        .url(url2)
+		        .build();
+		final Call call = okHttpClient.newCall(request);
+		new Thread(new Runnable() {
+		    @Override
+		    public void run() {
+		        try {
+		            Response response = call.execute();
+		            Log.d("TAG", "run: " + response.body().string());
+		            
+		        } catch (IOException e) {
+		            e.printStackTrace();
+		        }
+		    }
+		}).start();
 	}
 
     public String getPath() {

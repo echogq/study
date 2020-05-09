@@ -122,11 +122,11 @@ public class TcpServer extends Thread{
     								+"\r\nX-NWS-LOG-UUID: 04e9a9df-57df-4e96-aea9-9c93bd712ad5 11cc68d8ac416839db7813d322bd9066\r\nX-Cache-Lookup: Hit From Disktank3\r\nX-Cache-Lookup: Hit From Upstream\r\nX-Daa-Tunnel: hop_count=1\r\nAccess-Control-Allow-Origin: *\r\n\r\n";
     						out.write(sResp.getBytes(), 0, sResp.length());
 
-    						out.write(StaticBufs.get(sHttpGetPath), 0, StaticBufs.get(sHttpGetPath).length);
+    						out.write(StaticBufs.mapGet(sHttpGetPath), 0, StaticBufs.mapGet(sHttpGetPath).length);
     						out.flush();
  
-        					UDP_Push.pushLog("MX Player got: "+sHttpGetPath + " Len=" + StaticBufs.get(sHttpGetPath).length);
-        			    	Log.i("TAGmx", "MX Player got: "+sHttpGetPath + " Len=" + StaticBufs.get(sHttpGetPath).length);
+        					UDP_Push.pushLog("MX Player got: "+sHttpGetPath + " Len=" + StaticBufs.mapGet(sHttpGetPath).length);
+        			    	Log.i("TAGmx", "MX Player got: "+sHttpGetPath + " Len=" + StaticBufs.mapGet(sHttpGetPath).length);
 
     						
     					}

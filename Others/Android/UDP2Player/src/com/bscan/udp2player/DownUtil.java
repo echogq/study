@@ -53,19 +53,23 @@ public class DownUtil {
 		        conn = (HttpURLConnection)url.openConnection();
 		        conn.setConnectTimeout(2 * 1000);
 		        conn.setReadTimeout(9 * 1000);
+		        //设置请求方法
+		        conn.setRequestMethod("GET");
+		        Map<String, List<String>> aaa;
+		        aaa=conn.getRequestProperties();
+		        //设置请求属性
+		        for (Map.Entry<String ,String> entry : StaticBufs.header.entrySet()) {
+					Log.i("TAG", "Key = " + entry.getKey() + ", Value = " + entry.getValue());
+					conn.setRequestProperty(entry.getKey(), entry.getValue());
+				}
+		        //Header.header.forEach((key, value) -> conn.setRequestProperty(key,value));
+		
+		        conn.setRequestProperty("Accept-Encoding", "identity");
         	}
-	        //设置请求方法
-	        conn.setRequestMethod("GET");
-	        Map<String, List<String>> aaa;
-	        aaa=conn.getRequestProperties();
-	        //设置请求属性
-	        for (Map.Entry<String ,String> entry : StaticBufs.header.entrySet()) {
-				Log.i("TAG", "Key = " + entry.getKey() + ", Value = " + entry.getValue());
-				conn.setRequestProperty(entry.getKey(), entry.getValue());
-			}
-	        //Header.header.forEach((key, value) -> conn.setRequestProperty(key,value));
-	
-	        conn.setRequestProperty("Accept-Encoding", "identity");
+        	else
+        	{
+        		conn.getOutputStream().write(("GET " + "/123.ts"+ " HTTP/1.1\r\n").getBytes());
+        	}
 	        //得到文件大小
 	        fileSize = conn.getContentLength();
 	        

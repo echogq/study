@@ -35,6 +35,7 @@ public class StaticBufs {
 //        header.put("Accept-Language", "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2");
 //        header.put("Cache-Control", "max-age=0");
         header.put("Connection", "keep-alive");
+        header.put("Accept-Encoding", "identity");
 //        header.put("User-Agent","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0");
 //        header.put("Accept",
 //                "image/gif,image/jpeg,image/pjpeg,image/pjpeg, "
@@ -43,13 +44,13 @@ public class StaticBufs {
 //                        + "application/x-ms-application,application/vnd.ms-excel"
 //                        + "application/vnd.ms-powerpoint, application/msword,*/*");
     }
-	public static void put(String input, byte[] pppm) {
+	public static void mapPut(String input, byte[] pppm) {
 		lock.lock();  
 		vFileMap.put(input, pppm);
 		lock.unlock();  
 		UDP_Push.pushLog("vFileMap.put("+input);
 	}
-	public static byte[] get(String sKey) {
+	public static byte[] mapGet(String sKey) {
 		lock.lock();  
 		byte[] tmp = vFileMap.get(sKey);
 		lock.unlock();  

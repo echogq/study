@@ -48,6 +48,12 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
  
 public class MainActivity extends Activity implements Runnable{
  
@@ -63,6 +69,7 @@ public class MainActivity extends Activity implements Runnable{
     public static final int MAX_BLOCKs = 80;
 
     static byte[] bytesM3u8 = null;
+	private static OkHttpClient okHttpClientG = null;
     
   //子字符串modelStr在字符串str中第count次出现时的下标
     public static int getFromIndex(String str, String modelStr, Integer count) {
@@ -272,17 +279,181 @@ public class MainActivity extends Activity implements Runnable{
         Intent intent = new Intent(this, MyService.class);
         startService(intent);
     }
-    
+
+	public static Response okGetUrl2(String url2) {
+		if(okHttpClientG == null)
+			okHttpClientG = new OkHttpClient();
+		final Request request = new Request.Builder()
+		        .url(url2)
+		        .build();
+		final Call call = okHttpClientG.newCall(request);
+		Response response = null;
+		try {
+			response = call.execute();
+			 
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			call.cancel();
+			okHttpClientG = null;
+			Log.d("TAG", url2+" : 失败了" );
+		} finally{
+		}
+		return response; 		
+	}
+	
+	public static void okGetUrl(String url2) {
+		OkHttpClient okHttpClient = new OkHttpClient();
+		final Request request = new Request.Builder()
+		        .url(url2)
+		        .build();
+		final Call call = okHttpClient.newCall(request);
+		new Thread(new Runnable() {
+		    @Override
+		    public void run() {
+		        call.enqueue(new Callback() {//入队
+				    @Override
+				    public void onFailure(Call call, IOException e) {
+				    //当失败时
+				        Log.d("TAG", request.url().toString()+" : 失败" );
+				    }
+
+				    @Override
+				    public void onResponse(Call call, final Response response) throws IOException {
+				    	
+				       // Log.d("TAG", request.url().toString()+" : " + response.body().contentLength());
+				    	if(request.url().toString().indexOf(".m3u8") >0){
+				    		String sBody = response.body().string();
+				    		
+	        				if(sBody.indexOf(".m3u8") <0)
+	        				{//修改M3U8, 避开MXPLAYER PRO的bug
+	        					bytesM3u8 = sBody.getBytes();
+	        					modM3u8ForMXPlayer(request.url().toString());
+	        					sBody = new String (bytesM3u8);
+	        				}
+
+
+//	    					if(sBody.indexOf(".m3u8") >0) {
+						        Log.d("TAG", request.url().toString()+" : " + response.body().contentLength() + sBody);
+						        
+						        String lines[] = sBody.split("(\r\n|\r|\n)", -1);
+						        for(int i=0;i<lines.length;i++)
+						        {
+						        	//System.out.print(lines[i]+" ");//输出a b c d e，获取字符串数组
+						        	if((lines[i].indexOf(".m3u8") >0) || (lines[i].indexOf(".ts") >0)){
+	
+						        		String sPrefix = "";
+						        		String sUrl = request.url().toString();
+						        		if((lines[i].indexOf("/") ==0))
+						        			sPrefix = sUrl.substring(0, getFromIndex(sUrl, ("/"), 3));
+						        		else
+						        			sPrefix = sUrl.substring(0, sUrl.lastIndexOf("/"))+"/";
+
+						        		if(lines[i].indexOf(".ts") >0){
+						        			/////////////////////////////////////
+						        			if((StaticBufs.sCurPlayingPart[0].length() > 0) && !StaticBufs.conKey(StaticBufs.sCurPlayingPart[0])){
+						        				for(i=0;i<lines.length;i++)
+						        				{
+						        					if(lines[i].equals(StaticBufs.sCurPlayingPart[0]))
+						        					{
+						        						break;
+						        					}
+						        				}
+						        			}
+
+						        			if(StaticBufs.lstNames.indexOf(lines[i]) == -1)
+						        				StaticBufs.lstNames.add(lines[i]);
+
+						        			for (int a = 0; a < StaticBufs.lstNames.size()-(MainActivity.MAX_BLOCKs/3); a++) {
+						        				StaticBufs.vecIngAndDone.remove(StaticBufs.lstNames.get(a));
+						        				StaticBufs.mapRemove(StaticBufs.lstNames.get(a));
+						        				//StaticBufs.lstNames.RemoveRange(1,3);
+						        			}
+
+						        			//if(!StaticBufs.conKey(sOneLine) && !DownUtil.isDowning(sOneLine))
+						        			//if(!StaticBufs.conKey(sOneLine) && !DownUtil.isDowning(sOneLine))
+						        			if(!StaticBufs.vecIngAndDone.contains(lines[i]))
+						        			{
+						        				StaticBufs.vecIngAndDone.addElement(lines[i]);
+						        				//UDP_Push.pushLog(sPrefix +sOneLine + " " +(!StaticBufs.conKey(sOneLine)) + "_" +!DownUtil.isDowning(sOneLine));
+
+						        				if(lines[i].equals(StaticBufs.sCurPlayingPart[0]))
+						        				{
+						        					StaticBufs.sCurPlayingPart[0] = "";
+						        				}
+						        				//					    								else
+						        				//					    	        						while((StaticBufs.iCntThreads[0] >= MAX_THREADS)||(StaticBufs.vFileMap.size() >= MainActivity.MAX_BLOCKs))
+						        				//					    	        							Thread.sleep(50);
+
+						        				////////////////////////////
+
+						        				Response response2 = null;
+						        				while(response2 == null)
+						        					response2 = okGetUrl2(sPrefix + lines[i]);
+
+						        				Log.d("TAG", sPrefix + lines[i]+" : " + response2.body().contentLength());
+
+						        				String path = sPrefix + lines[i];
+						        				if(StaticBufs.mapGet(path .substring(MainActivity.getFromIndex(path, ("/"), 3))) == null)
+						        					StaticBufs.mapPut(path.substring(MainActivity.getFromIndex(path, ("/"), 3)), response2.body().bytes());
+
+						        			}
+						        		}
+						        		else
+						        			okGetUrl(sPrefix + lines[i]);
+						        	}
+						        }
+		        				Log.d("TAG", "Done!!!!!!!!!!!");
+
+	
+//	    					}
+//	    					
+
+				    	}
+//    					else if(request.url().toString().indexOf(".ts") >0){
+//					        Log.d("TAG", request.url().toString()+" : " + response.body().contentLength());
+//   						
+//    					}
+
+
+//		                    当响应时
+//		                    runOnUiThread(new Thread(){//在主线程更新UI
+//		                        @Override
+//		                        public void run() {
+//		                            try {
+//		                                mTextView.setText(response.body().string());//从网络上获取的就是JSON
+//		                            } catch (IOException e) {
+//		                                e.printStackTrace();
+//		                            }
+//		                        }
+//		                    });
+
+				    }
+				});
+		    }
+		}).start();
+	}
+
 	public void openIntent(String url) {
 		
 		String sUrl2Player = url;
 		if(url.length() == 0) {
-			//url = beforeResult;
-			url = "https://56.com-t-56.com/20190222/6275_993e32bb/index.m3u8";
+			url = beforeResult;
+			//url = "https://56.com-t-56.com/20190222/6275_993e32bb/index.m3u8";
 			//url = "https://leshi.cdn-zuyida.com/20180421/23526_27748718/index.m3u8";
 			setBtnText(url);
 			sUrl2Player = "http://127.0.0.1:9999/?go="+url;
-			buffM3U8(url);
+			//buffM3U8(url);
+			
+			StaticBufs.vecIngAndDone.clear();
+			StaticBufs.vFileMap.clear();
+			StaticBufs.lstNames.clear();
+			StaticBufs.iCntThreads[0] = 0;
+			StaticBufs.sCurPlayingPart[0] = "";
+			
+
+			okGetUrl(url);
+			
 		}
 		else
 			setBtnText(url);
@@ -563,7 +734,7 @@ public class MainActivity extends Activity implements Runnable{
     
 
 
-	public void modM3u8ForMXPlayer(String sUrl) throws IOException {
+	public static void modM3u8ForMXPlayer(String sUrl) throws IOException {
 		String strTmp2 = "";
 		ByteArrayInputStream byteArray = new ByteArrayInputStream(bytesM3u8);
 		BufferedReader bInput = new BufferedReader(new InputStreamReader(byteArray));
