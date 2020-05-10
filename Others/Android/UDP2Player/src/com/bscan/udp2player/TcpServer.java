@@ -82,7 +82,7 @@ public class TcpServer extends Thread{
             int length = 0;
             while((length = inn.read(data)) != -1){
             	String sRequest = new String(data).substring(0, length);
-    			Log.i("TAGo", sRequest);
+    			//Log.i("TAGo", sRequest);
     			
     			if(length<4096) {
     				if(((sRequest.indexOf(".ts") >=0) 
@@ -98,14 +98,16 @@ public class TcpServer extends Thread{
     						}
     					}
     					
-    					UDP_Push.pushLog("MX Player ask: "+sHttpGetPath);
-    			    	Log.i("TAGmx", "MX Player ask: "+sHttpGetPath);
+    					UDP_Push.pushLog("MX Player GET: "+sHttpGetPath);
+    			    	Log.i("TAGmx", "MX Player GET: "+sHttpGetPath);
 
     					//if(StaticBufs.conKey(sHttpGetPath) == false)
     					if(!StaticBufs.vecIngAndDone.contains(sHttpGetPath))
-								StaticBufs.sCurPlayingPart[0] = sHttpGetPath;
+								StaticBufs.sNeedDownFN[0] = sHttpGetPath;
+						StaticBufs.sMXPlayingFN[0] = sHttpGetPath;
 
-    					while(StaticBufs.conKey(sHttpGetPath) == false)
+    					UDP_Push.pushLog("IsBufed? "+sHttpGetPath + " Played:" +  StaticBufs.lstNames.size() + " buffed:" +  StaticBufs.vFileMap.size());
+    					while(StaticBufs.haveKey(sHttpGetPath) == false)
 							try {
 								Thread.sleep(100);
 							} catch (InterruptedException e) {

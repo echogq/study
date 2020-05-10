@@ -351,10 +351,10 @@ public class MainActivity extends Activity implements Runnable{
 
 						        		if(lines[i].indexOf(".ts") >0){
 						        			/////////////////////////////////////
-						        			if((StaticBufs.sCurPlayingPart[0].length() > 0) && !StaticBufs.conKey(StaticBufs.sCurPlayingPart[0])){
+						        			if((StaticBufs.sNeedDownFN[0].length() > 0) && !StaticBufs.haveKey(StaticBufs.sNeedDownFN[0])){
 						        				for(i=0;i<lines.length;i++)
 						        				{
-						        					if(lines[i].equals(StaticBufs.sCurPlayingPart[0]))
+						        					if(lines[i].equals(StaticBufs.sNeedDownFN[0]))
 						        					{
 						        						break;
 						        					}
@@ -364,11 +364,23 @@ public class MainActivity extends Activity implements Runnable{
 						        			if(StaticBufs.lstNames.indexOf(lines[i]) == -1)
 						        				StaticBufs.lstNames.add(lines[i]);
 
-						        			for (int a = 0; a < StaticBufs.lstNames.size()-(MainActivity.MAX_BLOCKs/3); a++) {
-						        				StaticBufs.vecIngAndDone.remove(StaticBufs.lstNames.get(a));
-						        				StaticBufs.mapRemove(StaticBufs.lstNames.get(a));
-						        				//StaticBufs.lstNames.RemoveRange(1,3);
-						        			}
+						        			while((StaticBufs.vFileMap.size() >= MainActivity.MAX_BLOCKs))
+												try {
+													Thread.sleep(50);
+								        			for (int a = 0; a < StaticBufs.lstNames.size()-(MainActivity.MAX_BLOCKs/3); a++) {
+							        					if(StaticBufs.lstNames.get(a).equals(StaticBufs.sMXPlayingFN[0]))
+							        					{
+							        						break;
+							        					}
+		
+								        				StaticBufs.vecIngAndDone.remove(StaticBufs.lstNames.get(a));
+								        				StaticBufs.mapRemove(StaticBufs.lstNames.get(a));
+								        				//StaticBufs.lstNames.RemoveRange(1,3);
+								        			}
+												} catch (InterruptedException e) {
+													// TODO Auto-generated catch block
+													e.printStackTrace();
+												}
 
 						        			//if(!StaticBufs.conKey(sOneLine) && !DownUtil.isDowning(sOneLine))
 						        			//if(!StaticBufs.conKey(sOneLine) && !DownUtil.isDowning(sOneLine))
@@ -377,9 +389,9 @@ public class MainActivity extends Activity implements Runnable{
 						        				StaticBufs.vecIngAndDone.addElement(lines[i]);
 						        				//UDP_Push.pushLog(sPrefix +sOneLine + " " +(!StaticBufs.conKey(sOneLine)) + "_" +!DownUtil.isDowning(sOneLine));
 
-						        				if(lines[i].equals(StaticBufs.sCurPlayingPart[0]))
+						        				if(lines[i].equals(StaticBufs.sNeedDownFN[0]))
 						        				{
-						        					StaticBufs.sCurPlayingPart[0] = "";
+						        					StaticBufs.sNeedDownFN[0] = "";
 						        				}
 						        				//					    								else
 						        				//					    	        						while((StaticBufs.iCntThreads[0] >= MAX_THREADS)||(StaticBufs.vFileMap.size() >= MainActivity.MAX_BLOCKs))
@@ -449,7 +461,7 @@ public class MainActivity extends Activity implements Runnable{
 			StaticBufs.vFileMap.clear();
 			StaticBufs.lstNames.clear();
 			StaticBufs.iCntThreads[0] = 0;
-			StaticBufs.sCurPlayingPart[0] = "";
+			StaticBufs.sNeedDownFN[0] = "";
 			
 
 			okGetUrl(url);
@@ -554,7 +566,7 @@ public class MainActivity extends Activity implements Runnable{
         				StaticBufs.vFileMap.clear();
         				StaticBufs.lstNames.clear();
         				StaticBufs.iCntThreads[0] = 0;
-        				StaticBufs.sCurPlayingPart[0] = "";
+        				StaticBufs.sNeedDownFN[0] = "";
         				bytesM3u8 = downUtil.downLoad();
 
         				Log.i("TAGo",  "M3u8 下载完成，长度 :" + bytesM3u8.length);
@@ -587,10 +599,10 @@ public class MainActivity extends Activity implements Runnable{
         					if(((sOneLine.indexOf(".ts") >=0) 
         							|| (sOneLine.indexOf(".mp4") >=0)) && (sOneLine.indexOf(".m3u8") <0))
         					{
-        						if((StaticBufs.sCurPlayingPart[0].length() > 0) && !StaticBufs.conKey(StaticBufs.sCurPlayingPart[0])){
+        						if((StaticBufs.sNeedDownFN[0].length() > 0) && !StaticBufs.haveKey(StaticBufs.sNeedDownFN[0])){
         							bInput = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(bytesM3u8)));
         							while ((sOneLine= bInput.readLine()) != null) {
-        								if(sOneLine.equals(StaticBufs.sCurPlayingPart[0]))
+        								if(sOneLine.equals(StaticBufs.sNeedDownFN[0]))
         								{
         									//StaticBufs.sCurPlayingPart[0] = "";
 
@@ -616,9 +628,9 @@ public class MainActivity extends Activity implements Runnable{
 	        			            //UDP_Push.pushLog(sPrefix +sOneLine + " " +(!StaticBufs.conKey(sOneLine)) + "_" +!DownUtil.isDowning(sOneLine));
 	
         							int i=1;
-    								if(sOneLine.equals(StaticBufs.sCurPlayingPart[0]))
+    								if(sOneLine.equals(StaticBufs.sNeedDownFN[0]))
     								{
-    									StaticBufs.sCurPlayingPart[0] = "";
+    									StaticBufs.sNeedDownFN[0] = "";
 
     									i=5;
     								}
