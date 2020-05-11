@@ -61,7 +61,7 @@ public class MainActivity extends Activity implements Runnable{
     String multicastHost="224.0.0.1";
     InetAddress receiveAddress;
     TextView result;
-    String sRcvUDPData="";
+    public static String sRcvUDPData="";
     Handler mHandler;
 	TcpServer m3u8Server;
 	private static Button sendUDPBrocast1;
@@ -297,6 +297,7 @@ public class MainActivity extends Activity implements Runnable{
 		final Call call = okHttpClientG.newCall(request);
 		Response response = null;
 		try {
+	    	setBtnText2("ÏÂÔØ£º" + url2);
 			response = call.execute();
 			 
 		} catch (IOException e) {
@@ -363,6 +364,7 @@ public class MainActivity extends Activity implements Runnable{
 						        			sPrefix = sUrl.substring(0, sUrl.lastIndexOf("/"))+"/";
 
 						        		if(lines[i].indexOf(".ts") >0){
+
 						        			/////////////////////////////////////
 						        			if((StaticBufs.sNeedDownFN[0].length() > 0) && !StaticBufs.haveKey(StaticBufs.sNeedDownFN[0])){
 						        				for(i=0;i<lines.length;i++)
@@ -413,6 +415,7 @@ public class MainActivity extends Activity implements Runnable{
 						        				////////////////////////////
 
 										    	setBtnText2("ÏÂÔØ£º" + sPrefix + lines[i]);
+										    	Log.d("TAG", "ÏÂÔØ£º" + sPrefix + lines[i]);
 						        				Response response2 = null;
 						        				while(response2 == null)
 						        					response2 = okGetUrl2(sPrefix + lines[i]);
@@ -426,7 +429,11 @@ public class MainActivity extends Activity implements Runnable{
 						        			}
 						        		}
 						        		else
+						        		{
+						        			sRcvUDPData = sPrefix + lines[i];
+
 						        			okGetUrl(sPrefix + lines[i]);
+						        		}
 						        	}
 						        }
 		        				Log.d("TAG", "Done!!!!!!!!!!!");
