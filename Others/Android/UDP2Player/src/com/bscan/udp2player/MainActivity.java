@@ -61,15 +61,22 @@ public class MainActivity extends Activity implements Runnable{
     String multicastHost="224.0.0.1";
     InetAddress receiveAddress;
     TextView result;
-    String beforeResult="";
+    String sRcvUDPData="";
     Handler mHandler;
 	TcpServer m3u8Server;
+	private static Button sendUDPBrocast1;
     public final static String EXTRA_MESSAGE = "com.bscan.udp2player.MESSAGE";
 	protected static final int MAX_THREADS = 1;
     public static final int MAX_BLOCKs = 80;
 
     static byte[] bytesM3u8 = null;
 	private static OkHttpClient okHttpClientG = null;
+    private static Context mContext = null;
+
+    //创建一个静态的方法，以便获取context对象
+    public static Context getContext(){
+        return mContext;
+    }
     
   //子字符串modelStr在字符串str中第count次出现时的下标
     public static int getFromIndex(String str, String modelStr, Integer count) {
@@ -147,7 +154,8 @@ public class MainActivity extends Activity implements Runnable{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+        mContext = getApplicationContext();
+      
         new Thread() {
         	@Override
         	public void run() {
@@ -155,7 +163,7 @@ public class MainActivity extends Activity implements Runnable{
         	}
         }.start();
         
-        Button sendUDPBrocast1 = (Button) findViewById(R.id.sendd);
+        sendUDPBrocast1 = (Button) findViewById(R.id.sendd);
         sendUDPBrocast1.setOnClickListener(new SendUDPBrocastListener1());
  
         mHandler = new Handler(new Handler.Callback() {
@@ -297,12 +305,13 @@ public class MainActivity extends Activity implements Runnable{
 			call.cancel();
 			okHttpClientG = null;
 			Log.d("TAG", url2+" : 失败了" );
+	    	setBtnText2("下载失败：" + url2);
 		} finally{
 		}
 		return response; 		
 	}
 	
-	public static void okGetUrl(String url2) {
+	public static void okGetUrl(final String url2) {
 		OkHttpClient okHttpClient = new OkHttpClient();
 		final Request request = new Request.Builder()
 		        .url(url2)
@@ -311,10 +320,13 @@ public class MainActivity extends Activity implements Runnable{
 		new Thread(new Runnable() {
 		    @Override
 		    public void run() {
-		        call.enqueue(new Callback() {//入队
-				    @Override
+		    	
+		    	setBtnText2("下载：" + url2);
+		    	call.enqueue(new Callback() {//入队
+		    		@Override
 				    public void onFailure(Call call, IOException e) {
 				    //当失败时
+				    	setBtnText2("下载失败：" + url2);
 				        Log.d("TAG", request.url().toString()+" : 失败" );
 				    }
 
@@ -324,7 +336,8 @@ public class MainActivity extends Activity implements Runnable{
 				       // Log.d("TAG", request.url().toString()+" : " + response.body().contentLength());
 				    	if(request.url().toString().indexOf(".m3u8") >0){
 				    		String sBody = response.body().string();
-				    		
+					    	setBtnText2("下载完成：" + request.url());
+
 	        				if(sBody.indexOf(".m3u8") <0)
 	        				{//修改M3U8, 避开MXPLAYER PRO的bug
 	        					bytesM3u8 = sBody.getBytes();
@@ -399,16 +412,17 @@ public class MainActivity extends Activity implements Runnable{
 
 						        				////////////////////////////
 
+										    	setBtnText2("下载：" + sPrefix + lines[i]);
 						        				Response response2 = null;
 						        				while(response2 == null)
 						        					response2 = okGetUrl2(sPrefix + lines[i]);
 
 						        				Log.d("TAG", sPrefix + lines[i]+" : " + response2.body().contentLength());
-
+										    	setBtnText2("下载完成：" + sPrefix + lines[i]+" : " + response2.body().contentLength());
+										    	
 						        				String path = sPrefix + lines[i];
 						        				if(StaticBufs.mapGet(path .substring(MainActivity.getFromIndex(path, ("/"), 3))) == null)
 						        					StaticBufs.mapPut(path.substring(MainActivity.getFromIndex(path, ("/"), 3)), response2.body().bytes());
-
 						        			}
 						        		}
 						        		else
@@ -450,9 +464,11 @@ public class MainActivity extends Activity implements Runnable{
 		
 		String sUrl2Player = url;
 		if(url.length() == 0) {
-			url = beforeResult;
+			url = sRcvUDPData;
 			//url = "https://56.com-t-56.com/20190222/6275_993e32bb/index.m3u8";
 			//url = "https://leshi.cdn-zuyida.com/20180421/23526_27748718/index.m3u8";
+			if(url.length() == 0)
+				url = "https://leshi.cdn-zuyida.com/20180421/23526_27748718/index.m3u8";
 			setBtnText(url);
 			sUrl2Player = "http://127.0.0.1:9999/?go="+url;
 			//buffM3U8(url);
@@ -712,15 +728,15 @@ public class MainActivity extends Activity implements Runnable{
                 ds.receive(dp);
                 //Toast.makeText(this, new String(buf, 0, dp.getLength()), Toast.LENGTH_LONG);
                 String x = "" + new String(buf, 0, dp.getLength());
-                beforeResult = x;
+                sRcvUDPData = x;
                 System.out.println(x);
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        result.setText(beforeResult+"<>");
+                        result.setText(sRcvUDPData+"<>");
                         
                         //String url = "https://www.baidu.com/1.m3u8?plplp=899";//示例，实际填你的网络视频链接
-                        String url = beforeResult;//"http://www.baidu.com/1.m3u8";//示例，实际填你的网络视频链接
+                        String url = sRcvUDPData;//"http://www.baidu.com/1.m3u8";//示例，实际填你的网络视频链接
                         
                 		new Thread() {
                         	String sUrl;
@@ -832,5 +848,16 @@ public class MainActivity extends Activity implements Runnable{
 	    long endTime = System.currentTimeMillis();
 	    Log.d("aaa", "do_exec pgkProcessAppMap = " + pgkProcessAppMap + "\t time = " + (endTime - startTime));
 	    return pgkProcessAppMap;
+	}
+
+	public static void setBtnText2(final String url2) {
+		// 这是一个主线程的 handler
+		new Handler(MainActivity.getContext().getMainLooper()).post(
+				new Runnable() {
+					@Override
+					public void run() {
+						MainActivity.sendUDPBrocast1.setText(url2);
+					}
+				});
 	}
 }
