@@ -1,10 +1,14 @@
 package com.bscan.udp2player;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -18,7 +22,7 @@ public class StaticBufs {
     public static final int iBufBlockSize = 32*1024;
 	public static Vector<String> vecIngAndDone=new Vector<String>();
 
-    public static final HashMap<String ,byte[]> vFileMap = new HashMap<>(); //map，hashmap不是线程安全的
+    public static final LinkedHashMap<String ,byte[]> vFileMap = new LinkedHashMap<>(); //map，hashmap不是线程安全的
   //Hashtable
 //    public static final Map<String, byte[]> vFileMap = new Hashtable<>();
     public static final HashMap<String ,String> header = new HashMap<>();
@@ -70,5 +74,15 @@ public class StaticBufs {
 			UDP_Push.pushLog("Removed-- "+sKey + " Played:" +  StaticBufs.lstNames.size() + " buffed:" +  StaticBufs.vFileMap.size());
 		lock.unlock();  
 	}
-
+	public static void mapRemoveTailOne(){
+		lock.lock();  
+		Iterator<Entry<String, byte[]>> iterator = vFileMap.entrySet().iterator();
+		Entry<String, byte[]> tail = null;
+		while (iterator.hasNext()) {
+			tail = iterator.next();
+		}
+		if(tail != null)
+			vFileMap.remove(tail.getKey());
+		lock.unlock();  
+	}
 }

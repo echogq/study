@@ -380,22 +380,26 @@ public class MainActivity extends Activity implements Runnable{
 						        				StaticBufs.lstNames.add(lines[i]);
 
 						        			while((StaticBufs.vFileMap.size() >= MainActivity.MAX_BLOCKs))
-												try {
-													Thread.sleep(50);
-								        			for (int a = 0; a < StaticBufs.lstNames.size()-(MainActivity.MAX_BLOCKs/3); a++) {
-							        					if(StaticBufs.lstNames.get(a).equals(StaticBufs.sMXPlayingFN[0]))
-							        					{
-							        						break;
-							        					}
-		
-								        				StaticBufs.vecIngAndDone.remove(StaticBufs.lstNames.get(a));
-								        				StaticBufs.mapRemove(StaticBufs.lstNames.get(a));
-								        				//StaticBufs.lstNames.RemoveRange(1,3);
-								        			}
-												} catch (InterruptedException e) {
-													// TODO Auto-generated catch block
-													e.printStackTrace();
-												}
+						        				try {
+						        					Thread.sleep(50);
+						        					for (int a = 0; a < StaticBufs.lstNames.size()-(MainActivity.MAX_BLOCKs/3); a++) 
+						        					{
+						        						if(StaticBufs.lstNames.get(a).equals(StaticBufs.sMXPlayingFN[0]))
+						        						{
+						        							//É¾³ý×îºóÒ»¿é£¬·ÀÖ¹whileËÀÑ­»·À²
+						        							//a = StaticBufs.lstNames.size()-(MainActivity.MAX_BLOCKs/3)-1;
+						        							StaticBufs.mapRemoveTailOne();
+						        							break;
+						        						}
+
+						        						StaticBufs.vecIngAndDone.remove(StaticBufs.lstNames.get(a));
+						        						StaticBufs.mapRemove(StaticBufs.lstNames.get(a));
+						        						//StaticBufs.lstNames.RemoveRange(1,3);
+						        					}
+						        				} catch (InterruptedException e) {
+						        					// TODO Auto-generated catch block
+						        					e.printStackTrace();
+						        				}
 
 						        			//if(!StaticBufs.conKey(sOneLine) && !DownUtil.isDowning(sOneLine))
 						        			//if(!StaticBufs.conKey(sOneLine) && !DownUtil.isDowning(sOneLine))
