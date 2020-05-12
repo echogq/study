@@ -431,6 +431,7 @@ public class MainActivity extends Activity implements Runnable{
 						        		else
 						        		{
 						        			sRcvUDPData = sPrefix + lines[i];
+						        			StaticBufs.sCurM3U8[0] = sRcvUDPData;
 
 						        			okGetUrl(sPrefix + lines[i]);
 						        		}
@@ -467,31 +468,41 @@ public class MainActivity extends Activity implements Runnable{
 		}).start();
 	}
 
-	public void openIntent(String url) {
+	public void openIntent(String sInUrl) {
 		
-		String sUrl2Player = url;
-		if(url.length() == 0) {
-			url = sRcvUDPData;
+		String sUrl2Player = sInUrl;
+		if(sInUrl.length() == 0) {//buf2play
+			sInUrl = sRcvUDPData;
 			//url = "https://56.com-t-56.com/20190222/6275_993e32bb/index.m3u8";
 			//url = "https://leshi.cdn-zuyida.com/20180421/23526_27748718/index.m3u8";
-			if(url.length() == 0)
-				url = "https://leshi.cdn-zuyida.com/20180421/23526_27748718/index.m3u8";
-			setBtnText(url);
-			sUrl2Player = "http://127.0.0.1:9999/?go="+url;
+			if(sInUrl.length() == 0)
+				sInUrl = "https://leshi.cdn-zuyida.com/20180421/23526_27748718/index.m3u8";
+			setBtnText(sInUrl);
+			sUrl2Player = "http://127.0.0.1:9999/?go="+sInUrl;
 			//buffM3U8(url);
-			
-			StaticBufs.vecIngAndDone.clear();
-			StaticBufs.vFileMap.clear();
-			StaticBufs.lstNames.clear();
+			if(!StaticBufs.sCurM3U8[0].equals(sRcvUDPData)) 
+			{
+				StaticBufs.vFileMap.clear();
+				StaticBufs.vecIngAndDone.clear();
+				StaticBufs.lstNames.clear();
+			}
+				
 			StaticBufs.iCntThreads[0] = 0;
 			StaticBufs.sNeedDownFN[0] = "";
-			
+			StaticBufs.sCurM3U8[0] = sRcvUDPData;
 
-			okGetUrl(url);
+			okGetUrl(sInUrl);
 			
+	        while(StaticBufs.vFileMap.size() < 1)
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 		}
-		else
-			setBtnText(url);
+		else//play
+			setBtnText(sInUrl);
 
 //		String sUrl2Player = "http://127.0.0.1:9999/?go="+url;
 //		if(url.indexOf(".ts.m3u8") >=0)
@@ -501,7 +512,7 @@ public class MainActivity extends Activity implements Runnable{
 //		else
 //			sUrl2Player = url;
 		
-		String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+		String extension = MimeTypeMap.getFileExtensionFromUrl(sInUrl);
         String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
         if(mimeType == null)
         	mimeType = "video/*";
@@ -523,14 +534,6 @@ public class MainActivity extends Activity implements Runnable{
         //intent.putExtra("data", setData());
         mediaIntent.setPackage("com.mxtech.videoplayer.pro");
         
-        if(!sUrl2Player.equals(url))
-	        while(StaticBufs.vFileMap.size() < 1)
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
         startActivity(mediaIntent);
         
 //        String[] headers = {

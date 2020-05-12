@@ -11,6 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class StaticBufs {
     public static final ArrayList<String> lstNames = new ArrayList();
+    public static final String[] sCurM3U8 = new String[1];
     public static final String[] sNeedDownFN = new String[1];
     public static final String[] sMXPlayingFN = new String[1];
     public static final int[] iCntThreads = new int[1];
@@ -33,6 +34,9 @@ public class StaticBufs {
     private StaticBufs() {
     }
     static {
+    	StaticBufs.sCurM3U8[0] = "";
+		StaticBufs.iCntThreads[0] = 0;
+		StaticBufs.sNeedDownFN[0] = "";
 //        header.put("Accept-Encoding", "gzip, deflate");
 //        header.put("Accept-Language", "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2");
 //        header.put("Cache-Control", "max-age=0");
