@@ -14,15 +14,16 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class StaticBufs {
-    public static final ArrayList<String> lstNames = new ArrayList();
-    public static final String[] sCurM3U8 = new String[1];
-    public static final String[] sNeedDownFN = new String[1];
-    public static final String[] sMXPlayingFN = new String[1];
+    //public static final ArrayList<String> lstNames = new ArrayList();
+    public static final String[] sCurM3U8Url = new String[1];
+    public static final String[] sNeedDownTS = new String[1];
+    public static final String[] sMXPlayingFile = new String[1];
     public static final int[] iCntThreads = new int[1];
     public static final int iBufBlockSize = 32*1024;
-	public static Vector<String> vecIngAndDone=new Vector<String>();
+	//public static Vector<String> vecIngAndDone=new Vector<String>();
 
     public static final LinkedHashMap<String ,byte[]> vFileMap = new LinkedHashMap<>(); //map，hashmap不是线程安全的
+    public static final LinkedHashMap<String ,String> vUrlMap = new LinkedHashMap<>(); //map，hashmap不是线程安全的
   //Hashtable
 //    public static final Map<String, byte[]> vFileMap = new Hashtable<>();
     public static final HashMap<String ,String> header = new HashMap<>();
@@ -31,16 +32,16 @@ public class StaticBufs {
 //		UDP_Push.pushLog("Buffed== "+sKey + " Played:" +  StaticBufs.lstNames.size() + " buffed:" +  StaticBufs.vFileMap.size());
     	boolean ret = false;
 		lock.lock(); 
-		ret = vFileMap.containsKey(sKey);
+		ret = (vFileMap.get(sKey)!=null);
 		lock.unlock();  
 		return ret;
     }
     private StaticBufs() {
     }
     static {
-    	StaticBufs.sCurM3U8[0] = "";
+    	StaticBufs.sCurM3U8Url[0] = "";
 		StaticBufs.iCntThreads[0] = 0;
-		StaticBufs.sNeedDownFN[0] = "";
+		StaticBufs.sNeedDownTS[0] = "";
 //        header.put("Accept-Encoding", "gzip, deflate");
 //        header.put("Accept-Language", "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2");
 //        header.put("Cache-Control", "max-age=0");
@@ -55,7 +56,7 @@ public class StaticBufs {
 //                        + "application/vnd.ms-powerpoint, application/msword,*/*");
     }
 	public static void mapPut(String sKey, byte[] pppm) {
-		UDP_Push.pushLog("Buffed++ "+sKey + " Played:" +  StaticBufs.lstNames.size() + " buffed:" +  StaticBufs.vFileMap.size());
+		UDP_Push.pushLog("mapPut++ "+sKey /*+ " Played:" +  StaticBufs.lstNames.size()*/ + " buffed:" +  StaticBufs.vFileMap.size());
 		lock.lock();  
 		vFileMap.put(sKey, pppm);
 		lock.unlock();  
@@ -68,10 +69,11 @@ public class StaticBufs {
 		return tmp;
 	}
 	public static void mapRemove(String sKey) {
-		lock.lock();  
-		byte[] ppp = vFileMap.remove(sKey);
-		if(ppp != null)
-			UDP_Push.pushLog("Removed-- "+sKey + " Played:" +  StaticBufs.lstNames.size() + " buffed:" +  StaticBufs.vFileMap.size());
+		lock.lock(); 
+		vFileMap.put(sKey, null); 
+//		byte[] ppp = vFileMap.remove(sKey);
+//		if(ppp != null)
+//			UDP_Push.pushLog("Removed-- "+sKey /*+ " Played:" +  StaticBufs.lstNames.size()*/ + " buffed:" +  StaticBufs.vFileMap.size());
 		lock.unlock();  
 	}
 	public static void mapRemoveTailOne(){
@@ -84,5 +86,68 @@ public class StaticBufs {
 		if(tail != null)
 			vFileMap.remove(tail.getKey());
 		lock.unlock();  
+	}
+	public static void mapRemoveFirstOne(String sNotThis){
+		lock.lock();  
+		Object obj = null;
+        for (Entry<String, byte[]> entry : vFileMap.entrySet()) {
+            obj = entry.getKey();
+            if (obj != null) {
+            	if(!obj.equals(sNotThis))
+            		break;
+            }
+        }
+
+		if(obj != null)
+		{
+			UDP_Push.pushLog("Removed---- "+obj /*+ " Played:" +  StaticBufs.lstNames.size()*/ + " buffed:" +  StaticBufs.vFileMap.size());
+			
+			vFileMap.remove(obj);
+		}
+		lock.unlock();  
+	}
+	public static int mapGetBufedSize() {
+		lock.lock();  
+		int iSize = 0;
+		Object obj = null;
+        for (Entry<String, byte[]> entry : vFileMap.entrySet()) {
+            obj = entry.getValue();
+            if (obj != null) {
+            	iSize++;
+            }
+        }
+
+		lock.unlock();  
+		return iSize;
+	}
+	public static void mapKeepSize(int maxBlocks) {
+		while((StaticBufs.mapGetBufedSize() >= maxBlocks)) {
+			lock.lock();  
+			Object obj = null;
+	        for (Entry<String, byte[]> entry : vFileMap.entrySet()) {
+	            obj = entry.getKey();
+	            if (obj != null) {
+	            	if(!obj.equals(StaticBufs.sMXPlayingFile[0]))
+	            		entry.setValue(null);
+	            	else
+	            		break;
+	            }
+	        }
+
+			lock.unlock();  
+		}
+		
+		if((StaticBufs.mapGetBufedSize() >= maxBlocks)) {
+			lock.lock();  
+			Object obj = null;
+	        for (Entry<String, byte[]> entry : vFileMap.entrySet()) {
+	            obj = entry.getKey();
+	            if (obj != null) {
+	            	if(!obj.equals(StaticBufs.sMXPlayingFile[0]))
+	            		entry.setValue(null);
+	            }
+	        }
+			lock.unlock();  			
+		}			
 	}
 }

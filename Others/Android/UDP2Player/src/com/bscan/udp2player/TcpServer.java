@@ -102,11 +102,11 @@ public class TcpServer extends Thread{
     			    	Log.i("TAGmx", "MX Player GET: "+sHttpGetPath);
 
     					//if(StaticBufs.conKey(sHttpGetPath) == false)
-    					if(!StaticBufs.vecIngAndDone.contains(sHttpGetPath))
-								StaticBufs.sNeedDownFN[0] = sHttpGetPath;
-						StaticBufs.sMXPlayingFN[0] = sHttpGetPath;
+    					if(StaticBufs.mapGet(sHttpGetPath) == null)
+								StaticBufs.sNeedDownTS[0] = sHttpGetPath;
+						StaticBufs.sMXPlayingFile[0] = sHttpGetPath;
 
-    					UDP_Push.pushLog("IsBufed? "+sHttpGetPath + " Played:" +  StaticBufs.lstNames.size() + " buffed:" +  StaticBufs.vFileMap.size());
+    					UDP_Push.pushLog("IsBufed? "+sHttpGetPath /*+ " Played:" +  StaticBufs.lstNames.size()*/ + " buffed:" +  StaticBufs.vFileMap.size());
     					while(StaticBufs.haveKey(sHttpGetPath) == false)
 							try {
 								Thread.sleep(100);
@@ -114,7 +114,7 @@ public class TcpServer extends Thread{
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
-    					UDP_Push.pushLog("Buffed "+sHttpGetPath + " Played:" +  StaticBufs.lstNames.size() + " buffed:" +  StaticBufs.vFileMap.size());
+    					UDP_Push.pushLog("Found "+sHttpGetPath /*+ " Played:" +  StaticBufs.lstNames.size()*/ + " buffed:" +  StaticBufs.vFileMap.size());
     					
     					{
     						//Ð´³öÊý¾Ý
