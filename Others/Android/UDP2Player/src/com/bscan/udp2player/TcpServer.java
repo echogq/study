@@ -52,10 +52,12 @@ public class TcpServer extends Thread{
 
     @Override
       public void run() {
-        webDataIO(clientSocket);
+    	while(true)
+    		webDataIO(clientSocket);
     }
 
 	public void webDataIO(Socket clientSocket) {
+    	Thread.currentThread().setName("webDataIO.MX"); 
 		try {
             //获得客户端的ip地址和主机名
             String clientAddress = clientSocket.getInetAddress().getHostAddress();
@@ -99,7 +101,7 @@ public class TcpServer extends Thread{
     					}
     					
     					UDP_Push.pushLog("MX Player GET: "+sHttpGetPath);
-    			    	Log.i("TAGmx", "MX Player GET: "+sHttpGetPath);
+    			    	//Log.i("TAGmx", "MX Player GET: "+sHttpGetPath);
 
     					//if(StaticBufs.conKey(sHttpGetPath) == false)
     					if(StaticBufs.mapGet(sHttpGetPath) == null)
@@ -128,7 +130,7 @@ public class TcpServer extends Thread{
     						out.flush();
  
         					UDP_Push.pushLog("MX Player got: "+sHttpGetPath + " Len=" + StaticBufs.mapGet(sHttpGetPath).length);
-        			    	Log.i("TAGmx", "MX Player got: "+sHttpGetPath + " Len=" + StaticBufs.mapGet(sHttpGetPath).length);
+//        			    	Log.i("TAGmx", "MX Player got: "+sHttpGetPath + " Len=" + StaticBufs.mapGet(sHttpGetPath).length);
 
     						
     					}

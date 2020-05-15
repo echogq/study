@@ -20,6 +20,7 @@ public class StaticBufs {
     public static final String[] sMXPlayingFile = new String[1];
     public static final int[] iCntThreads = new int[1];
     public static final int iBufBlockSize = 32*1024;
+    public static final int iBufAFTER = 10;
 	//public static Vector<String> vecIngAndDone=new Vector<String>();
 
     public static final LinkedHashMap<String ,byte[]> vFileMap = new LinkedHashMap<>(); //map，hashmap不是线程安全的
@@ -56,11 +57,11 @@ public class StaticBufs {
 //                        + "application/vnd.ms-powerpoint, application/msword,*/*");
     }
 	public static void mapPut(String sKey, byte[] pppm) {
-		UDP_Push.pushLog("mapPut++ "+sKey /*+ " Played:" +  StaticBufs.lstNames.size()*/ + " buffed:" +  StaticBufs.vFileMap.size());
+		UDP_Push.pushLog("mapPut++ "+sKey /*+ " Played:" +  StaticBufs.lstNames.size()*/ );
 		lock.lock();  
 		vFileMap.put(sKey, pppm);
 		lock.unlock();  
-		UDP_Push.pushLog("vFileMap.put("+sKey);
+		UDP_Push.pushLog("vFileMap.put("+sKey + ") buffed:【" +  StaticBufs.mapGetBufedSize());
 	}
 	public static byte[] mapGet(String sKey) {
 		lock.lock();  

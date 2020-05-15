@@ -139,6 +139,7 @@ public class MainActivity extends Activity implements Runnable{
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                	Thread.currentThread().setName("onClick"); 
 //                	openIntent("https://tv1.youkutv.cc/2020/03/28/h0fA8TSZSijKdCi4/playlist.m3u8");
 //                	openIntent("https://cn4.5311444.com/hls/20190426/97ed0bf400fc7efb547d3f91ea31d7b1/1556253639/index.m3u8");
 //                	openIntent("https://leshi.cdn-zuyida.com/20180421/23526_27748718/index.m3u8");
@@ -159,6 +160,7 @@ public class MainActivity extends Activity implements Runnable{
         new Thread() {
         	@Override
         	public void run() {
+            	Thread.currentThread().setName("TcpServer"); 
                 m3u8Server = new TcpServer(null);
         	}
         }.start();
@@ -188,6 +190,7 @@ public class MainActivity extends Activity implements Runnable{
         new Thread() {
         	@Override
         	public void run() {
+            	Thread.currentThread().setName("main.Loop"); 
         	     //这里写入子线程需要做的工作
         		
 //                String packageName = "com.mitv.mivideoplayer";
@@ -319,6 +322,7 @@ public class MainActivity extends Activity implements Runnable{
 			new Thread(new Runnable() {
 			    @Override
 			    public void run() {
+                	Thread.currentThread().setName("ok..GetUrlThread"); 
 					try {
 						loop2Buff(url2, StaticBufs.vUrlMap.get(url2));
 					} catch (IOException e) {
@@ -338,6 +342,7 @@ public class MainActivity extends Activity implements Runnable{
 		new Thread(new Runnable() {
 		    @Override
 		    public void run() {
+            	Thread.currentThread().setName("...url2"); 
 		    	
 		    	setBtnText2("下载：" + url2);
 		    	call.enqueue(new Callback() {//入队
@@ -637,7 +642,7 @@ public class MainActivity extends Activity implements Runnable{
 
     @Override
     public void run() {
-        // TODO Auto-generated method stub
+    	Thread.currentThread().setName("receive(dp)"); 
         byte buf[] = new byte[1024];
         DatagramPacket dp = new DatagramPacket(buf, 1024);
         while (true) {
@@ -650,6 +655,7 @@ public class MainActivity extends Activity implements Runnable{
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
+                    	Thread.currentThread().setName("sRcvUDPData"); 
                         result.setText(sRcvUDPData+"<>");
                         
                         //String url = "https://www.baidu.com/1.m3u8?plplp=899";//示例，实际填你的网络视频链接
@@ -788,6 +794,7 @@ public class MainActivity extends Activity implements Runnable{
 			}
 		}
 		
+		int iBufLenAfterCur = StaticBufs.iBufAFTER;
 		for(int i=0;i<lines.length;i++)
 		{
 			//System.out.print(lines[i]+" ");//输出a b c d e，获取字符串数组
@@ -800,7 +807,7 @@ public class MainActivity extends Activity implements Runnable{
 					sPrefix = sUrl.substring(0, sUrl.lastIndexOf("/"))+"/";
 
 				if(lines[i].indexOf(".ts") >0){
-					StaticBufs.mapPut(lines[i], null);
+//					StaticBufs.mapPut(lines[i], null);
 
 					/////////////////////////////////////
 					if((StaticBufs.sNeedDownTS[0].length() > 0) && !StaticBufs.haveKey(StaticBufs.sNeedDownTS[0])){
@@ -808,11 +815,14 @@ public class MainActivity extends Activity implements Runnable{
 						{
 							if(lines[i].equals(StaticBufs.sNeedDownTS[0]))
 							{
+								iBufLenAfterCur = StaticBufs.iBufAFTER;
+								StaticBufs.sNeedDownTS[0] = "";
 								break;
 							}
 						}
 					}
 
+						
 //					if(StaticBufs.lstNames.indexOf(lines[i]) == -1)
 //						StaticBufs.lstNames.add(lines[i]);
 
@@ -825,28 +835,35 @@ public class MainActivity extends Activity implements Runnable{
 //						StaticBufs.vecIngAndDone.addElement(lines[i]);
 						//UDP_Push.pushLog(sPrefix +sOneLine + " " +(!StaticBufs.conKey(sOneLine)) + "_" +!DownUtil.isDowning(sOneLine));
 
-						if(lines[i].equals(StaticBufs.sNeedDownTS[0]))
-						{
-							StaticBufs.sNeedDownTS[0] = "";
-						}
 						//					    								else
 						//					    	        						while((StaticBufs.iCntThreads[0] >= MAX_THREADS)||(StaticBufs.vFileMap.size() >= MainActivity.MAX_BLOCKs))
 						//					    	        							Thread.sleep(50);
 
 						////////////////////////////
 
-				    	setBtnText2("下载：" + sPrefix + lines[i]);
-				    	Log.d("TAG", "下载：" + sPrefix + lines[i]);
-						Response response2 = null;
-						while(response2 == null)
-							response2 = okGetUrl(sPrefix + lines[i]);
-
-						Log.d("TAG", "下载完成：" + sPrefix + lines[i]+" : " + response2.body().contentLength());
-				    	setBtnText2("下载完成：" + sPrefix + lines[i]+" : " + response2.body().contentLength());
-				    	
-						String path = sPrefix + lines[i];
-						if(StaticBufs.mapGet(path .substring(MainActivity.getFromIndex(path, ("/"), 3))) == null)
-							StaticBufs.mapPut(path.substring(MainActivity.getFromIndex(path, ("/"), 3)), response2.body().bytes());
+						if(iBufLenAfterCur > 0){
+					    	setBtnText2("下载：" + sPrefix + lines[i]);
+								
+					    	long t1 = System.currentTimeMillis();
+					    	Response response2 = null;
+							while(response2 == null){
+						    	Log.d("TAG", "下载：" + sPrefix + lines[i]);
+								response2 = okGetUrl(sPrefix + lines[i]);
+							}
+	
+					    	byte[] tmp = response2.body().bytes();
+					        long t2 = System.currentTimeMillis();
+					        String sLogg = "下载完成：" + sPrefix + lines[i]+" : " + tmp.length+" " /*+ t2+" " + t1+" " + (t2-t1)+" " */ + String.format("%.3f", tmp.length*1.0/(1024*1024*1.0)/((t2-t1)*1.0/1000.0))+"MB/s";
+							Log.d("TAG", sLogg);
+					    	setBtnText2(sLogg);
+					    	
+							String path = sPrefix + lines[i];
+							if(StaticBufs.mapGet(path .substring(MainActivity.getFromIndex(path, ("/"), 3))) == null)
+								StaticBufs.mapPut(path.substring(MainActivity.getFromIndex(path, ("/"), 3)), tmp);
+							iBufLenAfterCur--;
+						}
+						else
+							i--;
 					}
 				}
 				else
@@ -859,5 +876,6 @@ public class MainActivity extends Activity implements Runnable{
 				}
 			}
 		}
+		Log.d("TAG", "Loop完成：");
 	}
 }
