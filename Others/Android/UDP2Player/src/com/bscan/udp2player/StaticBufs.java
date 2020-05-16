@@ -29,7 +29,7 @@ public class StaticBufs {
 //    public static final Map<String, byte[]> vFileMap = new Hashtable<>();
     public static final HashMap<String ,String> header = new HashMap<>();
     public static Lock lock = new ReentrantLock();;
-    public static boolean haveKey(String sKey) {
+    public static boolean buffedKey(String sKey) {
 //		UDP_Push.pushLog("Buffed== "+sKey + " Played:" +  StaticBufs.lstNames.size() + " buffed:" +  StaticBufs.vFileMap.size());
     	boolean ret = false;
 		lock.lock(); 

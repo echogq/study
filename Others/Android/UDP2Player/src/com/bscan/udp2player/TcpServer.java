@@ -109,7 +109,7 @@ public class TcpServer extends Thread{
 						StaticBufs.sMXPlayingFile[0] = sHttpGetPath;
 
     					UDP_Push.pushLog("IsBufed? "+sHttpGetPath /*+ " Played:" +  StaticBufs.lstNames.size()*/ + " buffed:" +  StaticBufs.vFileMap.size());
-    					while(StaticBufs.haveKey(sHttpGetPath) == false)
+    					while(StaticBufs.buffedKey(sHttpGetPath) == false)
 							try {
 								Thread.sleep(100);
 							} catch (InterruptedException e) {

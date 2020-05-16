@@ -67,7 +67,7 @@ public class MainActivity extends Activity implements Runnable{
 	private static Button sendUDPBrocast1;
     public final static String EXTRA_MESSAGE = "com.bscan.udp2player.MESSAGE";
 	protected static final int MAX_THREADS = 1;
-    public static final int MAX_BLOCKs = 80;
+    public static final int MAX_BLOCKs = 30;
 
     static byte[] bytesM3u8 = null;
 	private static OkHttpClient okHttpClientG = null;
@@ -389,7 +389,7 @@ public class MainActivity extends Activity implements Runnable{
 			//url = "https://56.com-t-56.com/20190222/6275_993e32bb/index.m3u8";
 			//url = "https://leshi.cdn-zuyida.com/20180421/23526_27748718/index.m3u8";
 			if(sInUrl.length() == 0)
-				sInUrl = "https://leshi.cdn-zuyida.com/20180421/23526_27748718/index.m3u8";
+				sInUrl = "https://youku.letv-cdn.com/2019/06/24/QQIESZqIocv7Grdx/playlist.m3u8";
 			setBtnText(sInUrl);
 			sUrl2Player = "http://127.0.0.1:9999/?go="+sInUrl;
 			//buffM3U8(url);
@@ -810,7 +810,7 @@ public class MainActivity extends Activity implements Runnable{
 //					StaticBufs.mapPut(lines[i], null);
 
 					/////////////////////////////////////
-					if((StaticBufs.sNeedDownTS[0].length() > 0) && !StaticBufs.haveKey(StaticBufs.sNeedDownTS[0])){
+					if((StaticBufs.sNeedDownTS[0].length() > 0) && !StaticBufs.buffedKey(StaticBufs.sNeedDownTS[0])){
 						for(i=0;i<lines.length;i++)
 						{
 							if(lines[i].equals(StaticBufs.sNeedDownTS[0]))
