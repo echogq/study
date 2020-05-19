@@ -160,6 +160,7 @@ public class DownloadThread implements Runnable {
 		new Thread(new Runnable() {
 		    @Override
 		    public void run() {
+            	Thread.currentThread().setName("===okGetUrl"); 
 		        try {
 		            Response response = call.execute();
 		            Log.d("TAG", "run: " + response.body().string());
