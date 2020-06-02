@@ -548,7 +548,7 @@ BOOL CAuto_TDXBuyApp::InitInstance()
 			}
 		}
 	}
-	LogTrace16380("======本次行动。。。？？？？？？\n");
+	LogTrace16380("======本次行动【意外退出】。。。？？？？？？\n");
 	return FALSE; //下面的代码是为HAZQ.TDX, 暂时不用了。。。
 
 	if (3 < __argc)
