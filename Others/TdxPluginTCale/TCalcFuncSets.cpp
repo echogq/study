@@ -244,7 +244,7 @@ float fEndPrice = 0;
 int iSaleCount = 0;
 int iWinCount = 0;
 float fFirstDay = 0;;
-float fLastDay = 0;;
+float fEndDay = 0;;
 
 void PostMsgToTradeWnd(LPARAM lParam)
 {
@@ -364,7 +364,7 @@ void CalcWin(int DataLen,float* pfOUT,float* currPrice,float* fAction,float* cur
 	iWinCount = 0;
 	float fBuyDay = 0; 
 	fFirstDay = 0;
-	fLastDay = 0;
+	fEndDay = 0;
 
 	if (DataLen>0)
 	{
@@ -373,7 +373,7 @@ void CalcWin(int DataLen,float* pfOUT,float* currPrice,float* fAction,float* cur
 		//fStartPrice = currPrice[0];
 		fEndPrice = currPrice[DataLen-1];
 		fFirstDay = currDay[0];
-		fLastDay = currDay[DataLen-1];
+		fEndDay = currDay[DataLen-1];
 
 		for(int i=0;i<DataLen;i++)
 		{
@@ -430,7 +430,7 @@ void CalcWin(int DataLen,float* pfOUT,float* currPrice,float* fAction,float* cur
 					fStockCounts = fTotalAsset / currPrice[i];
 //#ifdef _DEBUG
 					TCHAR bbb[256] = { 0 };
-					sprintf(bbb, ">>买入day,%.0f,价格,%.3f,总资产,%.3f,", fBuyDay-1000000, currPrice[i], fTotalAsset);
+					sprintf(bbb, "+++买入day,%.0f,价格,%.3f,总资产,%.3f,", fBuyDay-1000000, currPrice[i], fTotalAsset);
 					OutputDebugString(bbb);
 //#endif
 				}
@@ -455,7 +455,7 @@ void CalcWin(int DataLen,float* pfOUT,float* currPrice,float* fAction,float* cur
 
 	//#ifdef _DEBUG
 						TCHAR bbb[256] = { 0 };
-						sprintf(bbb, "====卖出day,%.0f,价格,%.3f,总资产,%.3f,[%d]次", currDay[i]-1000000, currPrice[i], fTotalAsset, iSaleCount);
+						sprintf(bbb, "---卖出day,%.0f,价格,%.3f,总资产,%.3f,[%d]次", currDay[i]-1000000, currPrice[i], fTotalAsset, iSaleCount);
 						OutputDebugString(bbb);
 	//#endif
 					}
@@ -481,21 +481,21 @@ void getReal_BS(int DataLen,float* pfOUT,float* currDay,float* currTime,float* f
 {
 	//实际买卖:TDXDLL2(5,DATE,TIME,IF(全买点,1,IF(全卖点,2,0)));
 
-	BOOL bBought = FALSE;
+	float fBuyDay = 0; 
+	//BOOL bBought = FALSE;
 	BOOL bNextDaySale = FALSE;
 	//float fFirstBuy = 0;
 	//float fLastSale = 0;
 	//float fBuy = 0;
 	//float fWin = 0;
-	float fBuyDay = 0; 
 	fFirstDay = 0;
-	fLastDay = 0;
+	fEndDay = 0;
 
 	if (DataLen>0)
 	{
 		TraceEx("\r\n[TDX]==>>>>>>>>>>>>>>>>>>>>>>>>>>>>\r\n");
 		fFirstDay = currDay[0];
-		fLastDay = currDay[DataLen-1];
+		fEndDay = currDay[DataLen-1];
 
 		for(int i=0;i<DataLen;i++)
 		{
@@ -510,15 +510,15 @@ void getReal_BS(int DataLen,float* pfOUT,float* currDay,float* currTime,float* f
 						if (fAction[i+1] == 0.0f)//下一数据无动作
 						{
 							fAction[i+1] = fAction[i];//当前动作移入下一数据
-							fAction[i] = 0.0f;//当前动作清除
 						}
+						fAction[i] = 0.0f;//当前动作清除
 					}
 				}
 
 				continue;
 			}
 
-			if (bBought)//持股中
+			if (fBuyDay != 0.0f)//持股中
 			{
 				if ((fAction[i] == 0.0f))
 				{
@@ -535,9 +535,8 @@ void getReal_BS(int DataLen,float* pfOUT,float* currDay,float* currTime,float* f
 
 			if(fAction[i] == 1.0f)//买入
 			{
-				if (!bBought)
+				if ((fBuyDay == 0.0f) )
 				{
-					bBought = TRUE;
 					fBuyDay = currDay[i];
 					pfOUT[i] = 1.0f;//输出
 				}
@@ -545,15 +544,12 @@ void getReal_BS(int DataLen,float* pfOUT,float* currDay,float* currTime,float* f
 			}
 			else if((fAction[i] == 2.0f))
 			{
-				if ((fBuyDay != currDay[i]))//卖出
+				if ((fBuyDay != currDay[i]) && (fBuyDay != 0.0f))//卖出
 				{
-					if (bBought)
-					{
-						bBought = FALSE;
-						pfOUT[i] = 2.0f;//输出
-					}
+					fBuyDay = 0.0f;
+					pfOUT[i] = 2.0f;//输出
 				}			
-				else
+				else if ((fBuyDay != 0.0f))
 				{
 					bNextDaySale = TRUE;
 				}
@@ -778,7 +774,7 @@ void returnMaxLost(int DataLen,float* pfOUT,float* pfINa,float* pfINb,float* pfI
 	{
 		//Log 最大回撤 fMaxLost
 		TCHAR bbb[256] = {0};
-		TraceEx("\r\n[TDX]总(%.0f_%.0f_%.0f),%2.2f～%2.2f, 价(%.3f～%.3f), 资:%.3f, 盈\t%.3f\t％|撤-%.2f％|比%.2f％, %d卖|%d盈|比%.2f％", pfINa[0], pfINb[0], pfINc[0], 190000.0+(fFirstDay/100), 190000.0+(fLastDay/100), fStartPrice, fEndPrice, fTotalAsset, fWinRate,fMaxLost, 100*fWinRate/fMaxLost, iSaleCount,iWinCount,(100.0*iWinCount/iSaleCount));
+		TraceEx("\r\n[TDX]总(%.0f_%.0f_%.0f),%2.2f～%2.2f, 价(%.3f～%.3f), 资:%.3f, 盈\t%.3f\t％|撤-%.2f％|比%.2f％, %d卖|%d盈|比%.2f％", pfINa[0], pfINb[0], pfINc[0], 190000.0+(fFirstDay/100), 190000.0+(fEndDay/100), fStartPrice, fEndPrice, fTotalAsset, fWinRate,fMaxLost, 100*fWinRate/fMaxLost, iSaleCount,iWinCount,(100.0*iWinCount/iSaleCount));
 		//OutputDebugString(bbb);
 	}
 
@@ -1005,7 +1001,7 @@ fAction=0 表示无信号
 	iSaleCount = 0;
 	iWinCount = 0;
 	fFirstDay = 0;
-	fLastDay = 0;
+	fEndDay = 0;
 
 	if (DataLen>0)
 	{
@@ -1013,7 +1009,7 @@ fAction=0 表示无信号
 		fStartPrice = currPrice[0];
 		fEndPrice = currPrice[DataLen-1];
 		fFirstDay = currDay[0];
-		fLastDay = currDay[DataLen-1];
+		fEndDay = currDay[DataLen-1];
 
 		for(int i=0;i<DataLen;i++)
 		{
