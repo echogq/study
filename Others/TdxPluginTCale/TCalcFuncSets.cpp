@@ -8,7 +8,7 @@
 #include<sstream>
 //#include "winsock.h"
 #include "mysql.h"//头文件顺序不能颠倒
-#include <..\..\..\..\..\VS2013\VC\include\iostream>
+#include <iostream>
 #include <ws2ipdef.h>
 #include <ws2tcpip.h>
 #include <iptypes.h>
@@ -340,6 +340,24 @@ void PostMsgToTradeWnd(LPARAM lParam)
 // 	}
 // }
 
+void SaleCalc( float* currPrice, int i, float fStockCounts, float* currDay )
+{
+	float fCurrMoney = 0;
+	fCurrMoney = currPrice[i] * fStockCounts * 0.9995/*扣除 ETF买卖 各【万2.5】手续费*/;
+	if (fCurrMoney > fTotalAsset)
+	{
+		iWinCount++;
+	}
+	fTotalAsset = fCurrMoney;
+	iSaleCount++;
+
+	//#ifdef _DEBUG
+	TCHAR bbb[256] = { 0 };
+	sprintf(bbb, "---卖出day,%.0f,价格,%.3f,总资产,%.3f,[%d]次", currDay[i]-1000000, currPrice[i], fTotalAsset, iSaleCount);
+	OutputDebugString(bbb);
+	//#endif
+}
+
 //第二版本
 void CalcWin(int DataLen,float* pfOUT,float* currPrice,float* fAction,float* currDay)
 {
@@ -444,20 +462,7 @@ void CalcWin(int DataLen,float* pfOUT,float* currPrice,float* fAction,float* cur
 					{
 						bBought = FALSE;
 						//fLastSale = fAction[i];
-						float fCurrMoney = 0;
-						fCurrMoney = currPrice[i] * fStockCounts * 0.9995/*扣除 ETF买卖 各【万2.5】手续费*/;
-						if (fCurrMoney > fTotalAsset)
-						{
-							iWinCount++;
-						}
-						fTotalAsset = fCurrMoney;
-						iSaleCount++;
-
-	//#ifdef _DEBUG
-						TCHAR bbb[256] = { 0 };
-						sprintf(bbb, "---卖出day,%.0f,价格,%.3f,总资产,%.3f,[%d]次", currDay[i]-1000000, currPrice[i], fTotalAsset, iSaleCount);
-						OutputDebugString(bbb);
-	//#endif
+						SaleCalc(currPrice, i, fStockCounts, currDay);
 					}
 				}			
 				else
@@ -465,6 +470,15 @@ void CalcWin(int DataLen,float* pfOUT,float* currPrice,float* fAction,float* cur
 					bLastSale = TRUE;
 				}
 
+			}
+			else if(i+1 == DataLen) //最后一条，如果前有买入，则按收盘价计算最后一笔
+			{
+				if (bBought)
+				{
+					bBought = FALSE;
+					//fLastSale = fAction[i];
+					SaleCalc(currPrice, i, fStockCounts, currDay);
+				}
 			}
 
 		}

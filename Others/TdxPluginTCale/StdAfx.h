@@ -10,6 +10,9 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#if _MSC_VER
+#define snprintf _snprintf
+#endif
 
 // Insert your headers here
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
