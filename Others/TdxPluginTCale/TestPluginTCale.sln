@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestPluginTCale", "TestPluginTCale.vcxproj", "{0449DD5D-26A0-4D1A-A6C2-A89DBEEFB15C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MFCAppDbg", "..\MFCAppDbg\MFCAppDbg.vcxproj", "{ED028B5A-7E1A-4394-8202-EF8ED282BDBC}"
@@ -12,6 +10,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "profapi_TDX", "E:\Dev\GitHub\study\testApi_TDX\profapi.vcxproj", "{6D7CA939-DF5C-4888-A583-0AA80C42F277}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Auto_TDXBuy", "E:\Dev\GitHub\study\Others\Auto_TDXBuy\Auto_TDXBuy.vcxproj", "{F636F1B3-E778-42FD-9EFA-A25BB4367CE6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AutoTrade", "..\AutoTrade\AutoTrade.vcxproj", "{21743627-65B7-4501-8124-860E429E2217}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +57,12 @@ Global
 		{F636F1B3-E778-42FD-9EFA-A25BB4367CE6}.Release|Win32.Build.0 = Release|Win32
 		{F636F1B3-E778-42FD-9EFA-A25BB4367CE6}.Release|x64.ActiveCfg = Release|x64
 		{F636F1B3-E778-42FD-9EFA-A25BB4367CE6}.Release|x64.Build.0 = Release|x64
+		{21743627-65B7-4501-8124-860E429E2217}.Debug|Win32.ActiveCfg = Debug|Win32
+		{21743627-65B7-4501-8124-860E429E2217}.Debug|Win32.Build.0 = Debug|Win32
+		{21743627-65B7-4501-8124-860E429E2217}.Debug|x64.ActiveCfg = Debug|Win32
+		{21743627-65B7-4501-8124-860E429E2217}.Release|Win32.ActiveCfg = Release|Win32
+		{21743627-65B7-4501-8124-860E429E2217}.Release|Win32.Build.0 = Release|Win32
+		{21743627-65B7-4501-8124-860E429E2217}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
