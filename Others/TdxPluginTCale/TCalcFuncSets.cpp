@@ -47,8 +47,8 @@ void TraceEx(const char *strOutputString, ...)
 	delete [] strBuffer;  
 }  
 //test  
-// 	TraceEx(L"DEBUG_INFO | %d %s\r\n", 1234, L"this is test by kandy(wchar_t*)");  
-// 	TraceEx("DEBUG_INFO | %d %s\r\n", 5678, "this is test by kandy(char*)");  
+// 	//TraceEx(L"DEBUG_INFO | %d %s\r\n", 1234, L"this is test by kandy(wchar_t*)");  
+// 	//TraceEx("DEBUG_INFO | %d %s\r\n", 5678, "this is test by kandy(char*)");  
 // 	
 double round(double r)
 {
@@ -386,7 +386,7 @@ void CalcWin(int DataLen,float* pfOUT,float* currPrice,float* fAction,float* cur
 
 	if (DataLen>0)
 	{
-		TraceEx("\r\n[TDX]==>>>>>>>>>>>>>>>>>>>>>>>>>>>>\r\n");
+		//TraceEx("\r\n[TDX]==>>>>>>>>>>>>>>>>>>>>>>>>>>>>\r\n");
 		//fTotalAsset = currPrice[0];//初始资产=第一天的收盘价
 		//fStartPrice = currPrice[0];
 		fEndPrice = currPrice[DataLen-1];
@@ -507,7 +507,7 @@ void getReal_BS(int DataLen,float* pfOUT,float* currDay,float* currTime,float* f
 
 	if (DataLen>0)
 	{
-		TraceEx("\r\n[TDX]==>>>>>>>>>>>>>>>>>>>>>>>>>>>>\r\n");
+		//TraceEx("\r\n[TDX]==>>>>>>>>>>>>>>>>>>>>>>>>>>>>\r\n");
 		fFirstDay = currDay[0];
 		fEndDay = currDay[DataLen-1];
 
@@ -606,7 +606,7 @@ void getReal_BS(int DataLen,float* pfOUT,float* currDay,float* currTime,float* f
 //	int iShort = 10 * iMultiple;
 //	int iLong = 12 * iMultiple;
 //	int iMid = 9;
-//	TraceEx("\r\n[TDX]======testDea \tiMultiple=%d 测算=%d\tDataLen=%d\t", iMultiple, bTestCalc, DataLen);
+//	//TraceEx("\r\n[TDX]======testDea \tiMultiple=%d 测算=%d\tDataLen=%d\t", iMultiple, bTestCalc, DataLen);
 //
 //	if ((DataLen > 0))
 //	{
@@ -636,7 +636,7 @@ void getReal_BS(int DataLen,float* pfOUT,float* currDay,float* currTime,float* f
 //			}
 //			pfOUT[i] = (2 * (pfTmp1[i] - pfTmp2[i]) + (iMid - 1) * pfOUT[i - 1]) / (iMid + 1);	//EMA计算公式
 //
-//			//TraceEx("\r\n[TDX]======testDea \tiMultiple=%d 测算=%d\t%.3f\t%.3f\t%.3f\t%.3f", iMultiple, bTestCalc, pfOUT[i], pfDIF1[i], pfTmp1[i], pfTmp2[i]);
+//			////TraceEx("\r\n[TDX]======testDea \tiMultiple=%d 测算=%d\t%.3f\t%.3f\t%.3f\t%.3f", iMultiple, bTestCalc, pfOUT[i], pfDIF1[i], pfTmp1[i], pfTmp2[i]);
 //			if (bTestCalc)
 //			{
 ////////////////////////////////////////Calc Win
@@ -648,7 +648,7 @@ void getReal_BS(int DataLen,float* pfOUT,float* currDay,float* currTime,float* f
 //						lastBuyDate = pfDate[i];
 //						lastBuyPrice = pfINa[i];
 //						curMoney = 0;
-//						//TraceEx("\r\n[TDX]======B \t%d\t可%.3f\t总%.3f\t%d\tdif=%.3f\tout=%.3f", iMultiple, curMoney, curMoney + (curStocks * pfINa[i]), (int)pfDate[i] + 19000000, pfDIF1[i], pfOUT[i]);
+//						////TraceEx("\r\n[TDX]======B \t%d\t可%.3f\t总%.3f\t%d\tdif=%.3f\tout=%.3f", iMultiple, curMoney, curMoney + (curStocks * pfINa[i]), (int)pfDate[i] + 19000000, pfDIF1[i], pfOUT[i]);
 //					}
 //
 //				}
@@ -661,19 +661,19 @@ void getReal_BS(int DataLen,float* pfOUT,float* currDay,float* currTime,float* f
 //						lastBuyDate = 0;
 //						lastBuyPrice = 0;
 //						curStocks = 0;
-////						TraceEx("\r\n[TDX]======S \t%d\t可%.3f\t总%.3f\t%d", iMultiple, curMoney, curMoney + (curStocks * pfINa[i]), (int)pfDate[i] + 19000000);
-//						//TraceEx("\r\n[TDX]===SS \t%d\t可%.3f\t总%.3f\t%d\tdif=%.3f\tout=%.3f", iMultiple, curMoney, curMoney + (curStocks * pfINa[i]), (int)pfDate[i] + 19000000, pfDIF1[i], pfOUT[i]);
+////						//TraceEx("\r\n[TDX]======S \t%d\t可%.3f\t总%.3f\t%d", iMultiple, curMoney, curMoney + (curStocks * pfINa[i]), (int)pfDate[i] + 19000000);
+//						////TraceEx("\r\n[TDX]===SS \t%d\t可%.3f\t总%.3f\t%d\tdif=%.3f\tout=%.3f", iMultiple, curMoney, curMoney + (curStocks * pfINa[i]), (int)pfDate[i] + 19000000, pfDIF1[i], pfOUT[i]);
 //					}
 //				}
 //
 //				if (i == DataLen-1)
 //				{
-//					TraceEx("\r\n[TDX]===盈[%.3f%%] 次[%d] \t%d\t可%.3f\t总%.3f\t%d\tdif=%.3f\tout=%.3f", (curMoney + (curStocks * pfINa[i]) - 100000)/1000, iBS, iMultiple, curMoney, curMoney + (curStocks * pfINa[i]), (int)pfDate[i] + 19000000, pfDIF1[i], pfOUT[i]);
+//					//TraceEx("\r\n[TDX]===盈[%.3f%%] 次[%d] \t%d\t可%.3f\t总%.3f\t%d\tdif=%.3f\tout=%.3f", (curMoney + (curStocks * pfINa[i]) - 100000)/1000, iBS, iMultiple, curMoney, curMoney + (curStocks * pfINa[i]), (int)pfDate[i] + 19000000, pfDIF1[i], pfOUT[i]);
 //				}
 ////////////////////////////////////////Calc Win DONE.
 //			}
 //		}
-//		TraceEx("\r\n[TDX]=====End= \tiMultiple=%d\t%.3f", iMultiple, curMoney+(curStocks * pfINa[DataLen-1]));
+//		//TraceEx("\r\n[TDX]=====End= \tiMultiple=%d\t%.3f", iMultiple, curMoney+(curStocks * pfINa[DataLen-1]));
 //
 //		delete[] pfTmp1;
 //		delete[] pfTmp2;
@@ -711,7 +711,7 @@ void testEma(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc
 	}
 	else
 	{
-		TraceEx("Load DLL Error or DLL not exist!\n");
+		//TraceEx("Load DLL Error or DLL not exist!\n");
 	}
 
 	//if ((DataLen > 0) )
@@ -762,7 +762,7 @@ void OutputN(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc
 		{
 			if (pfINa[i] != 0.0f && pfINb[i] != 0.0f && pfINc[i] != 0.0f)
 			{
-				TraceEx("\r\n[TDX]=- \t%.3f\t%.3f\t%.3f", pfINa[i], pfINb[i], pfINc[i]);
+				//TraceEx("\r\n[TDX]=- \t%.3f\t%.3f\t%.3f", pfINa[i], pfINb[i], pfINc[i]);
 			}
 		}
 	}
@@ -776,7 +776,7 @@ void OutputP(int DataLen, float* pfOUT, float* pfINa, float* pfINb, float* pfINc
 		{
 			if (pfINa[i]!=0.0f && pfINb[i] != 0.0f && pfINc[i] != 0.0f )
 			{
-				TraceEx("\r\n[TDX]=+ \t%.3f\t%.3f\t%.3f", pfINa[i], pfINb[i], pfINc[i]);
+				//TraceEx("\r\n[TDX]=+ \t%.3f\t%.3f\t%.3f", pfINa[i], pfINb[i], pfINc[i]);
 			}
 		}
 	}
@@ -788,7 +788,7 @@ void returnMaxLost(int DataLen,float* pfOUT,float* pfINa,float* pfINb,float* pfI
 	{
 		//Log 最大回撤 fMaxLost
 		TCHAR bbb[256] = {0};
-		TraceEx("\r\n[TDX]总(%.0f_%.0f_%.0f),%2.2f～%2.2f, 价(%.3f～%.3f), 资:%.3f, 盈\t%.3f\t％|撤-%.2f％|比%.2f％, %d卖|%d盈|比%.2f％", pfINa[0], pfINb[0], pfINc[0], 190000.0+(fFirstDay/100), 190000.0+(fEndDay/100), fStartPrice, fEndPrice, fTotalAsset, fWinRate,fMaxLost, 100*fWinRate/fMaxLost, iSaleCount,iWinCount,(100.0*iWinCount/iSaleCount));
+		//TraceEx("\r\n[TDX]总(%.0f_%.0f_%.0f),%2.2f～%2.2f, 价(%.3f～%.3f), 资:%.3f, 盈\t%.3f\t％|撤-%.2f％|比%.2f％, %d卖|%d盈|比%.2f％", pfINa[0], pfINb[0], pfINc[0], 190000.0+(fFirstDay/100), 190000.0+(fEndDay/100), fStartPrice, fEndPrice, fTotalAsset, fWinRate,fMaxLost, 100*fWinRate/fMaxLost, iSaleCount,iWinCount,(100.0*iWinCount/iSaleCount));
 		//OutputDebugString(bbb);
 	}
 
@@ -847,7 +847,7 @@ void GetminFilefullPath(TCHAR * pBuf)
 		tmp = strstr(tmp, "\\")+1;
 	}
 	tmp[0] = '\0';
-	//TraceEx(pBuf);
+	////TraceEx(pBuf);
 	strcat(pBuf, "vipdoc\\sz\\minline\\sz399006.lc1");
 }
 
@@ -887,7 +887,7 @@ void dataExport1Minute(int DataLen,float* pfOUT,float* currPrice,float* curDate,
 		//转换数据格式
 		int DateToFile = convertDateToFile((int)(curDate[0]));
 		int DateInFile = 0;
-		TraceEx("[TDX]( DateToFile=%X curDate[0]=%X", DateToFile, (int)(curDate[0]));
+		//TraceEx("[TDX]( DateToFile=%X curDate[0]=%X", DateToFile, (int)(curDate[0]));
 		if (m_iLastDate == 0)
 		{
 			DateInFile = readLastDateInFile();
@@ -896,7 +896,7 @@ void dataExport1Minute(int DataLen,float* pfOUT,float* currPrice,float* curDate,
 			{	
 				//上次最后日期晚于当前数据的第一天
 				//向后翻页
-// 				TraceEx("[TDX](翻页aaa DateInFile=%X, DateToFile=%X",DateInFile, DateToFile);
+// 				//TraceEx("[TDX](翻页aaa DateInFile=%X, DateToFile=%X",DateInFile, DateToFile);
 // 				WaitCorrectActiveWnd();
 // 				::PostMessage(::GetActiveWindow(),WM_KEYDOWN,VK_NEXT,NULL);
 // 				::PostMessage(::GetActiveWindow(),WM_KEYUP,VK_NEXT,NULL);
@@ -907,7 +907,7 @@ void dataExport1Minute(int DataLen,float* pfOUT,float* currPrice,float* curDate,
 		{
 			//上次最后日期晚于当前数据的第一天
 			//向后翻页
-// 			TraceEx("[TDX](翻页bbb m_iLastDate=%X, DateToFile=%X",m_iLastDate, DateToFile);
+// 			//TraceEx("[TDX](翻页bbb m_iLastDate=%X, DateToFile=%X",m_iLastDate, DateToFile);
 // 			WaitCorrectActiveWnd();
 // 			::PostMessage(::GetActiveWindow(),WM_KEYDOWN,VK_NEXT,NULL);
 // 			::PostMessage(::GetActiveWindow(),WM_KEYUP,VK_NEXT,NULL);
@@ -927,7 +927,7 @@ void dataExport1Minute(int DataLen,float* pfOUT,float* currPrice,float* curDate,
 		fseek(pFile, 0, SEEK_END);
 		for(int i=0;i<DataLen;i++)
 		{
-			TraceEx("[TDX]( 分钟数据A： %d, %d, %f, %x\r\n", (int)(curDate[i]+19000000), (int)(currTime[i]), currPrice[i], *(int *)&currPrice[i]);
+			//TraceEx("[TDX]( 分钟数据A： %d, %d, %f, %x\r\n", (int)(curDate[i]+19000000), (int)(currTime[i]), currPrice[i], *(int *)&currPrice[i]);
 			/*
 			(int)(curDate[i]+19000000)	20170105	int
 			(int)currTime[i]			93200	int
@@ -959,14 +959,14 @@ void dataExport1Minute(int DataLen,float* pfOUT,float* currPrice,float* curDate,
 			？7143720
 			*/
 			//追加写入1分钟TDX脱机文件中
-			TraceEx("%d",fwrite(&outD , 4 , 1 , pFile)); // 
-			TraceEx("%d",fwrite(&xPrice , 4 , 1 , pFile)); // 
-			TraceEx("%d",fwrite(&xPrice , 4 , 1 , pFile)); // 
-			TraceEx("%d",fwrite(&xPrice , 4 , 1 , pFile)); // 
-			TraceEx("%d",fwrite(&xPrice , 4 , 1 , pFile)); // 
-			TraceEx("%d",fwrite(&outZero , 4 , 1 , pFile)); // 
-			TraceEx("%d",fwrite(&outZero , 4 , 1 , pFile)); // 
-			TraceEx("%d",fwrite(&outZero , 4 , 1 , pFile)); // 
+			//TraceEx("%d",fwrite(&outD , 4 , 1 , pFile)); // 
+			//TraceEx("%d",fwrite(&xPrice , 4 , 1 , pFile)); // 
+			//TraceEx("%d",fwrite(&xPrice , 4 , 1 , pFile)); // 
+			//TraceEx("%d",fwrite(&xPrice , 4 , 1 , pFile)); // 
+			//TraceEx("%d",fwrite(&xPrice , 4 , 1 , pFile)); // 
+			//TraceEx("%d",fwrite(&outZero , 4 , 1 , pFile)); // 
+			//TraceEx("%d",fwrite(&outZero , 4 , 1 , pFile)); // 
+			//TraceEx("%d",fwrite(&outZero , 4 , 1 , pFile)); // 
 		}
 		fclose(pFile); // 关闭文件  
 		if (DataLen > 0)
@@ -986,7 +986,7 @@ void dataExport1Minute(int DataLen,float* pfOUT,float* currPrice,float* curDate,
 //{
 // 	for(int i=0;i<DataLen;i++)
 // 	{
-// 		TraceEx("[TDX]( 分时数据B： %.3f, %.3f, %.3f\r\n", o, h, l);
+// 		//TraceEx("[TDX]( 分时数据B： %.3f, %.3f, %.3f\r\n", o, h, l);
 // 	}
 //}
 
@@ -1051,7 +1051,7 @@ fAction=0 表示无信号
 
 
 				float fCurPercent = ((currPrice[i] * (fStockSellable + fStockLocked))/fTotalAsset);
-				TraceEx("\r\n[TDX]( 仓位=%.2f《B [%.0f日| 价=%.2f| 限仓=%.2f| 加仓=%.2f| 资产=%.2f| 钱=%.2f| T0票=%.2f | T1票=%.2f  数据=%d ]***\r\n", fCurPercent, currDay[i], currPrice[i], fMaxPercent, fBuyPercent, fTotalAsset, fMoney, fStockSellable, fStockLocked, DataLen);
+				//TraceEx("\r\n[TDX]( 仓位=%.2f《B [%.0f日| 价=%.2f| 限仓=%.2f| 加仓=%.2f| 资产=%.2f| 钱=%.2f| T0票=%.2f | T1票=%.2f  数据=%d ]***\r\n", fCurPercent, currDay[i], currPrice[i], fMaxPercent, fBuyPercent, fTotalAsset, fMoney, fStockSellable, fStockLocked, DataLen);
 				if ((fMaxPercent - fCurPercent) >= 0.01)
 				{
 					float fNeedMoney = 0;
@@ -1077,7 +1077,7 @@ fAction=0 表示无信号
 					}//余钱=0
 				} 
 				fCurPercent = ((currPrice[i] * (fStockSellable + fStockLocked))/fTotalAsset);
-				TraceEx("\r\n[TDX]( 仓位=%.2f B》[%.0f日| 价=%.2f| 限仓=%.2f| 加仓=%.2f| 资产=%.2f| 钱=%.2f| T0票=%.2f | T1票=%.2f  数据=%d ]***\r\n", fCurPercent, currDay[i], currPrice[i], fMaxPercent, fBuyPercent, fTotalAsset, fMoney, fStockSellable, fStockLocked, DataLen);
+				//TraceEx("\r\n[TDX]( 仓位=%.2f B》[%.0f日| 价=%.2f| 限仓=%.2f| 加仓=%.2f| 资产=%.2f| 钱=%.2f| T0票=%.2f | T1票=%.2f  数据=%d ]***\r\n", fCurPercent, currDay[i], currPrice[i], fMaxPercent, fBuyPercent, fTotalAsset, fMoney, fStockSellable, fStockLocked, DataLen);
 			}
 			else if (fAction[i] < 0)//卖出信号
 			{
@@ -1089,7 +1089,7 @@ fAction=0 表示无信号
 					fSellPercent = (float)((int)(fSellPercent*1000)%1000)/100;//本次仓位百分比
 
 					float fCurPercent = ((currPrice[i] * (fStockSellable + fStockLocked))/fTotalAsset);
-					TraceEx("\r\n[TDX]( 仓位=%.2f【S [%.0f日| 价=%.2f| 限仓=%.2f| 加仓=%.2f| 资产=%.2f| 钱=%.2f| T0票=%.2f | T1票=%.2f  数据=%d ]***\r\n", fCurPercent, currDay[i], currPrice[i], fMaxPercent, fSellPercent, fTotalAsset, fMoney, fStockSellable, fStockLocked, DataLen);
+					//TraceEx("\r\n[TDX]( 仓位=%.2f【S [%.0f日| 价=%.2f| 限仓=%.2f| 加仓=%.2f| 资产=%.2f| 钱=%.2f| T0票=%.2f | T1票=%.2f  数据=%d ]***\r\n", fCurPercent, currDay[i], currPrice[i], fMaxPercent, fSellPercent, fTotalAsset, fMoney, fStockSellable, fStockLocked, DataLen);
 
 					//卖出仓位百分比fSellPercent
 					float fNeedStock = (fSellPercent * fTotalAsset)/currPrice[i];
@@ -1108,16 +1108,16 @@ fAction=0 表示无信号
 					}//可卖票=0
 
 					fCurPercent = ((currPrice[i] * (fStockSellable + fStockLocked))/fTotalAsset);
-					TraceEx("\r\n[TDX]( 仓位=%.2f S】[%.0f日| 价=%.2f| 限仓=%.2f| 加仓=%.2f| 资产=%.2f| 钱=%.2f| T0票=%.2f | T1票=%.2f  数据=%d ]***\r\n", fCurPercent, currDay[i], currPrice[i], fMaxPercent, fSellPercent, fTotalAsset, fMoney, fStockSellable, fStockLocked, DataLen);
+					//TraceEx("\r\n[TDX]( 仓位=%.2f S】[%.0f日| 价=%.2f| 限仓=%.2f| 加仓=%.2f| 资产=%.2f| 钱=%.2f| T0票=%.2f | T1票=%.2f  数据=%d ]***\r\n", fCurPercent, currDay[i], currPrice[i], fMaxPercent, fSellPercent, fTotalAsset, fMoney, fStockSellable, fStockLocked, DataLen);
 				} 
 				else
 				{
-					TraceEx("\r\n[TDX]( 仓位=0 [S][%.0f日| 价=%.2f| 资产=%.2f| 钱=%.2f| T0票=%.2f | T1票=%.2f  数据=%d ]***\r\n", currDay[i], currPrice[i], fTotalAsset, fMoney, fStockSellable, fStockLocked, DataLen);
+					//TraceEx("\r\n[TDX]( 仓位=0 [S][%.0f日| 价=%.2f| 资产=%.2f| 钱=%.2f| T0票=%.2f | T1票=%.2f  数据=%d ]***\r\n", currDay[i], currPrice[i], fTotalAsset, fMoney, fStockSellable, fStockLocked, DataLen);
 				}
 			}
 			else
 			{
-				//TraceEx("\r\n[TDX]( 仓位控制[ 总=%f| 钱=%f| 可卖票=%f | 不可卖=%f \r\n", fTotalAsset, fMoney, fStockSellable, fStockLocked);
+				////TraceEx("\r\n[TDX]( 仓位控制[ 总=%f| 钱=%f| 可卖票=%f | 不可卖=%f \r\n", fTotalAsset, fMoney, fStockSellable, fStockLocked);
 				//计算最大回撤 fMaxLost
 				if (pfOUT[i] > fHighWin)
 				{
@@ -1308,7 +1308,7 @@ std::string BroadcastPing(const char* bcIP, u_short uPort, string sProjectName =
 			//zlog_info(ZLOGP, "BroadcastPing... sendto() IP=%s:%d", bcIP, uPort);
 		int ret = sendto(sock, msg.c_str(), msg.length()/*strlen(msg)*/, 0, (sockaddr*)&addrto, nlen);//向广播地址发布消息
 
-		TraceEx("bcIP = \"%s\"\r\n", bcIP);
+		//TraceEx("bcIP = \"%s\"\r\n", bcIP);
 
 		if (ret < 0)
 		{
@@ -1418,7 +1418,7 @@ void Thread_UDP_PingPong(LPVOID Para)
 {
 	while (true)
 	{
-		TraceEx("TDX Thread_UDP_PingPong");
+		//TraceEx("TDX Thread_UDP_PingPong");
 		//GoListenUDP();
 		Sleep(200);
 	}
@@ -1474,7 +1474,7 @@ string UDP_BC_Ping(int uPort)
 					//pAI->strBroadcastIp = inet_ntoa(broadcast);
 
 					cout << "BroadcastIp:	" << inet_ntoa(broadcast) << endl;
-					TraceEx("BroadcastPing:	%s	", inet_ntoa(broadcast));
+					//TraceEx("BroadcastPing:	%s	", inet_ntoa(broadcast));
 
 					sPong = BroadcastPing(inet_ntoa(broadcast), uPort);
 
@@ -1749,7 +1749,7 @@ int TCP_RcvFile(int uPort, std::string sFName)
 			return 0;
 		}
 		//等待客户端请求到来
-		TraceEx("LoaderX==> 如果此处一直等待连接，请检查本机防火墙！ 客户机ip：%s", sOK.c_str());
+		//TraceEx("LoaderX==> 如果此处一直等待连接，请检查本机防火墙！ 客户机ip：%s", sOK.c_str());
 		SOCKET sockConn = accept(sockServer, (SOCKADDR*)&addrClient, &len);
 		if (sockConn == INVALID_SOCKET) {
 			printf("accept() called failed! The error code is: %d\n", WSAGetLastError());
@@ -1758,7 +1758,7 @@ int TCP_RcvFile(int uPort, std::string sFName)
 			printf("The server receive a new client connection!\n");
 		}
 
-		TraceEx("LoaderX==> %s 来自：%s 的连接", sFName.c_str(), inet_ntoa(addrClient.sin_addr));
+		//TraceEx("LoaderX==> %s 来自：%s 的连接", sFName.c_str(), inet_ntoa(addrClient.sin_addr));
 
 		//char sendBuf[100];
 		//sprintf_s(sendBuf, 100, "Welcome %s", inet_ntoa(addrClient.sin_addr));
@@ -1800,7 +1800,7 @@ HANDLE hThread_TCP2Trader = INVALID_HANDLE_VALUE;
 
 void TCP2Trader(int DataLen,float* pfOUT,float* pfINa,float* pfINb,float* pfINc)
 {
-	TraceEx("TCP2Trader");
+	//TraceEx("TCP2Trader");
 
 	if (INVALID_HANDLE_VALUE == hThread_TCP2Trader)
 	{
