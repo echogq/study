@@ -17,8 +17,9 @@ static char THIS_FILE[] = __FILE__;
 #include<string.h>
 #include<time.h>
 #include <ws2tcpip.h>
-#include <..\..\..\..\..\VS2013\VC\include\iostream>
+#include <iostream>
 #include "../Common/Common.h"
+#include "../TdxPluginTCale/StdAfx.h"
 
 #define AUTO_OPEN_ALL "..\\Script\\Auto_OpenAll.exe"
 
