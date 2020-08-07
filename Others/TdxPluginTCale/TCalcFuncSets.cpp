@@ -7,8 +7,16 @@
 #include<string>
 #include<sstream>
 //#include "winsock.h"
+
+//#define __MYSQL
+#ifdef __MYSQL
 #include "mysql.h"//头文件顺序不能颠倒
+#endif
+
 #include <iostream>
+#include "Winsock2.h"
+#include "windows.h"
+
 #include <ws2ipdef.h>
 #include <ws2tcpip.h>
 #include <iptypes.h>
@@ -18,7 +26,9 @@
 #pragma comment(lib, "Ws2_32.lib")
 #pragma comment(lib, "Iphlpapi.lib")
 
+#ifdef __MYSQL
 MYSQL mysql; //数据库连接句柄
+#endif
 BOOL bConnectMysql = FALSE;
 using namespace std;
 
@@ -90,6 +100,7 @@ void OnScreenfont(char* szBuffer, int x, int y, COLORREF newClr)
 //1、连接mysql
 int ConnectMysql(LPCTSTR sip,LPCTSTR suser,LPCTSTR spass,LPCTSTR sdbname,int sport)
 {
+#ifdef __MYSQL
 	if( mysql_init(&mysql) == NULL )
 	{
 		::OutputDebugString("初始化mysql失败!");
@@ -106,11 +117,13 @@ int ConnectMysql(LPCTSTR sip,LPCTSTR suser,LPCTSTR spass,LPCTSTR sdbname,int spo
 		//Trace2Logger("数据库连接成功");
 		return TRUE;
 	}
+#endif
 }
 
 BOOL bLastData = FALSE;
 void ShowTable(float* fOut, float a1,float a2,float a3,float a4 )
 {
+#ifdef __MYSQL
 	//显示数据
 	MYSQL_RES *result=NULL;
 	//if(0==mysql_query(&mysql,"SELECT * FROM stock.399006_1min LIMIT 0, 100"))
@@ -208,6 +221,7 @@ min4a=floor(round(-0.49,2)*2)/2;
 	}
 	//OutputDebugString("111Done*********");
 
+#endif
 }
 
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) 
@@ -1873,6 +1887,7 @@ void Test99(int DataLen,float* pfOUT,float* pfINa,float* pfINb,float* pfINc)
 
 void QueryDB(int DataLen,float* pfOUT,float* pfINa,float* pfINb,float* pfINc)
 {
+#ifdef __MYSQL
 	if (bConnectMysql == FALSE)
 	{
 		bConnectMysql = ConnectMysql("127.0.0.1", "root", "admin777", "stock", 3306);
@@ -1898,6 +1913,7 @@ void QueryDB(int DataLen,float* pfOUT,float* pfINa,float* pfINb,float* pfINc)
 		}
 	}	
 	//mysql_close(&mysql);//最好写到OnDestroy()函数中
+#endif
 
 }
 //加载的函数

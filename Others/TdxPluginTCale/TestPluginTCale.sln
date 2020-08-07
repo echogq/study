@@ -1,17 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestPluginTCale", "TestPluginTCale.vcxproj", "{0449DD5D-26A0-4D1A-A6C2-A89DBEEFB15C}"
-EndProject
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MFCAppDbg", "..\MFCAppDbg\MFCAppDbg.vcxproj", "{ED028B5A-7E1A-4394-8202-EF8ED282BDBC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TcAPI", "E:\Dev\GitHub\study\Others\TcAPI\TcAPI.vcxproj", "{C17AC67E-CAAC-4D11-A2ED-896D77DF5962}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TcAPI", "..\TcAPI\TcAPI.vcxproj", "{C17AC67E-CAAC-4D11-A2ED-896D77DF5962}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "profapi_TDX", "E:\Dev\GitHub\study\testApi_TDX\profapi.vcxproj", "{6D7CA939-DF5C-4888-A583-0AA80C42F277}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "profapi_TDX", "..\testApi_TDX\profapi.vcxproj", "{6D7CA939-DF5C-4888-A583-0AA80C42F277}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Auto_TDXBuy", "E:\Dev\GitHub\study\Others\Auto_TDXBuy\Auto_TDXBuy.vcxproj", "{F636F1B3-E778-42FD-9EFA-A25BB4367CE6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Auto_TDXBuy", "..\Auto_TDXBuy\Auto_TDXBuy.vcxproj", "{F636F1B3-E778-42FD-9EFA-A25BB4367CE6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AutoTrade", "..\AutoTrade\AutoTrade.vcxproj", "{21743627-65B7-4501-8124-860E429E2217}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestPluginTCale", "TestPluginTCale.vcxproj", "{4C35986A-09F6-48B2-9190-5100038DE117}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,12 +23,6 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0449DD5D-26A0-4D1A-A6C2-A89DBEEFB15C}.Debug|Win32.ActiveCfg = Debug|Win32
-		{0449DD5D-26A0-4D1A-A6C2-A89DBEEFB15C}.Debug|Win32.Build.0 = Debug|Win32
-		{0449DD5D-26A0-4D1A-A6C2-A89DBEEFB15C}.Debug|x64.ActiveCfg = Debug|Win32
-		{0449DD5D-26A0-4D1A-A6C2-A89DBEEFB15C}.Release|Win32.ActiveCfg = Release|Win32
-		{0449DD5D-26A0-4D1A-A6C2-A89DBEEFB15C}.Release|Win32.Build.0 = Release|Win32
-		{0449DD5D-26A0-4D1A-A6C2-A89DBEEFB15C}.Release|x64.ActiveCfg = Release|Win32
 		{ED028B5A-7E1A-4394-8202-EF8ED282BDBC}.Debug|Win32.ActiveCfg = Debug|Win32
 		{ED028B5A-7E1A-4394-8202-EF8ED282BDBC}.Debug|Win32.Build.0 = Debug|Win32
 		{ED028B5A-7E1A-4394-8202-EF8ED282BDBC}.Debug|x64.ActiveCfg = Debug|x64
@@ -63,6 +59,14 @@ Global
 		{21743627-65B7-4501-8124-860E429E2217}.Release|Win32.ActiveCfg = Release|Win32
 		{21743627-65B7-4501-8124-860E429E2217}.Release|Win32.Build.0 = Release|Win32
 		{21743627-65B7-4501-8124-860E429E2217}.Release|x64.ActiveCfg = Release|Win32
+		{4C35986A-09F6-48B2-9190-5100038DE117}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4C35986A-09F6-48B2-9190-5100038DE117}.Debug|Win32.Build.0 = Debug|Win32
+		{4C35986A-09F6-48B2-9190-5100038DE117}.Debug|x64.ActiveCfg = Debug|x64
+		{4C35986A-09F6-48B2-9190-5100038DE117}.Debug|x64.Build.0 = Debug|x64
+		{4C35986A-09F6-48B2-9190-5100038DE117}.Release|Win32.ActiveCfg = Release|Win32
+		{4C35986A-09F6-48B2-9190-5100038DE117}.Release|Win32.Build.0 = Release|Win32
+		{4C35986A-09F6-48B2-9190-5100038DE117}.Release|x64.ActiveCfg = Release|x64
+		{4C35986A-09F6-48B2-9190-5100038DE117}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
