@@ -15,25 +15,30 @@ const int MAX_BUF_LEN = 4096;
 
 void TraceEx(const wchar_t *strOutputString, ...)
 {
+	wchar_t strBuffer[4096] = L"\r\n[TDX] ";
+	int iPreLen = wcslen(strBuffer);
+
 	va_list vlArgs = NULL;
 	va_start(vlArgs, strOutputString);
-	size_t nLen = _vscwprintf(strOutputString, vlArgs) + 1;
-	wchar_t *strBuffer = new wchar_t[nLen];
-	_vsnwprintf_s(strBuffer, nLen, nLen, strOutputString, vlArgs);
+	size_t nLen = _vscwprintf(strOutputString, vlArgs) + iPreLen + 1;
+	//wchar_t *strBuffer = new wchar_t[nLen];
+	_vsnwprintf_s(strBuffer + iPreLen, nLen, nLen, strOutputString, vlArgs);
 	va_end(vlArgs);
 	OutputDebugStringW(strBuffer);
-	delete[] strBuffer;
+//	delete[] strBuffer;
 }
 
 void TraceEx(const char *strOutputString, ...)
 {
-	char strBuffer[4096] = { 0 };
-	memset(strBuffer, 0, 4096);
+	char strBuffer[4096] = "\r\n[TDX] ";
+	int iPreLen = strlen(strBuffer);
+
 	va_list vlArgs = NULL;
 	va_start(vlArgs, strOutputString);
-	size_t nLen = _vscprintf(strOutputString, vlArgs) + 1 + 8;
-	strcpy(strBuffer, "\r\n[TDX] ");
-	_vsnprintf_s(strBuffer + 8, nLen, nLen, strOutputString, vlArgs);
+	size_t nLen = _vscprintf(strOutputString, vlArgs) + iPreLen + 1;
+	//char *strBuffer = new char[nLen];
+	//strcpy(strBuffer, "[TDX] ");
+	_vsnprintf_s(strBuffer + iPreLen, nLen, nLen, strOutputString, vlArgs);
 	va_end(vlArgs);
 	OutputDebugStringA(strBuffer);
 	//delete[] strBuffer;
