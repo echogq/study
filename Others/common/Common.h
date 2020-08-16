@@ -7,6 +7,10 @@
 #include <sstream>
 #include<set>
 #include <list>
+#include <iostream>
+#include <fstream>
+#include <cassert>
+#include <string>
 
 using std::random_shuffle;
 using std::vector;
@@ -151,4 +155,25 @@ void FindClickRefresh(HWND hSubWnd)
 	}
 }
 
+//逐行读取
+string readTxt(string file)
+{
+	if (file.length() == 0)
+	{
+		return "";
+	}
+	ifstream infile;
+	infile.open(file.data());   //将文件流对象与文件连接起来 
+	assert(infile.is_open());   //若失败,则输出错误消息,并终止程序运行 
+
+	string s,sOut;
+	while (getline(infile, s))
+	{
+		//cout << s << endl;
+		sOut += s;
+		sOut += "\r\n";
+	}
+	infile.close();             //关闭文件输入流 
+	return sOut;
+}
 
