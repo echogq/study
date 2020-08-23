@@ -111,7 +111,7 @@ void CClipboard_MonDlg::OnDrawClipboard()
 
 	// TODO: 在此处添加消息处理程序代码
 	//Sleep(100);
-	string sDone = readTxt("z:\\downX.ini");
+	string sDone = readTxt("D:\\My_Data\\downX.ini");
 
 	::OpenClipboard(GetSafeHwnd());
 
@@ -154,7 +154,7 @@ void CClipboard_MonDlg::OnDrawClipboard()
 			//return;
 		}
 
-		m_sCMD = "ffmpeg -i \"" + sUrl + "\" -c copy \"z:\\" + sMp4Name + ".mkv\" > z:\\cmdlog.txt";
+		m_sCMD = "ffmpeg -i \"" + sUrl + "\" -c copy \"z:\\" + sMp4Name + ".mkv\" ";
 
 		TRACE("\r\n%s\r\n", m_sCMD);
 		UpdateData(FALSE);
