@@ -39,4 +39,7 @@ public:
 	CString m_sCMD;
 	CStatic m_InDoneList;
 	CButton m_OK;
+	CString m_sName;
+	CString m_smmUrl;
+	afx_msg void OnBnClickedOk2();
 };

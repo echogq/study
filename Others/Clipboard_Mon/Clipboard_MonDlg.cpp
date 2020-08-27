@@ -20,6 +20,8 @@
 CClipboard_MonDlg::CClipboard_MonDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_CLIPBOARD_MON_DIALOG, pParent)
 	, m_sCMD(_T(""))
+	, m_sName(_T(""))
+	, m_smmUrl(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -30,6 +32,8 @@ void CClipboard_MonDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT1, m_sCMD);
 	DDX_Control(pDX, IDC_STATIC2, m_InDoneList);
 	DDX_Control(pDX, IDOK, m_OK);
+	DDX_Text(pDX, IDC_EDIT2, m_sName);
+	DDX_Text(pDX, IDC_EDIT3, m_smmUrl);
 }
 
 BEGIN_MESSAGE_MAP(CClipboard_MonDlg, CDialogEx)
@@ -39,6 +43,7 @@ BEGIN_MESSAGE_MAP(CClipboard_MonDlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CClipboard_MonDlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDCANCEL, &CClipboard_MonDlg::OnBnClickedCancel)
 	ON_BN_CLICKED(IDABORT, &CClipboard_MonDlg::OnBnClickedAbort)
+	ON_BN_CLICKED(IDOK2, &CClipboard_MonDlg::OnBnClickedOk2)
 END_MESSAGE_MAP()
 
 
@@ -155,6 +160,8 @@ void CClipboard_MonDlg::OnDrawClipboard()
 		}
 
 		m_sCMD = "ffmpeg -i \"" + sUrl + "\" -c copy \"z:\\" + sMp4Name + ".mkv\" ";
+		m_sName = sMp4Name;
+		m_smmUrl = sUrl;
 
 		TRACE("\r\n%s\r\n", m_sCMD);
 		UpdateData(FALSE);
@@ -197,4 +204,12 @@ void CClipboard_MonDlg::OnBnClickedAbort()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	this->ShowWindow(SW_HIDE);
+}
+
+
+void CClipboard_MonDlg::OnBnClickedOk2()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	UpdateData(TRUE);
+	//UDP BC the Url and Name
 }
