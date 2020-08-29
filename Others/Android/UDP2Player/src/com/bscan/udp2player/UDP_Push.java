@@ -154,7 +154,7 @@ public class UDP_Push  extends Activity {
     public void init() {
         setContentView(R.layout.activity_main);
         
-        TextView00 = (TextView) findViewById(R.id.result);
+        TextView00 = (TextView) findViewById(R.id.TextView00);
         TextView01 = (TextView) findViewById(R.id.TextView01);
         
         TextView00.setOnClickListener(new View.OnClickListener() {
@@ -212,7 +212,7 @@ public class UDP_Push  extends Activity {
             e.printStackTrace();
         }
     }
-    private String intToIp(int i) {
+    private String int2IP(int i) {
  
         return (i & 0xFF ) + "." +
                 ((i >> 8 ) & 0xFF) + "." +
@@ -250,7 +250,7 @@ public class UDP_Push  extends Activity {
 		    }
 		    WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 		    int ipAddress = wifiInfo.getIpAddress();
-		    String ip = intToIp(ipAddress);
+		    String ip = int2IP(ipAddress);
  
 
 		    //String sendData=ip+formatedDate;

@@ -10,6 +10,8 @@ import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -60,12 +62,15 @@ public class MainActivity extends Activity implements Runnable{
     private MulticastSocket ds;
     String multicastHost="224.0.0.1";
     InetAddress receiveAddress;
-    TextView result;
+    TextView TextView00;
     public static String sRcvUDPData="";
     Handler mHandler;
 	TcpServer m3u8Server;
+	private SharedPreferences iniPreferences;
+	private Editor iniEditor;
 	private static Button sendUDPBrocast1;
-    public final static String EXTRA_MESSAGE = "com.bscan.udp2player.MESSAGE";
+ 	private static Button sendUDPBrocast2;
+   public final static String EXTRA_MESSAGE = "com.bscan.udp2player.MESSAGE";
 	protected static final int MAX_THREADS = 1;
     public static final int MAX_BLOCKs = 30;
 
@@ -151,12 +156,37 @@ public class MainActivity extends Activity implements Runnable{
          }
     }
     
+    class SendUDPBrocastListener2 implements View.OnClickListener {
+ 
+        @Override
+        public void onClick(View v) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                	Thread.currentThread().setName("===onClick2"); 
+                	
+                    String sNNN = "lastUrl."+(iniPreferences.getAll().size()-1);
+                    String sLastUrl = iniPreferences.getString(sNNN, "");
+                    if(sLastUrl.length() > 0){
+                    	openIntent(sLastUrl);
+                    }
+
+               }
+            }).start();
+         }
+    }
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mContext = getApplicationContext();
-      
+  
+        //获得对象preferences，创建文件及其属性（这里设置为可追加的属性）
+        iniPreferences=getSharedPreferences("lastUrl", MODE_APPEND);
+        //编辑器
+        iniEditor=iniPreferences.edit();
+        
         new Thread() {
         	@Override
         	public void run() {
@@ -167,7 +197,10 @@ public class MainActivity extends Activity implements Runnable{
         
         sendUDPBrocast1 = (Button) findViewById(R.id.sendd);
         sendUDPBrocast1.setOnClickListener(new SendUDPBrocastListener1());
- 
+
+        sendUDPBrocast2 = (Button) findViewById(R.id.sendd2);
+        sendUDPBrocast2.setOnClickListener(new SendUDPBrocastListener2());
+
         mHandler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(Message msg) {
@@ -175,7 +208,7 @@ public class MainActivity extends Activity implements Runnable{
             }
         });
  
-        result  =(TextView)findViewById(R.id.result);
+        TextView00  =(TextView)findViewById(R.id.TextView00);
         
         try {
             ds = new MulticastSocket(8003);
@@ -187,6 +220,12 @@ public class MainActivity extends Activity implements Runnable{
             e1.printStackTrace();
         }
         
+        String sNNN = "lastUrl."+(iniPreferences.getAll().size()-1);
+        String sLastUrl = this.iniPreferences.getString(sNNN, "");
+        if(sLastUrl.length() > 0){
+        	((Button) findViewById(R.id.sendd2)).setText(sLastUrl);
+        }
+
         new Thread() {
         	@Override
         	public void run() {
@@ -213,57 +252,61 @@ public class MainActivity extends Activity implements Runnable{
                     //Toast.makeText(getApplicationContext(), "1. FoundPackage:" + getRunningApk(packageName), Toast.LENGTH_SHORT).show();  
                     
                     //while(getRunningApk(packageName).length() > 0)
-                    while(true)
-                    {
-                        //Toast.makeText(getApplicationContext(), "killBackgroundProcesses" + packageName, Toast.LENGTH_SHORT).show();  
-        	            //Toast.makeText(getApplicationContext(), "3. FoundPackage:" + getRunningApk(packageName), Toast.LENGTH_SHORT).show();  
-                   	try{
-                    	    Thread.sleep(300);
-                    	}catch (Exception e ){
+				while (true) {
+					// Toast.makeText(getApplicationContext(),
+					// "killBackgroundProcesses" + packageName,
+					// Toast.LENGTH_SHORT).show();
+					// Toast.makeText(getApplicationContext(),
+					// "3. FoundPackage:" + getRunningApk(packageName),
+					// Toast.LENGTH_SHORT).show();
+					try {
+						Thread.sleep(300);
+					} catch (Exception e) {
 
-                    	}
-                   	
-                    String packageName = "com.mitv.mivideoplayer";
-                    //private void killApp(String packageName) {
-                       // ActivityManager am = (ActivityManager)getApplicationContext().getSystemService(ACTIVITY_SERVICE);
-                        //Log.d("aaa", "Trying to kill app " + packageName);
-                        
-                        ActivityManager am=(ActivityManager) getSystemService(ACTIVITY_SERVICE);  
-                        //am.killBackgroundProcesses(packageName);  
-     
-                    }
-        	        }
-        	   }.start();
-        	   
-//注册系统剪切板的监听器事件，当剪切板数据发生变化的时候，就能获取到剪切板的数据
-        	   final ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        	   clipboardManager.addPrimaryClipChangedListener(new ClipboardManager.OnPrimaryClipChangedListener()
-        	   {
-        	       @Override
-        	   	public void onPrimaryClipChanged()
-        	       {
-        	           ClipData.Item itemAt = clipboardManager.getPrimaryClip().getItemAt(0);
-        	           Log.e("监听到剪切板中的内容:",itemAt.getText().toString());
-        	           
-       				Intent intent = new Intent();
-    				intent.setClass(MainActivity.this, UDP_Push.class);  //从IntentActivity跳转到SubActivity
-    				intent.putExtra("name", "xiazdong");  //放入数据
+					}
 
+					String packageName = "com.mitv.mivideoplayer";
+					// private void killApp(String packageName) {
+					// ActivityManager am =
+					// (ActivityManager)getApplicationContext().getSystemService(ACTIVITY_SERVICE);
+					// Log.d("aaa", "Trying to kill app " + packageName);
 
-//        	           UDP_Push sss;
-//        	           Intent intent = new Intent(getApplicationContext(), UDP_Push.class);
-        	           intent.setAction(Intent.ACTION_SEND);
-        	           intent.setType("http");
-        	           String message = itemAt.getText().toString();
-        	           intent.setData(Uri.parse(message));
-        	           //intent.putExtra(EXTRA_MESSAGE, message);
-       				startActivity(intent);  //开始跳转
-       				moveToFront();
-       				
-        	       }
-        	   });
-    }
- 
+					ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+					// am.killBackgroundProcesses(packageName);
+
+				}
+			}
+		}.start();
+
+		// 注册系统剪切板的监听器事件，当剪切板数据发生变化的时候，就能获取到剪切板的数据
+		final ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+		clipboardManager
+				.addPrimaryClipChangedListener(new ClipboardManager.OnPrimaryClipChangedListener() {
+					@Override
+					public void onPrimaryClipChanged() {
+						ClipData.Item itemAt = clipboardManager
+								.getPrimaryClip().getItemAt(0);
+						Log.e("监听到剪切板中的内容:", itemAt.getText().toString());
+
+						Intent intent = new Intent();
+						intent.setClass(MainActivity.this, UDP_Push.class); // 从IntentActivity跳转到SubActivity
+						intent.putExtra("name", "xiazdong"); // 放入数据
+
+						// UDP_Push sss;
+						// Intent intent = new Intent(getApplicationContext(),
+						// UDP_Push.class);
+						intent.setAction(Intent.ACTION_SEND);
+						intent.setType("http");
+						String message = itemAt.getText().toString();
+						intent.setData(Uri.parse(message));
+						// intent.putExtra(EXTRA_MESSAGE, message);
+						startActivity(intent); // 开始跳转
+						moveToFront();
+
+					}
+				});
+	}
+
     //@TargetApi(11)
     protected void moveToFront() {
         if (Build.VERSION.SDK_INT >= 11) { // honeycomb
@@ -283,13 +326,13 @@ public class MainActivity extends Activity implements Runnable{
         }
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-// 这是前提——你的app至少运行了一个service。这里表示当进程不在前台时，马上开启一个service
-        Intent intent = new Intent(this, MyService.class);
-        startService(intent);
-    }
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//// 这是前提——你的app至少运行了一个service。这里表示当进程不在前台时，马上开启一个service
+//        Intent intent = new Intent(this, MyService.class);
+//        startService(intent);
+//    }
 
 	public static Response okGetUrl(String url2) {
 		if(okHttpClientG == null)
@@ -447,8 +490,9 @@ public class MainActivity extends Activity implements Runnable{
         //intent.putExtra("data", setData());
         mediaIntent.setPackage("com.mxtech.videoplayer.pro");
         
-        startActivity(mediaIntent);
-        
+        if (mediaIntent.resolveActivity(getPackageManager()) != null) {
+        	startActivity(mediaIntent);
+        }
 //        String[] headers = {
 //        		"User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.99 Safari/537.36",
 //        		"Referer", "https://vidcloud.icu"};
@@ -466,7 +510,7 @@ public class MainActivity extends Activity implements Runnable{
 		public void run()
 		{
 			((Button) findViewById(R.id.sendd)).setText(url);
-			((Button) findViewById(R.id.sendd)).setWidth(((Button) findViewById(R.id.sendd)).getMeasuredWidth());
+			//((Button) findViewById(R.id.sendd)).setWidth(((Button) findViewById(R.id.sendd)).getMeasuredWidth());
 		}
 		});
 	}
@@ -643,8 +687,8 @@ public class MainActivity extends Activity implements Runnable{
     @Override
     public void run() {
     	Thread.currentThread().setName("===receive(dp)"); 
-        byte buf[] = new byte[1024];
-        DatagramPacket dp = new DatagramPacket(buf, 1024);
+        byte buf[] = new byte[4096];
+        DatagramPacket dp = new DatagramPacket(buf, 4096);
         while (true) {
             try {
                 ds.receive(dp);
@@ -656,10 +700,15 @@ public class MainActivity extends Activity implements Runnable{
                     @Override
                     public void run() {
                     	Thread.currentThread().setName("===sRcvUDPData"); 
-                        result.setText(sRcvUDPData+"<>");
+                        TextView00.setText(sRcvUDPData+"<>");
                         
                         //String url = "https://www.baidu.com/1.m3u8?plplp=899";//示例，实际填你的网络视频链接
                         String url = sRcvUDPData;//"http://www.baidu.com/1.m3u8";//示例，实际填你的网络视频链接
+                        
+                        iniEditor.putString("lastUrl."+iniPreferences.getAll().size(), url);
+                        iniEditor.commit();
+                        //iniEditor.clear();
+                        //Toast.makeText(MainActivity.this,"已保存:"+"lastUrl."+(iniPreferences.getAll().size()-1),Toast.LENGTH_SHORT).show();
                         
                 		new Thread() {
                         	String sUrl;

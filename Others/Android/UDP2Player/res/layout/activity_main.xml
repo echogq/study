@@ -14,7 +14,7 @@
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:layout_alignParentTop="true"
-         android:layout_alignRight="@+id/result"
+         android:layout_alignRight="@+id/TextView00"
          android:text="发至TV播" />
 
      <Button
@@ -26,18 +26,26 @@
          android:text="=======================测试=======================" />
 
      <Button
+         android:id="@+id/sendd2"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_below="@+id/sendd"
+         android:layout_centerHorizontal="true"
+         android:text="=======================测试2=======================" />
+
+     <Button
          android:id="@+id/senddd"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:layout_alignParentTop="true"
-         android:layout_alignLeft="@+id/result"
+         android:layout_alignLeft="@+id/TextView00"
          android:text="发至TV播2" />
      
      <TextView
-         android:id="@+id/result"
+         android:id="@+id/TextView00"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:layout_below="@+id/send"
+         android:layout_below="@+id/sendd2"
          android:layout_marginTop="16dp"
          android:text="Hello World!" />
 
@@ -45,7 +53,7 @@
          android:id="@+id/TextView01"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
-         android:layout_alignLeft="@+id/result"
+         android:layout_alignLeft="@+id/TextView00"
          android:layout_centerVertical="true"
          android:text="Hello World!" />
 
